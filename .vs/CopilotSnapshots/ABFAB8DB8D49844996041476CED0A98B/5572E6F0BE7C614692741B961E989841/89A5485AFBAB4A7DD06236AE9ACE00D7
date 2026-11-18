@@ -1,0 +1,925 @@
+﻿# Kiến Trúc Backend & Chức Năng Ngoài CRUD
+
+## 📋 Tổng Quan
+
+Hệ thống backend bao gồm nhiều chức năng nâng cao vượt ra ngoài các hoạt động CRUD tiêu chuẩn. Tài liệu này mô tả chi tiết các thành phần kiến trúc chính và luồng làm việc của chúng.
+
+---
+
+## 1. 🔐 Bảo Mật & Xác Thực
+
+### 1.1 Dịch Vụ Xác Thực Bảo Mật
+
+**File:** `Infrastructure\Security\SecureAuthenticationService.cs`
+
+**Mục đích:** Quản lý xác thực người dùng với các biện pháp bảo mật tiên tiến
+
+**Luồng công việc:**
+
+```
+Yêu cầu đăng nhập từ người dùng
+    ↓
+1. Xác thực thông tin đăng nhập (tên đăng nhập + mật khẩu)
+    ↓
+2. Kiểm tra tài khoản có bị khóa (bảng AccountLockout)
+    ├─ Nếu bị khóa → Trả về false
+    ├─ Nếu không bị khóa → Tiếp tục
+    ↓
+3. Xác minh mật khẩu so với hash (PBKDF2-SHA256)
+    ├─ Nếu sai → Tăng số lần thất bại
+    ├─ Nếu sai → Ghi lại nỗ lực & trả về false
+    ↓
+4. Kiểm tra người dùng đã được xác minh (cờ IsVerified)
+    ├─ Nếu chưa → Trả về false
+    ↓
+5. Đặt lại bộ đếm nỗ lực đăng nhập thất bại
+    ↓
+6. Tạo Claims Bảo Mật
+    ├─ ID người dùng, Tên đăng nhập, Email
+    ├─ Họ tên, Vai trò
+    ├─ Địa chỉ IP, Thời gian đăng nhập
+    ↓
+7. Tạo FormsAuthenticationTicket
+    ├─ Mã hóa ticket
+    ├─ Đặt cờ HttpOnly (JavaScript không thể truy cập)
+    ├─ Đặt cờ Secure (chỉ HTTPS)
+    ├─ Đặt SameSite=Strict (bảo vệ CSRF)
+    ├─ Đặt hết hạn (7 ngày nếu RememberMe, 30 phút theo mặc định)
+    ↓
+8. Ghi lại nỗ lực đăng nhập thành công
+    ↓
+9. Trả về true & Chuyển hướng đến bảng điều khiển
+```
+
+**Các tính năng chính:**
+- Khóa tài khoản sau 5 lần thất bại (khóa 15 phút)
+- Ghi lại địa chỉ IP để kiểm tra bảo mật
+- Bảo vệ CSRF qua cookie SameSite
+- Cờ HttpOnly và Secure trên cookie xác thực
+- Hết phiên (30 phút theo mặc định)
+
+**Các phương thức:**
+- `Authenticate(username, password, rememberMe)` - Luồng xác thực chính
+- `SignOut()` - Đăng xuất an toàn với dọn dẹp cookie
+- `GetCurrentUserId()` - Trích xuất ID người dùng từ claims
+- `GetCurrentUsername()` - Trích xuất tên đăng nhập từ claims
+- `GetCurrentRole()` - Trích xuất vai trò từ claims
+
+---
+
+### 1.2 Password Hashing Service
+
+**File:** `Infrastructure\Security\PasswordHasherService.cs`
+
+**Purpose:** Secure password hashing using PBKDF2-SHA256
+
+**Algorithm Details:**
+- **Algorithm:** PBKDF2 (Password-Based Key Derivation Function 2)
+- **Hash Algorithm:** SHA-256
+- **Salt Size:** 16 bytes (128 bits)
+- **Hash Size:** 20 bytes (160 bits)
+- **Iterations:** 10,000
+
+**Workflow:**
+
+```
+HashPassword(password)
+    ↓
+1. Generate cryptographically secure random salt (16 bytes)
+    ↓
+2. Apply PBKDF2-SHA256 with 10,000 iterations
+    ├─ Input: password + salt
+    ├─ Output: 20-byte hash
+    ↓
+3. Combine salt and hash
+    ├─ Format: [salt (16 bytes) || hash (20 bytes)]
+    ├─ Total: 36 bytes
+    ↓
+4. Convert to Base64 string
+    ↓
+5. Store in database
+
+---
+
+VerifyPassword(password, hash)
+    ↓
+1. Extract salt and hash from stored Base64 string
+    ├─ First 16 bytes = salt
+    ├─ Last 20 bytes = stored hash
+    ↓
+2. Verify length (must be exactly 36 bytes)
+    ├─ If not → Return false
+    ↓
+3. Apply PBKDF2-SHA256 to input password with extracted salt
+    ├─ Use same 10,000 iterations
+    ├─ Output: computed hash (20 bytes)
+    ↓
+4. Compare computed hash with stored hash (byte-by-byte)
+    ├─ Use constant-time comparison to prevent timing attacks
+    ↓
+5. Return true if hashes match, false otherwise
+```
+
+**Security Considerations:**
+- Unique salt per password prevents rainbow table attacks
+- High iteration count (10,000) makes brute-force attacks expensive
+- Base64 encoding for database storage and transmission
+
+---
+
+### 1.3 Password Reset Service
+
+**File:** `Services\PasswordResetService.cs`
+
+**Purpose:** Secure password reset workflow with expiring tokens
+
+**Workflow:**
+
+```
+User Requests Password Reset
+    ↓
+1. Generate secure reset token (256-bit random)
+    ├─ Format: Base64-encoded bytes
+    ├─ Uniqueness: Cryptographically random
+    ↓
+2. Invalidate all previous reset tokens for user
+    ├─ Mark IsUsed = true
+    ↓
+3. Create PasswordResetToken record
+    ├─ UserId: Link to user
+    ├─ Token: The reset token
+    ├─ ExpiryTime: +24 hours from now
+    ├─ IsUsed: false (not used yet)
+    ├─ CreatedAt: Current timestamp
+    ↓
+4. Send reset link via email
+    ├─ Format: https://domain.com/Account/ResetPassword?token=xxxxx
+    ↓
+
+---
+
+User Clicks Reset Link
+    ↓
+1. Extract token from URL
+    ↓
+2. Verify token validity
+    ├─ Check if token exists in database
+    ├─ Check if IsUsed = false
+    ├─ Check if ExpiryTime > now
+    ├─ If any check fails → Return error
+    ↓
+3. Show password reset form (token in hidden field)
+    ↓
+
+---
+
+User Submits New Password
+    ↓
+1. Verify reset token again (security check)
+    ├─ Prevent replay attacks
+    ↓
+2. Hash new password using PasswordHasherService
+    ↓
+3. Update user's PasswordHash
+    ↓
+4. Mark token as used
+    ├─ IsUsed = true
+    ├─ UsedAt = current timestamp
+    ↓
+5. Save to database
+    ↓
+6. Send confirmation email
+    ↓
+7. Redirect to login page
+```
+
+**Token Management:**
+- One token per reset request
+- Tokens expire after 24 hours
+- Each successful reset invalidates the token
+- All old tokens invalidated when new reset is requested
+
+**Constants:**
+- `TOKEN_EXPIRY_HOURS = 24`
+- Token size: 256 bits (32 bytes)
+
+---
+
+## 2. 📧 Email & Notification System
+
+### 2.1 Email Service
+
+**File:** `Services\EmailService.cs`
+
+**Purpose:** Send templated HTML emails via SMTP
+
+**Configuration:** Read from `Web.config` appSettings
+- `EmailSmtpServer` - SMTP server address
+- `EmailSmtpPort` - SMTP port (default: 587)
+- `EmailUsername` - SMTP authentication username
+- `EmailPassword` - SMTP authentication password
+- `EmailSenderAddress` - From email address
+- `EmailSenderName` - From display name
+
+**Workflow:**
+
+```
+Send Generic Email
+    ↓
+1. Validate SMTP configuration
+    ├─ Server address not empty
+    ├─ Username not empty
+    ├─ Password not empty
+    ├─ If missing → Log error & return false
+    ↓
+2. Configure SMTP client
+    ├─ EnableSSL = true
+    ├─ UseDefaultCredentials = false
+    ├─ Timeout = 10 seconds
+    ├─ SecurityProtocol = TLS 1.2
+    ↓
+3. Create MailMessage object
+    ├─ From: Sender email
+    ├─ To: Recipient email
+    ├─ Subject: Email subject
+    ├─ Body: HTML content
+    ├─ IsBodyHtml = true
+    ├─ CharacterEncoding = UTF-8
+    ↓
+4. Send via SMTP
+    ├─ If success → Log & return true
+    ├─ If SMTP error → Log error & return false
+    ├─ If other error → Log error & return false
+    ↓
+5. Log result to file
+```
+
+**Email Templates:**
+
+#### OTP Email (`GenerateOTPEmailTemplate`)
+- 6-digit OTP code
+- Expiry warning (5 minutes)
+- Security disclaimers
+- Color-coded design
+
+#### Password Reset Email (`GeneratePasswordResetEmailTemplate`)
+- Reset link with token
+- Expiry warning (24 hours)
+- Button + fallback link
+- Security warnings
+
+#### Order Confirmation Email (`GenerateOrderConfirmationEmailTemplate`)
+- Order ID and date
+- Itemized list of products
+- Pricing breakdown
+- Voucher discount (if applied)
+- Shipping fee
+- Total amount
+- Shipping address
+- Payment method
+
+**Sent In These Workflows:**
+- OTP registration/verification
+- Password reset requests
+- Order confirmations
+- Generic notifications
+
+---
+
+### 2.2 Email Queue Service
+
+**File:** `Services\EmailQueueService.cs`
+
+**Purpose:** Queue emails for asynchronous sending (optional background processing)
+
+---
+
+### 2.3 OTP Service
+
+**File:** `Services\OtpService.cs`
+
+**Purpose:** Generate, store, and verify One-Time Passwords
+
+**Workflow:**
+
+```
+User Requests OTP (e.g., registration)
+    ↓
+1. Check rate limit
+    ├─ Count recent OTP requests for this email
+    ├─ If >= 5 in last 60 minutes → Return error
+    ↓
+2. Check cooldown period
+    ├─ Time since last OTP request
+    ├─ If < 33 seconds → Return error
+    ↓
+3. Generate OTP
+    ├─ Cryptographically secure random number
+    ├─ Format: 6 digits (000000-999999)
+    ↓
+4. Create RateLimitToken record
+    ├─ Identifier: user email
+    ├─ ActionType: "Register" / "PasswordReset" / etc
+    ├─ Status: "Pending"
+    ├─ ExpiresAt: +5 minutes
+    ├─ BlockReason: Store OTP code temporarily
+    ↓
+5. Send OTP via email
+    ├─ Call EmailService.SendOTP()
+    ├─ Include OTP in HTML template
+    ↓
+6. Return success status
+    ↓
+
+---
+
+User Enters OTP
+    ↓
+1. Verify OTP code
+    ├─ Check if OTP matches stored code
+    ├─ Check if OTP not expired
+    ├─ Check if OTP not already used
+    ├─ If any check fails → Return false
+    ↓
+2. Mark OTP as verified
+    ├─ Status = "Verified"
+    ↓
+3. Return true
+    ↓
+4. Proceed with registration/password reset
+```
+
+**OTP Parameters:**
+- `OTP_EXPIRY_MINUTES = 5` - OTP expires after 5 minutes
+- `OTP_RESEND_COOLDOWN_SECONDS = 33` - Minimum wait between resends
+- `MAX_ATTEMPTS = 5` - Maximum OTP attempts per hour
+- `RATE_LIMIT_WINDOW_MINUTES = 60`
+
+**OTP Statuses:**
+- `Pending` - OTP created, awaiting verification
+- `Verified` - OTP successfully verified
+- `Blocked` - Too many attempts, temporarily blocked
+
+---
+
+## 3. 🛡️ Anti-Abuse & Rate Limiting
+
+### 3.1 Abuse Detection Service
+
+**File:** `Services\OtpService.cs` (Part of it)
+
+**Purpose:** Prevent abuse through rate limiting, risk scoring, and challenge detection
+
+**Workflow:**
+
+```
+Request received (e.g., OTP request, login attempt)
+    ↓
+1. Extract identifier
+    ├─ Email, IP address, device fingerprint
+    ↓
+2. Check if blocked globally
+    ├─ Query RateLimitTokens with Status="Blocked"
+    ├─ Check if block expired
+    ├─ If blocked & not expired → Return error "Account locked"
+    ↓
+3. Get recent attempts
+    ├─ Query attempts for this identifier + action in last 60 minutes
+    ├─ Count total attempts
+    ↓
+4. Calculate risk score
+    ├─ Base score = attemptCount × 10
+    ├─ Risk factors = additional risk (device new, etc)
+    ├─ Total = base + factors
+    ├─ Cap at 100
+    ↓
+5. Decision logic based on risk score
+    ├─ If score >= 80 (BLOCK threshold)
+    │   ├─ Return error "Request blocked"
+    │   ├─ Create Blocked entry in RateLimitTokens
+    │   ├─ Block expires in 30 minutes
+    ├─ If score >= 40 (CAPTCHA threshold)
+    │   ├─ Allow request but require CAPTCHA
+    │   ├─ Return "RequireChallengeType: Captcha"
+    ├─ If attempts >= 5
+    │   ├─ Allow request but require CAPTCHA
+    ↓
+6. Check cooldown period
+    ├─ If last attempt < 60 seconds ago
+    ├─ Return error "Please wait before retrying"
+    ├─ Include remaining wait time
+    ↓
+7. Return AbuseCheckResult
+    ├─ IsAllowed: bool
+    ├─ RequireChallengeType: "None", "Captcha", "Block"
+    ├─ RiskScore: int (0-100)
+    ├─ RetryAfterSeconds: int
+```
+
+**Risk Scoring:**
+- Base: 10 points per attempt
+- Multiplier: Previous attempts within window
+- Factors: New device, geo-blocking, suspicious patterns
+- Threshold for CAPTCHA: >= 40 points
+- Threshold for Block: >= 80 points
+
+**Challenge Types:**
+- `None` - No challenge required
+- `Captcha` - Require CAPTCHA verification
+- `Block` - Block immediately (30-minute lockout)
+
+**Rate Limiting Parameters:**
+- `DEFAULT_WINDOW_MINUTES = 60` - Analysis window
+- `MAX_ATTEMPTS_THRESHOLD = 5` - Attempts before CAPTCHA
+- `RISK_SCORE_THRESHOLD_CAPTCHA = 40` - Risk score for CAPTCHA
+- `RISK_SCORE_THRESHOLD_BLOCK = 80` - Risk score for block
+- `COOLDOWN_SECONDS = 60` - Minimum time between attempts
+
+---
+
+## 4. 💳 Payment Processing
+
+### 4.1 VNPay Payment Service
+
+**File:** `Services\VNPayService.cs`
+
+**Purpose:** Integrate with VNPay payment gateway
+
+**Configuration:** Read from `Web.config` appSettings
+- `VNPay_TmnCode` - Terminal code
+- `VNPay_SecretKey` - Secret key for HMAC
+- `VNPay_Url` - VNPay payment URL
+- `VNPay_ReturnUrl` - Return URL after payment
+- `VNPay_NotifyUrl` - Webhook URL for payment notification
+
+**Workflow - Payment Initiation:**
+
+```
+User Initiates Payment
+    ↓
+1. Order created in database with TotalAmount
+    ↓
+2. BuildPaymentUrl(order) called
+    ↓
+3. Create VNPay parameters
+    ├─ vnp_Version: "2.1.0"
+    ├─ vnp_Command: "pay"
+    ├─ vnp_TmnCode: Merchant terminal code
+    ├─ vnp_Amount: (order.TotalAmount × 100) - in 100 VND units
+    ├─ vnp_CreateDate: Current timestamp (yyyyMMddHHmmss)
+    ├─ vnp_CurrCode: "VND"
+    ├─ vnp_OrderInfo: "Thanh toan don hang #123"
+    ├─ vnp_OrderType: "other"
+    ├─ vnp_ReturnUrl: Return page
+    ├─ vnp_Locale: "vi"
+    ├─ vnp_IpAddr: Client IP address
+    ↓
+4. Sort parameters alphabetically
+    ↓
+5. Build query string
+    ├─ Format: key1=value1&key2=value2&...
+    ├─ URL-encode all values
+    ↓
+6. Calculate HMAC-SHA512 hash
+    ├─ Data: query string
+    ├─ Key: VNPay secret key
+    ├─ Append as vnp_SecureHash parameter
+    ↓
+7. Build complete payment URL
+    ├─ URL: https://sandbox.vnpayment.vn/paygate/pay.html?param1=...&vnp_SecureHash=...
+    ↓
+8. Redirect user to VNPay
+    ↓
+
+---
+
+User Completes Payment at VNPay
+    ↓
+1. VNPay processes payment
+    ↓
+2. Redirect to vnp_ReturnUrl with response parameters
+    ├─ vnp_ResponseCode: "00" (success) or error code
+    ├─ vnp_SecureHash: Hash of response
+    ├─ vnp_TransactionNo: VNPay transaction number
+    ├─ vnp_Amount: Amount paid
+    ↓
+
+---
+
+VerifyPaymentResponse()
+    ↓
+1. Extract vnp_SecureHash from response
+    ↓
+2. Rebuild all response parameters (except hash)
+    ├─ Sort alphabetically
+    ├─ Build query string
+    ↓
+3. Calculate HMAC-SHA512 using secret key
+    ↓
+4. Compare calculated hash with received hash
+    ├─ Case-insensitive comparison
+    ├─ If not equal → Return error "Hash verification failed"
+    ↓
+5. Check vnp_ResponseCode
+    ├─ "00" = Success
+    ├─ Other codes = Payment failed
+    ↓
+6. Return verification result
+    ├─ IsValid: bool
+    ├─ Message: Error description
+    ↓
+7. If valid → Update order status to "Paid"
+   If invalid → Update order status to "Failed"
+```
+
+**Response Codes:**
+- `00` - Success
+- `01` - Transaction rejected
+- `02` - Account unavailable
+- `04` - Suspected fraud
+- `05` - Amount limit exceeded
+- `07` - Not supported
+- `99` - Transaction cancelled
+
+**Security:**
+- HMAC-SHA512 prevents tampering
+- Hash verification mandatory
+- Client IP address logging
+- Amount validation
+
+---
+
+## 5. 🎰 Lucky Spin / Gamification
+
+### 5.1 Lucky Spin Service
+
+**File:** `Services\LuckySpinService.cs`
+
+**Purpose:** Award prizes after successful purchase
+
+**Workflow:**
+
+```
+Order Payment Successful
+    ↓
+1. Trigger SpinLucky(userId, orderId)
+    ↓
+2. Get all active LuckySpinPrizes
+    ├─ Query with IsActive = true
+    ├─ Order by DisplayOrder
+    ├─ If none found → Return null
+    ↓
+3. Spin wheel based on WinRate
+    ├─ Calculate cumulative win rates
+    ├─ Generate random value (0 to total rate)
+    ├─ Find prize where random ≤ cumulative rate
+    ↓
+4. Create LuckySpinHistory record
+    ├─ UserId: Current user
+    ├─ OrderId: Associated order
+    ├─ PrizeId: Won prize
+    ├─ Status: "Pending"
+    ├─ SpinDate: Current date/time
+    ↓
+5. Process prize based on type
+    ├─ If Voucher:
+    │   ├─ Assign voucher to user
+    │   ├─ Status = "Claimed"
+    │   ├─ ClaimedDate = now
+    ├─ If Product:
+    │   ├─ Link to WonProductId
+    │   ├─ Status remains "Pending"
+    ↓
+6. Save to database
+    ↓
+7. Load related data
+    ├─ Load Prize details
+    ├─ Load Voucher (if applicable)
+    ├─ Load Product (if applicable)
+    ↓
+8. Return LuckySpinHistory with full details
+    ↓
+9. Display prize to user (frontend)
+    ├─ Show winning animation
+    ├─ Show prize details
+```
+
+**Prize Types:**
+- `Voucher` - Discount voucher (auto-claimed)
+- `Product` - Free product (pending user claim)
+
+**Spin Mechanics:**
+- Win Rate calculation: Weighted random selection
+- Each prize has WinRate (decimal) representing probability
+- Higher WinRate = Higher chance of winning
+
+**LuckySpinHistory Status:**
+- `Pending` - Prize won, awaiting claim
+- `Claimed` - Prize claimed by user
+
+---
+
+## 6. 📊 Audit Logging
+
+### 6.1 Audit Service
+
+**File:** `Services\AuditService.cs`
+
+**Purpose:** Track all administrative actions for compliance and security
+
+**Workflow:**
+
+```
+Admin Performs Action (e.g., ban user, warn post)
+    ↓
+1. Determine action details
+    ├─ Action: What was done (BanUser, WarnPost, etc)
+    ├─ Entity: What was affected (User, Post, etc)
+    ├─ EntityId: ID of affected entity
+    ├─ OldValue: Previous value (if applicable)
+    ├─ NewValue: New value (if applicable)
+    ├─ Description: Human-readable description
+    ↓
+2. Extract request context
+    ├─ Admin user ID
+    ├─ Client IP address
+    ├─ Timestamp
+    ↓
+3. Create AuditLog record
+    ├─ UserId: Admin who performed action
+    ├─ Action: Action type
+    ├─ Entity: Entity type
+    ├─ EntityId: Entity ID
+    ├─ OldValue: Previous state
+    ├─ NewValue: New state
+    ├─ Description: Details
+    ├─ IpAddress: Source IP
+    ├─ CreatedAt: UTC timestamp
+    ↓
+4. Save to database asynchronously
+    ├─ Use Task.Run() for async save
+    ├─ Prevent blocking user action
+    ↓
+5. Log to file
+    ├─ Include timestamp, action, entity
+```
+
+**Audit Specializations:**
+
+#### LogBanAsync(adminId, userId, reason, ipAddress)
+- Action: "BanUser"
+- Entity: "User"
+- Records user ban with reason
+
+#### LogWarnAsync(adminId, postId, reason, ipAddress)
+- Action: "WarnPost"
+- Entity: "Post"
+- Records post warning
+
+#### LogPaymentAsync(userId, orderId, status, transactionId, ipAddress)
+- Action: "Payment"
+- Entity: "Order"
+- Records payment transaction
+
+**Audit Table Columns:**
+- `Id` - Primary key
+- `UserId` - Admin who performed action
+- `Action` - Action type
+- `Entity` - Entity type affected
+- `EntityId` - Entity ID
+- `OldValue` - Previous value
+- `NewValue` - New value
+- `Description` - Details
+- `IpAddress` - Source IP
+- `CreatedAt` - Timestamp
+
+---
+
+## 7. ⚡ Caching Strategy
+
+### 7.1 Cache Service
+
+**File:** `Infrastructure\Caching\CacheService.cs`
+
+**Purpose:** In-memory caching for frequently accessed data
+
+**Workflow:**
+
+```
+Request for cached data
+    ↓
+1. Call Get<T>(key)
+    ↓
+2. Build cache key with prefix
+    ├─ CACHE_PREFIX = "AppCache:"
+    ├─ Final key = "AppCache:" + key
+    ↓
+3. Query System.Web.HttpRuntime.Cache
+    ↓
+4. If found (Cache HIT)
+    ├─ Log "Cache HIT"
+    ├─ Return casted value
+    ├─ Skip database query
+    ↓
+5. If not found (Cache MISS)
+    ├─ Log "Cache MISS"
+    ├─ Return default(T)
+    ├─ Caller fetches from database
+    ├─ Caller calls Set() to cache result
+    ↓
+
+---
+
+Store data in cache
+    ↓
+1. Call Set<T>(key, value, durationMinutes)
+    ↓
+2. Build cache key
+    ├─ Final key = "AppCache:" + key
+    ↓
+3. Insert into cache
+    ├─ Value: Data object
+    ├─ Dependency: None
+    ├─ Expiration: Now + durationMinutes
+    ├─ SlidingExpiration: None (absolute expiry)
+    ↓
+4. Log "Cache SET: key (30min)"
+    ↓
+
+---
+
+Remove from cache
+    ↓
+1. Call Remove(key)
+    ↓
+2. Query cache by key
+    ↓
+3. Delete entry
+    ↓
+4. Log "Cache REMOVED"
+    ↓
+
+---
+
+Remove by pattern
+    ↓
+1. Call RemoveByPattern(pattern)
+    ↓
+2. Enumerate all cache entries
+    ↓
+3. Find keys starting with CACHE_PREFIX + pattern
+    ↓
+4. Remove all matching entries
+    ↓
+5. Log count of removed items
+```
+
+**Cache Keys Constants:**
+- `CATEGORIES` = "Categories:All"
+- `PRODUCTS` = "Products:All"
+- `PRODUCTS_HOT` = "Products:Hot"
+- `NEWS` = "News:All"
+- `NEWS_BY_CATEGORY` = "News:Category:{0}"
+- `VOUCHERS` = "Vouchers:All"
+- `EVENTS` = "Events:Active"
+- `SETTINGS` = "Settings:All"
+
+**Cache Configuration:**
+- Duration: 60 minutes (default)
+- Prefix: "AppCache:"
+- Implementation: System.Web.Caching (ASP.NET built-in)
+- Expiration: Absolute (not sliding)
+
+**Cache Usage Patterns:**
+```csharp
+// Get from cache or database
+var products = _cacheService.Get<List<Product>>(CacheKeys.PRODUCTS);
+if (products == null) {
+    products = _db.Products.ToList();
+    _cacheService.Set(CacheKeys.PRODUCTS, products);
+}
+
+// Invalidate after update
+_cacheService.Remove(CacheKeys.PRODUCTS);
+
+// Bulk invalidate by pattern
+_cacheService.RemoveByPattern("News:");  // Removes all News:* entries
+```
+
+---
+
+## 8. 📝 Logging Infrastructure
+
+### 8.1 File Logger Service
+
+**File:** `Infrastructure\Logging\FileLogger.cs`
+
+**Purpose:** Persistent logging to files for debugging and auditing
+
+**Workflow:**
+
+```
+Log message generated
+    ↓
+1. Determine log level
+    ├─ Info: General information
+    ├─ Warning: Warning-level events
+    ├─ Error: Error conditions
+    ↓
+2. Format log message
+    ├─ Timestamp: [yyyy-MM-dd HH:mm:ss]
+    ├─ Level: [INFO] / [WARN] / [ERROR]
+    ├─ Message: User-provided message
+    ├─ Exception: Stack trace (if applicable)
+    ↓
+3. Determine log file
+    ├─ Directory: Application Root + /logs/
+    ├─ Filename: logs/{Level}.log or general.log
+    ↓
+4. Append to file
+    ├─ Thread-safe write
+    ├─ UTF-8 encoding
+    ↓
+5. Return to caller
+```
+
+**Log Levels:**
+- `Info` - General information
+- `Warning` - Warning conditions
+- `Error` - Error conditions
+
+**Log File Locations:**
+- `logs\info.log` - Information messages
+- `logs\error.log` - Error messages
+- `logs\general.log` - All messages
+- `logs\spinerror.log` - Spin service errors
+
+---
+
+## Summary Table
+
+| Component | Purpose | Key Workflow | Critical Security |
+|-----------|---------|--------------|-------------------|
+| **Secure Auth** | User login | Credentials → Lockout check → Verify → Claims → Cookie | Account lockout, CSRF, HttpOnly |
+| **Password Hash** | Secure password storage | PBKDF2-SHA256 with salt | 10,000 iterations, unique salt |
+| **Password Reset** | Account recovery | Generate token → Email → Verify → Reset | Token expiry (24h), one-time use |
+| **Email Service** | Send notifications | Config → Validate → SMTP → Template → Send | TLS 1.2, error logging |
+| **OTP Service** | Two-factor auth | Generate → Rate limit → Email → Verify | 5-minute expiry, 33sec cooldown |
+| **Abuse Detection** | Anti-spam/bot | Track attempts → Calculate risk → Challenge/Block | Risk scoring, IP blocking |
+| **VNPay Payment** | Payment processing | Build URL → HMAC hash → Redirect → Verify response | HMAC-SHA512, hash verification |
+| **Lucky Spin** | Gamification | Spin wheel → Calculate winner → Award prize | WinRate probability |
+| **Audit Logging** | Compliance tracking | Record admin actions → Store → Log | Immutable audit trail |
+| **Caching** | Performance optimization | Query cache → On miss fetch DB → Store | Pattern-based invalidation |
+
+---
+
+## 🔄 Data Flow Diagram
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    User Interactions                        │
+└─────────────────────────────────────────────────────────────┘
+    ↓                                    ↓
+┌──────────────────┐          ┌──────────────────────┐
+│  Authentication  │          │  Order Processing    │
+├──────────────────┤          ├──────────────────────┤
+│ • OTP Verify     │          │ • VNPay Payment      │
+│ • Login Attempt  │          │ • Email Confirm      │
+│ • Rate Limit     │          │ • Lucky Spin Award   │
+└──────────────────┘          └──────────────────────┘
+    ↓                                    ↓
+┌────────────────────────────────────────────────────┐
+│            Security & Audit Layer                  │
+├────────────────────────────────────────────────────┤
+│ • SecureAuthenticationService                      │
+│ • AbuseDetectionService                           │
+│ • AuditService (Admin actions)                     │
+│ • PasswordHasherService                           │
+└────────────────────────────────────────────────────┘
+    ↓                                    ↓
+┌──────────────────┐          ┌──────────────────────┐
+│  Cache Layer     │          │  Logging Layer       │
+├──────────────────┤          ├──────────────────────┤
+│ • CacheService   │          │ • FileLogger         │
+│ • Memory cache   │          │ • Persistent logs    │
+└──────────────────┘          └──────────────────────┘
+    ↓
+┌────────────────────────────────────────────────────┐
+│            Database Layer                          │
+├────────────────────────────────────────────────────┤
+│ • ApplicationDbContext (EF6)                       │
+│ • RateLimitTokens, AuditLogs, LoginAttempts, etc  │
+└────────────────────────────────────────────────────┘
+```
+
+---
+
+## Version & Framework Info
+
+- **Language:** C# 7.3
+- **Framework:** .NET Framework 4.7.2
+- **ORM:** Entity Framework 6
+- **Authentication:** Forms Authentication + Claims
+- **Email:** System.Net.Mail (SMTP)
+- **Payment:** VNPay (HMAC-SHA512)
+- **Caching:** System.Web.Caching (ASP.NET built-in)

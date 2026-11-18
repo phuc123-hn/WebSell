@@ -1,0 +1,9 @@
+[2026-04-01 20:48:45] [WARNING] Failed login attempt for username: testuser
+[2026-04-01 21:52:00] [INFO] New user registered: phucngo
+[2026-04-01 21:52:05] [INFO] User 'phucngo' logged in successfully
+[2026-04-01 21:52:51] [INFO] User logged out
+[2026-04-01 21:53:07] [INFO] User 'admin123' logged in successfully
+[2026-04-01 21:53:17] [INFO] User 'admin123' logged in successfully
+[2026-04-01 21:53:23] [INFO] User logged out
+[2026-04-01 21:53:32] [INFO] User 'phucngo' logged in successfully
+[2026-04-01 21:53:35] [INFO] User logged out

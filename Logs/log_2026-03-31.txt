@@ -1,0 +1,12 @@
+[2026-03-31 12:20:13] [INFO] User 'admin123' logged in successfully
+[2026-03-31 12:20:34] [INFO] User logged out
+[2026-03-31 12:20:45] [INFO] User 'john_doe' logged in successfully
+[2026-03-31 14:15:54] [INFO] User 'john_doe' logged in successfully
+[2026-03-31 14:16:22] [INFO] User logged out
+[2026-03-31 14:16:27] [INFO] User 'testuser' logged in successfully
+[2026-03-31 14:17:34] [INFO] User logged out
+[2026-03-31 14:17:42] [INFO] User 'admin123' logged in successfully
+[2026-03-31 14:17:55] [INFO] User logged out
+[2026-03-31 14:18:10] [INFO] User 'admin123' logged in successfully
+[2026-03-31 14:18:49] [INFO] User 'admin123' logged in successfully
+[2026-03-31 20:28:23] [INFO] User 'admin123' logged in successfully

@@ -1,0 +1,42 @@
+[2026-04-26 10:01:26] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-26 10:01:26] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-26 10:01:26] [INFO] [EMAIL] Starting to send email to: pngo9777@gmail.com, Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-26 10:01:26] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-26 10:01:26] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-26 10:01:26] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: pngo9777@gmail.com
+[2026-04-26 10:01:26] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-26 10:01:32] [INFO] ✅ [EMAIL] Email sent successfully to pngo9777@gmail.com - Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-26 10:01:32] [INFO] OTP email sent successfully to pngo9777@gmail.com for Register
+[2026-04-26 10:01:32] [INFO] OTP saved and email sent to pngo9777@gmail.com for Register
+[2026-04-26 10:01:33] [INFO] OTP sent for registration: pngo9777@gmail.com
+[2026-04-26 10:01:52] [INFO] [RECORD] Attempt recorded: ::1 - Register
+[2026-04-26 10:01:52] [INFO] VerifyOtpRegister called with email='pngo9777@gmail.com', otp='374814'
+[2026-04-26 10:01:52] [INFO] OTP verified successfully for pngo9777@gmail.com
+[2026-04-26 10:01:53] [INFO] New user registered and verified: sangcuto
+[2026-04-26 10:01:53] [INFO] [CLEAR] Records cleared: ::1 - Register
+[2026-04-26 10:12:33] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-26 10:12:33] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-26 10:12:33] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-26 10:12:33] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-26 10:12:33] [INFO] [EMAIL] Starting to send email to: pngo9777@gmail.com, Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-26 10:12:33] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-26 10:12:33] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-26 10:12:33] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: pngo9777@gmail.com
+[2026-04-26 10:12:33] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-26 10:12:39] [INFO] ✅ [EMAIL] Email sent successfully to pngo9777@gmail.com - Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-26 10:12:39] [INFO] OTP email sent successfully to pngo9777@gmail.com for Payment
+[2026-04-26 10:12:39] [INFO] OTP saved and email sent to pngo9777@gmail.com for Payment
+[2026-04-26 10:12:59] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-26 10:12:59] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-26 10:12:59] [INFO] OTP verified successfully for pngo9777@gmail.com
+[2026-04-26 10:13:00] [INFO] SpinCount += 1 for user 6, total: 1
+[2026-04-26 10:13:00] [INFO] [EMAIL] Starting to send email to: pngo9777@gmail.com, Subject: 📦 Xác nhận đơn hàng #7
+[2026-04-26 10:13:00] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-26 10:13:00] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-26 10:13:00] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: pngo9777@gmail.com
+[2026-04-26 10:13:00] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-26 10:13:06] [INFO] ✅ [EMAIL] Email sent successfully to pngo9777@gmail.com - Subject: 📦 Xác nhận đơn hàng #7
+[2026-04-26 10:13:06] [INFO] ✅ Order confirmation email sent to pngo9777@gmail.com for order #7
+[2026-04-26 10:15:29] [INFO] User logged out
+[2026-04-26 10:15:43] [INFO] User 'admin123' logged in successfully
+[2026-04-26 10:31:50] [INFO] User logged out

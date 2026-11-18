@@ -1,0 +1,54 @@
+﻿@model List<web1.Models.News>
+
+@{
+    ViewBag.Title = "Quản lý tin tức - Admin";
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2>Quản lý tin tức</h2>
+    </div>
+    <div class="col-md-6 text-right">
+        <a href="@Url.Action("Create", "News", new { area = "Admin" })" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Thêm tin tức
+        </a>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tiêu đề</th>
+                <th>Danh mục</th>
+                <th>Ngày đăng</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null)
+            {
+                foreach (var news in Model)
+                {
+                    <tr>
+                        <td>@news.Id</td>
+                        <td>@news.Title</td>
+                        <td>@news.Category</td>
+                        <td>@news.PublishDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@(news.IsActive ? "Hoạt động" : "Ẩn")</td>
+                        <td>
+                            <a href="@Url.Action("Edit", "News", new { area = "Admin", id = news.Id })" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> Sửa
+                            </a>
+                            <a href="@Url.Action("Delete", "News", new { area = "Admin", id = news.Id })" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i> Xóa
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

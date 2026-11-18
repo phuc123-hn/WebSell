@@ -1,0 +1,159 @@
+﻿using System;
+using System.Linq;
+using System.Web.Mvc;
+using web1.Data;
+using web1.Models;
+using web1.Services;
+using System.Data.Entity;
+
+namespace web1.Controllers
+{
+    [Authorize]
+    public class LuckySpinController : Controller
+    {
+        private ApplicationDbContext db = new ApplicationDbContext();
+        private LuckySpinService luckySpinService;
+
+        public LuckySpinController()
+        {
+            luckySpinService = new LuckySpinService(db);
+        }
+
+        // GET: LuckySpin/History
+        public ActionResult History()
+        {
+            int userId = (int)(Session["UserId"] ?? 0);
+            if (userId == 0)
+                return RedirectToAction("Login", "Account");
+
+            var spinHistories = db.LuckySpinHistories
+                .Where(h => h.UserId == userId)
+                .Include("Prize")
+                .Include("WonVoucher")
+                .Include("WonProduct")
+                .OrderByDescending(h => h.SpinDate)
+                .ToList();
+
+            return View(spinHistories);
+        }
+
+        // GET: LuckySpin/Index
+        [Authorize]
+        public ActionResult Index()
+        {
+            int userId = (int)(Session["UserId"] ?? 0);
+            if (userId == 0)
+                return RedirectToAction("Login", "Account");
+
+            var user = db.Users.Find(userId);
+            ViewBag.SpinCount = user?.SpinCount ?? 0;
+            return View();
+        }
+
+        // POST: LuckySpin/Spin
+        [HttpPost]
+        public ActionResult Spin()
+        {
+            try
+            {
+                int userId = (int)(Session["UserId"] ?? 0);
+                if (userId == 0)
+                    return Json(new { success = false, message = "Vui lòng đăng nhập" });
+
+                var user = db.Users.Find(userId);
+                if (user == null || user.SpinCount <= 0)
+                    return Json(new { success = false, message = "Bạn không có lượt quay nào" });
+
+                // Trừ 1 spin
+                user.SpinCount -= 1;
+                db.SaveChanges();
+
+                // Thực hiện quay — dùng orderId = 0 vì không còn cần
+                var spinResult = luckySpinService.SpinLucky(userId, 0);
+                if (spinResult == null)
+                {
+                    // Hoàn lại spin nếu lỗi
+                    user.SpinCount += 1;
+                    db.SaveChanges();
+                    return Json(new { success = false, message = "Lỗi khi quay" });
+                }
+
+                // Load Prize từ database
+                var spinHistory = db.LuckySpinHistories
+                    .Include("Prize")
+                    .Include("WonVoucher")
+                    .Include("WonProduct")
+                    .FirstOrDefault(s => s.Id == spinResult.Id);
+
+                if (spinHistory == null || spinHistory.Prize == null)
+                {
+                    return Json(new { success = false, message = "Không thể tải dữ liệu giải thưởng" });
+                }
+
+                return Json(new {
+                    success = true,
+                    spinHistoryId = spinHistory.Id,
+                    prizeId = spinHistory.PrizeId,
+                    prizeName = spinHistory.Prize.Name,
+                    prizeType = spinHistory.Prize.PrizeType,
+                    wonVoucherCode = spinHistory.WonVoucher?.Code,
+                    wonProductName = spinHistory.WonProduct?.Name,
+                    spinCountLeft = user.SpinCount,
+                    message = $"Bạn đã trúng: {spinHistory.Prize.Name}"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+            }
+        }
+
+        // POST: LuckySpin/ClaimVoucher
+        [HttpPost]
+        public ActionResult ClaimVoucher(int spinHistoryId)
+        {
+            try
+            {
+                int userId = (int)(Session["UserId"] ?? 0);
+                if (userId == 0)
+                    return Json(new { success = false, message = "Vui lòng đăng nhập" });
+
+                var result = luckySpinService.ClaimVoucher(spinHistoryId, userId);
+
+                if (result)
+                {
+                    return Json(new { success = true, message = "Voucher đã được thêm vào tài khoản" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Không thể nhận voucher" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+            }
+        }
+
+        // GET: LuckySpin/GetSpinCount
+        [HttpGet]
+        public ActionResult GetSpinCount()
+        {
+            int userId = (int)(Session["UserId"] ?? 0);
+            if (userId == 0)
+                return Json(new { spinCount = 0 }, JsonRequestBehavior.AllowGet);
+
+            var user = db.Users.Find(userId);
+            return Json(new { spinCount = user?.SpinCount ?? 0 }, JsonRequestBehavior.AllowGet);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+    }
+}

@@ -1,0 +1,76 @@
+﻿@model web1.Models.News
+@{
+    ViewBag.Title = Model.Title + " - TechWorld";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <article>
+            <h1 class="mb-3">@Model.Title</h1>
+            <div style="margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px;">
+                <span class="badge bg-primary">@Model.Category</span>
+                <span class="text-muted">
+                    <i class="fas fa-calendar"></i> @Model.PublishDate.ToString("dd/MM/yyyy HH:mm")
+                </span>
+            </div>
+
+            <!-- PHẦN ẢNH CHI TIẾT ĐÃ SỬA -->
+            <!-- PHẦN ẢNH CHI TIẾT (đã chỉnh kích thước đẹp) -->
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Url.Content(Model.ImageUrl)"
+                     alt="@Model.Title"
+                     class="img-fluid"
+                     style="width: 100%;
+                max-height: 450px;
+                object-fit: cover;
+                border-radius: 12px;
+                margin-bottom: 30px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            }
+            else
+            {
+                <!-- Placeholder nếu chưa có ảnh -->
+                <div style="background: #f0f0f0; height: 350px; border-radius: 12px;
+                display: flex; align-items: center; justify-content: center; margin-bottom: 30px;">
+                    <i class="fas fa-image" style="font-size: 6rem; color: #ddd;"></i>
+                </div>
+            }
+
+            <div style="line-height: 1.8; font-size: 1.1rem; margin-bottom: 30px;">
+                @Html.Raw(Model.Content?.Replace("\n", "<br>"))
+            </div>
+        </article>
+    </div>
+
+    <!-- Sidebar tin liên quan giữ nguyên -->
+    <div class="col-md-4">
+        <div class="sidebar">
+            <h4 class="sidebar-title">Tin tức liên quan</h4>
+            @if (ViewBag.RelatedNews != null)
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var relatedNews in ViewBag.RelatedNews)
+                    {
+                        <li class="list-group-item">
+                            <a href="@Url.Action("Details", "News", new { id = relatedNews.Id })" style="text-decoration: none; color: #333;">
+                                <strong>@relatedNews.Title</strong>
+                                <div style="font-size: 0.85rem; color: #666; margin-top: 5px;">
+                                    <i class="fas fa-calendar-alt"></i> @relatedNews.PublishDate.ToString("dd/MM/yyyy")
+                                </div>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <a href="@Url.Action("Index", "News")" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>

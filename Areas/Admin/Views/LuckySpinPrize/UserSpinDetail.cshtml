@@ -1,0 +1,111 @@
+﻿@model List<web1.Models.LuckySpinHistory>
+
+@{
+    ViewBag.Title = "Chi tiết quay - " + ViewBag.User.FullName;
+    var user = ViewBag.User as web1.Models.User;
+}
+
+<div class="row mb-3">
+    <div class="col-md-8">
+        <h2 style="color: #FFD700;">Chi tiết Quay của: <strong>@user.FullName</strong></h2>
+    </div>
+    <div class="col-md-4 text-right">
+        <a href="@Url.Action("History", "LuckySpinPrize", new { area = "Admin" })" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="card" style="background: #1e293b; border: 2px solid #667eea;">
+            <div class="card-body">
+                <p style="color: #FFD700;"><strong>Email:</strong> <span style="color: #94a3b8;">@user.Email</span></p>
+                <p style="color: #FFD700;"><strong>Số điện thoại:</strong> <span style="color: #94a3b8;">@user.Phone</span></p>
+                <p style="color: #FFD700;"><strong>Tổng lần quay:</strong> <span class="badge bg-info">@Model.Count</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped" style="background: #1e293b;">
+        <thead class="table-dark">
+            <tr>
+                <th style="color: #FFD700; width: 8%;">ID</th>
+                <th style="color: #FFD700; width: 10%;">Đơn hàng</th>
+                <th style="color: #FFD700; width: 20%;">Giải thưởng</th>
+                <th style="color: #FFD700; width: 20%;">Voucher/Sản phẩm</th>
+                <th style="color: #FFD700; width: 15%;">Ngày quay</th>
+                <th style="color: #FFD700; width: 12%;">Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                foreach (var history in Model)
+                {
+                    <tr style="color: #FFD700; border-color: #334155;">
+                        <td style="color: #FFD700;">@history.Id</td>
+                        <td>
+                            @if (history.OrderId.HasValue)
+                            {
+                                <a href="@Url.Action("Details", "Order", new { area = "Admin", id = history.OrderId })" class="btn btn-sm btn-info">
+                                    #@history.OrderId
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td style="color: #94a3b8;">
+                            @if (history.Prize != null)
+                            {
+                                <strong>@history.Prize.Name</strong>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td style="color: #94a3b8;">
+                            @if (history.WonVoucherId.HasValue && history.WonVoucher != null)
+                            {
+                                <span class="badge bg-success">@history.WonVoucher.Code</span>
+                                <br/>
+                                <small style="color: #94a3b8;">Giảm @history.WonVoucher.DiscountPercent%</small>
+                            }
+                            else if (history.WonProductId.HasValue && history.WonProduct != null)
+                            {
+                                <span class="badge bg-info">@history.WonProduct.Name</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td style="color: #94a3b8;">
+                            @history.SpinDate.ToString("dd/MM/yyyy HH:mm")
+                        </td>
+                        <td>
+                            <span class="badge bg-success"><i class="fas fa-check-circle"></i> Đã nhận</span>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center" style="color: #FFD700;">User chưa quay lần nào</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .table td {
+        border-color: #334155;
+    }
+</style>

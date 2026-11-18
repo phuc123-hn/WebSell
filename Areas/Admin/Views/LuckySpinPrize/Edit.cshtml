@@ -1,0 +1,144 @@
+﻿@model web1.Models.LuckySpinPrize
+
+@{
+    ViewBag.Title = "Sửa giải thưởng - Admin";
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2 style="color: #FFD700;">Sửa Giải Thưởng</h2>
+    </div>
+    <div class="col-md-6 text-right">
+        <a href="@Url.Action("Index", "LuckySpinPrize", new { area = "Admin" })" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+@if (ViewData.ModelState.Values.SelectMany(v => v.Errors).Any())
+{
+    <div class="alert alert-danger">
+        <strong>Lỗi:</strong>
+        <ul class="mb-0 mt-2">
+            @foreach (var modelState in ViewData.ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            }
+        </ul>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                @using (Html.BeginForm("Edit", "LuckySpinPrize", new { area = "Admin" }, FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.HiddenFor(model => model.CreatedAt)
+
+                    <div class="mb-3">
+                        <label class="form-label" style="color:yellow"><strong>Tên giải thưởng <span style="color: red;">*</span></strong></label>
+                        @Html.TextBoxFor(model => model.Name, new { @class = "form-control", placeholder = "VD: Voucher 10%" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" style="color:yellow"><strong>Mô tả</strong></label>
+                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 3 })
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="color:yellow"><strong>Loại giải thưởng <span style="color: red;">*</span></strong></label>
+                                @Html.DropDownListFor(model => model.PrizeType, new SelectList(new[] 
+                                {
+                                    new { Text = "Lời chúc", Value = "Message" },
+                                    new { Text = "Voucher", Value = "Voucher" },
+                                    new { Text = "Sản phẩm", Value = "Product" }
+                                }, "Value", "Text"), new { @class = "form-control", id = "prizeType" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="color:yellow"><strong>Tỷ lệ trúng (%) <span style="color: red;">*</span></strong></label>
+                                @Html.TextBoxFor(model => model.WinRate, new { @class = "form-control", type = "number", min = "0", max = "100", step = "0.00001", placeholder = "VD: 23.5" })
+                                <small class="text-muted">Ví dụ: 54.3, 12.7, 23, 9.99998, 0.00002</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3" id="voucherSection" style="display: none;">
+                        <label class="form-label" style="color:yellow"><strong>Chọn Voucher</strong></label>
+                        @Html.DropDownListFor(model => model.VoucherId, ViewBag.Vouchers as SelectList, "-- Chọn voucher --", new { @class = "form-control" })
+                    </div>
+
+                    <div class="mb-3" id="productSection" style="display: none;">
+                        <label class="form-label" style="color:yellow"><strong>Chọn Sản phẩm</strong></label>
+                        @Html.DropDownListFor(model => model.ProductId, ViewBag.Products as SelectList, "-- Chọn sản phẩm --", new { @class = "form-control" })
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="color:yellow"><strong>Thứ tự hiển thị</strong></label>
+                                @Html.TextBoxFor(model => model.DisplayOrder, new { @class = "form-control", type = "number", min = "0" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="color:yellow"><strong>Trạng thái</strong></label>
+                                <div class="form-check">
+                                    @Html.CheckBoxFor(model => model.IsActive, new { @class = "form-check-input" })
+                                    <label class="form-check-label" style="color:yellow">Kích hoạt</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i> Cập nhật
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Thông tin</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>ID:</strong> @Model.Id</p>
+                <p><strong>Loại:</strong> @Model.PrizeType</p>
+                <p><strong>Tỷ lệ:</strong> @Model.WinRate%</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        updatePrizeTypeDisplay();
+        $('#prizeType').change(function () {
+            updatePrizeTypeDisplay();
+        });
+    });
+
+    function updatePrizeTypeDisplay() {
+        var prizeType = $('#prizeType').val();
+        $('#voucherSection').hide();
+        $('#productSection').hide();
+
+        if (prizeType === 'Voucher') {
+            $('#voucherSection').show();
+        } else if (prizeType === 'Product') {
+            $('#productSection').show();
+        }
+    }
+</script>

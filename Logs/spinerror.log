@@ -1,0 +1,25 @@
+[2026-04-25 07:46:38] SpinLucky Exception: An error occurred while updating the entries. See the inner exception for details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at web1.Services.LuckySpinService.SpinLucky(Int32 userId, Int32 orderId) in C:\Users\VivoBook\Documents\WebSell\web1\web1\Services\LuckySpinService.cs:line 98
+An error occurred while updating the entries. See the inner exception for details.
+---
+[2026-04-25 08:40:36] SpinLucky Exception: An error occurred while updating the entries. See the inner exception for details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at web1.Services.LuckySpinService.SpinLucky(Int32 userId, Int32 orderId) in C:\Users\VivoBook\Documents\WebSell\web1\web1\Services\LuckySpinService.cs:line 74
+An error occurred while updating the entries. See the inner exception for details.
+---
+[2026-04-25 19:03:52] SpinLucky Exception: An error occurred while updating the entries. See the inner exception for details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at web1.Services.LuckySpinService.SpinLucky(Int32 userId, Int32 orderId) in C:\Users\VivoBook\Documents\WebSell\web1\web1\Services\LuckySpinService.cs:line 74
+An error occurred while updating the entries. See the inner exception for details.
+---
+[2026-04-25 19:03:56] SpinLucky Exception: An error occurred while updating the entries. See the inner exception for details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at web1.Services.LuckySpinService.SpinLucky(Int32 userId, Int32 orderId) in C:\Users\VivoBook\Documents\WebSell\web1\web1\Services\LuckySpinService.cs:line 74
+An error occurred while updating the entries. See the inner exception for details.
+---
+[2026-04-29 09:18:14] SpinLucky Exception: An error occurred while updating the entries. See the inner exception for details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at web1.Services.LuckySpinService.SpinLucky(Int32 userId, Int32 orderId) in C:\Users\VivoBook\Documents\WebSell\web1\web1\Services\LuckySpinService.cs:line 74
+An error occurred while updating the entries. See the inner exception for details.
+---

@@ -1,0 +1,296 @@
+﻿@model web1.Models.Event
+
+@{
+    ViewBag.Title = Model.Name + " - Chi tiết sự kiện - Admin";
+}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<div class="row mb-3">
+    <div class="col-md-8">
+        <h2 style="color: #FFD700;">@Model.Name</h2>
+    </div>
+    <div class="col-md-4 text-right">
+        <a href="@Url.Action("Index", "Event", new { area = "Admin" })" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Thông tin sự kiện</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong style="color: #FFD700;">Tên sự kiện:</strong></p>
+                        <p style="color:greenyellow">@Model.Name</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong style="color: #FFD700;">Trạng thái:</strong></p>
+                        <p>
+                            @{
+                                var now = DateTime.Now;
+                                string statusClass = "";
+                                string statusText = "";
+
+                                if (Model.StartDate <= now && Model.EndDate >= now)
+                                {
+                                    statusClass = "success";
+                                    statusText = "Đang diễn ra";
+                                }
+                                else if (Model.StartDate > now)
+                                {
+                                    statusClass = "warning";
+                                    statusText = "Sắp tới";
+                                }
+                                else
+                                {
+                                    statusClass = "secondary";
+                                    statusText = "Đã qua";
+                                }
+                            }
+                            <span class="badge bg-@statusClass">@statusText</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong style="color: #FFD700;">Ngày bắt đầu:</strong></p>
+                        <p style="color:greenyellow">@Model.StartDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong style="color: #FFD700;">Ngày kết thúc:</strong></p>
+                        <p style="color:greenyellow">@Model.EndDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <p><strong style="color: #FFD700;">Mô tả:</strong></p>
+                    <p style="color:greenyellow">@Model.Description</p>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div class="mb-3">
+                        <p><strong style="color: #FFD700;">Hình ảnh:</strong></p>
+                        <img src="@Model.ImageUrl" style="max-width: 300px; max-height: 300px; border-radius: 8px;">
+                    </div>
+                }
+
+                <div class="mb-3">
+                    <p><strong style="color: #FFD700;">Kích hoạt:</strong></p>
+                    <p>
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-success">Có</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Không</span>
+                        }
+                    </p>
+                </div>
+
+                <div class="mb-3">
+                    <a href="@Url.Action("Edit", "Event", new { area = "Admin", id = Model.Id })" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Sửa sự kiện
+                    </a>
+                    <a href="@Url.Action("Delete", "Event", new { area = "Admin", id = Model.Id })" class="btn btn-danger" onclick="return confirm('Xóa sự kiện này?')">
+                        <i class="fas fa-trash"></i> Xóa sự kiện
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-questions"></i> Quản lý quiz</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">Quản lý câu hỏi quiz cho sự kiện này</p>
+                
+                @{
+                    var questionCount = ViewBag.QuestionCount ?? 0;
+                }
+
+                <div class="alert alert-info mb-3">
+                    <strong>Số câu hỏi:</strong> @questionCount
+                    @if (questionCount == 0)
+                    {
+                        <span class="badge bg-danger ms-2">Chưa có quiz</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success ms-2">Đã có quiz</span>
+                    }
+                </div>
+
+                <button type="button" class="btn btn-success btn-lg w-100 mb-2" data-bs-toggle="modal" data-bs-target="#createQuestionModal">
+                    <i class="fas fa-plus"></i> Thêm câu hỏi
+                </button>
+
+                @if (questionCount > 0)
+                {
+                    <a href="@Url.Action("Index", "EventQuestion", new { area = "Admin", eventId = Model.Id })" class="btn btn-info btn-lg w-100">
+                        <i class="fas fa-list"></i> Danh sách câu hỏi
+                    </a>
+                }
+            </div>
+        </div>
+
+        <!-- Modal Create Question -->
+        <div class="modal fade" id="createQuestionModal" tabindex="-1" aria-labelledby="createQuestionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="createQuestionModalLabel">Thêm câu hỏi quiz</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="createQuestionForm">
+                            <div class="mb-3">
+                                <label class="form-label" style="color: #FFD700;"><strong>Câu hỏi <span style="color: #FF6B6B;">*</span></strong></label>
+                                <textarea id="question" class="form-control" rows="3" placeholder="Nhập nội dung câu hỏi..." required></textarea>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" style="color: #FFD700;">Đáp án A <span style="color: #FF6B6B;">*</span></label>
+                                    <input type="text" id="optionA" class="form-control" placeholder="Nhập đáp án A..." required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" style="color: #FFD700;">Đáp án B <span style="color: #FF6B6B;">*</span></label>
+                                    <input type="text" id="optionB" class="form-control" placeholder="Nhập đáp án B..." required>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" style="color: #FFD700;">Đáp án C <span style="color: #FF6B6B;">*</span></label>
+                                    <input type="text" id="optionC" class="form-control" placeholder="Nhập đáp án C..." required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" style="color: #FFD700;">Đáp án D <span style="color: #FF6B6B;">*</span></label>
+                                    <input type="text" id="optionD" class="form-control" placeholder="Nhập đáp án D..." required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" style="color: #FFD700;"><strong>Đáp án đúng <span style="color: #FF6B6B;">*</span></strong></label>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="correctAnswer" id="answerA" value="A" required>
+                                        <label class="form-check-label" style="color: #FFD700;">A</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="correctAnswer" id="answerB" value="B">
+                                        <label class="form-check-label" style="color: #FFD700;">B</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="correctAnswer" id="answerC" value="C">
+                                        <label class="form-check-label" style="color: #FFD700;">C</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="correctAnswer" id="answerD" value="D">
+                                        <label class="form-check-label" style="color: #FFD700;">D</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-success" onclick="createQuestion(@Model.Id)">
+                            <i class="fas fa-save"></i> Thêm
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Danh sách câu hỏi (để delete) -->
+        <div class="modal fade" id="questionsListModal" tabindex="-1" aria-labelledby="questionsListModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="questionsListModalLabel">Danh sách câu hỏi</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="questionsList">
+                        <!-- Sẽ load bằng AJAX -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function createQuestion(eventId) {
+                var question = document.getElementById('question').value;
+                var optionA = document.getElementById('optionA').value;
+                var optionB = document.getElementById('optionB').value;
+                var optionC = document.getElementById('optionC').value;
+                var optionD = document.getElementById('optionD').value;
+                var correctAnswer = document.querySelector('input[name="correctAnswer"]:checked').value;
+
+                if (!question || !optionA || !optionB || !optionC || !optionD || !correctAnswer) {
+                    alert('Vui lòng điền đầy đủ thông tin');
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("CreateQuestion", "Event", new { area = "Admin" })',
+                    method: 'POST',
+                    data: {
+                        eventId: eventId,
+                        question: question,
+                        optionA: optionA,
+                        optionB: optionB,
+                        optionC: optionC,
+                        optionD: optionD,
+                        correctAnswer: correctAnswer
+                    },
+                    success: function (data) {
+                        if (data.success) {
+                            alert(data.message);
+                            $('#createQuestionModal').modal('hide');
+                            location.reload();
+                        } else {
+                            alert('Lỗi: ' + data.message);
+                        }
+                    },
+                    error: function () {
+                        alert('Lỗi kết nối');
+                    }
+                });
+            }
+
+            function deleteQuestion(questionId) {
+                if (confirm('Xóa câu hỏi này?')) {
+                    $.ajax({
+                        url: '@Url.Action("DeleteQuestion", "Event", new { area = "Admin" })',
+                        method: 'POST',
+                        data: { id: questionId },
+                        success: function (data) {
+                            if (data.success) {
+                                alert(data.message);
+                                location.reload();
+                            } else {
+                                alert('Lỗi: ' + data.message);
+                            }
+                        },
+                        error: function () {
+                            alert('Lỗi kết nối');
+                        }
+                    });
+                }
+            }
+        </script>
+    </div>
+</div>

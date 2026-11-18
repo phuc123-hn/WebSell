@@ -1,0 +1,229 @@
+﻿@model web1.Models.Order
+
+@{
+    ViewBag.Title = "Chi tiết đơn hàng - Admin";
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2>Chi tiết đơn hàng #@Model.Id</h2>
+    </div>
+    <div class="col-md-6 text-right">
+        <a href="@Url.Action("Index", "Order", new { area = "Admin" })" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Thông tin đơn hàng -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-box"></i> Thông tin đơn hàng</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p style="color:yellow"><strong>Mã đơn hàng:</strong> #@Model.Id</p>
+                        <p style="color:yellow"><strong>Ngày đặt:</strong> @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                        <p style="color:yellow"><strong>Phương thức thanh toán:</strong> @Model.PaymentMethod</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>
+                            <strong style="color:yellow">Trạng thái:</strong>
+                            @{
+                                string statusClass = "";
+                                string statusText = "";
+                                switch (Model.Status)
+                                {
+                                    case "Pending":
+                                        statusClass = "warning";
+                                        statusText = "Chờ xử lý";
+                                        break;
+                                    case "Processing":
+                                        statusClass = "info";
+                                        statusText = "Đang xử lý";
+                                        break;
+                                    case "Shipped":
+                                        statusClass = "primary";
+                                        statusText = "Đã gửi";
+                                        break;
+                                    case "Delivered":
+                                        statusClass = "success";
+                                        statusText = "Đã giao";
+                                        break;
+                                    case "Cancelled":
+                                        statusClass = "danger";
+                                        statusText = "Đã hủy";
+                                        break;
+                                }
+                            }
+                            <span class="badge bg-@statusClass">@statusText</span>
+                        </p>
+                        <p>
+                            <strong style="color:yellow">Thanh toán:</strong>
+                            @if (Model.IsPaid)
+                            {
+                                <span class="badge bg-success"><i class="fas fa-check"></i> Đã thanh toán</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning"><i class="fas fa-clock"></i> Chưa thanh toán</span>
+                            }
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông tin khách hàng -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-user"></i> Thông tin khách hàng</h5>
+            </div>
+            <div class="card-body">
+                <p style="color:yellow"><strong>Tên khách hàng:</strong> @Model.User.FullName</p>
+                <p style="color:yellow"><strong>Username:</strong> @Model.User.Username</p>
+                <p style="color:yellow"><strong>Email:</strong> @Model.User.Email</p>
+                <p style="color:yellow"><strong>Số điện thoại:</strong> @Model.User.Phone</p>
+            </div>
+        </div>
+
+        <!-- Thông tin giao hàng -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-map-marker-alt"></i> Thông tin giao hàng</h5>
+            </div>
+            <div class="card-body">
+                <p style="color:yellow"><strong>Người nhận:</strong> @Model.ShippingName</p>
+                <p style="color:yellow"><strong>Số điện thoại giao hàng:</strong> @Model.ShippingPhone</p>
+                <p style="color:yellow"><strong>Địa chỉ giao hàng:</strong> @Model.ShippingAddress</p>
+            </div>
+        </div>
+
+        <!-- Chi tiết sản phẩm -->
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-list"></i> Chi tiết sản phẩm</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.OrderDetails != null && Model.OrderDetails.Count > 0)
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50%;">Sản phẩm</th>
+                                    <th style="width: 12%;">Giá</th>
+                                    <th style="width: 12%;">Số lượng</th>
+                                    <th style="width: 26%;">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var detail in Model.OrderDetails)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a href="@Url.Action("Details", "Product", new { area = "", id = detail.Product.Id })">
+                                                @detail.Product.Name
+                                            </a>
+                                        </td>
+                                        <td>@detail.UnitPrice.ToString("N0") đ</td>
+                                        <td>@detail.Quantity</td>
+                                        <td><strong>@detail.TotalPrice.ToString("N0") đ</strong></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">Không có sản phẩm nào</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Tóm tắt đơn hàng -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-receipt"></i> Tóm tắt</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span style="color:yellow">Tổng tiền hàng:</span>
+                        <strong style="color:red">@Model.TotalAmount.ToString("N0") đ</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span style="color:yellow">Phí vận chuyển:</span>
+                        <strong style="color:red">30,000 đ</strong>
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-between" style="font-size: 1.2rem;">
+                        <span style="color:yellow"><strong>Tổng cộng:</strong></span>
+                        <strong style="color: #667eea;">
+                            @((Model.TotalAmount + 30000).ToString("N0")) đ
+                        </strong>
+                    </div>
+                </div>
+
+                <hr />
+
+                @if (Model.Status != "Delivered" && Model.Status != "Cancelled")
+                {
+                    <a href="@Url.Action("UpdateStatus", "Order", new { area = "Admin", id = Model.Id })" class="btn btn-warning w-100 mb-2">
+                        <i class="fas fa-edit"></i> Cập nhật trạng thái
+                    </a>
+                }
+
+                @if (!Model.IsPaid && Model.PaymentMethod == "COD")
+                {
+                    <form method="post" action="@Url.Action("MarkAsPaid", "Order", new { area = "Admin" })" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-success w-100 mb-2">
+                            <i class="fas fa-money-bill-wave"></i> Đánh dấu đã thanh toán
+                        </button>
+                    </form>
+                }
+
+                @if (Model.Status != "Delivered" && Model.Status != "Cancelled")
+                {
+                    <a href="@Url.Action("Cancel", "Order", new { area = "Admin", id = Model.Id })" class="btn btn-danger w-100">
+                        <i class="fas fa-times"></i> Hủy đơn hàng
+                    </a>
+                }
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Notes))
+        {
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-sticky-note"></i> Ghi chú</h5>
+                </div>
+                <div class="card-body">
+                    <p>@Model.Notes</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>

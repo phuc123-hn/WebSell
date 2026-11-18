@@ -1,0 +1,103 @@
+﻿@model web1.Models.User
+
+@{
+    ViewBag.Title = "Chi tiết người dùng - Admin";
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2>Chi tiết người dùng</h2>
+    </div>
+    <div class="col-md-6 text-right">
+        <a href="@Url.Action("Index", "User", new { area = "Admin" })" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h5>Thông tin cơ bản</h5>
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong>ID:</strong></td>
+                        <td>@Model.Id</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tên đăng nhập:</strong></td>
+                        <td>@Model.Username</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Họ và tên:</strong></td>
+                        <td>@Model.FullName</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Email:</strong></td>
+                        <td>@Model.Email</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Số điện thoại:</strong></td>
+                        <td>@Model.Phone</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h5>Thông tin tài khoản</h5>
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong>Vai trò:</strong></td>
+                        <td>
+                            @if (Model.Role == "Admin")
+                            {
+                                <span class="badge bg-danger">Admin</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-info">Customer</span>
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Xác minh:</strong></td>
+                        <td>
+                            @if (Model.IsVerified)
+                            {
+                                <span class="badge bg-success"><i class="fas fa-check"></i> Đã xác minh</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning"><i class="fas fa-times"></i> Chưa xác minh</span>
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ngày tạo:</strong></td>
+                        <td>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                    </tr>
+                    <tr>
+                        <td><strong>OTP:</strong></td>
+                        <td>@(string.IsNullOrEmpty(Model.OTP) ? "Không có" : Model.OTP)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>OTP hết hạn:</strong></td>
+                        <td>@Model.OTPExpire.ToString("dd/MM/yyyy HH:mm")</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        @if (Model.Role != "Admin")
+        {
+            <hr />
+            <div class="row">
+                <div class="col-md-12">
+                    <a href="@Url.Action("Delete", "User", new { area = "Admin", id = Model.Id })" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Xóa người dùng
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>

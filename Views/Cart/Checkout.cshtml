@@ -1,0 +1,202 @@
+﻿@{
+    ViewBag.Title = "Thanh toán - TechWorld";
+    List<web1.Models.CartItem> cartItems = ViewBag.CartItems;
+    decimal total = ViewBag.Total;
+}
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-info-circle"></i> Thông tin giao hàng</h4>
+            </div>
+            <div class="card-body">
+                <form id="checkoutForm">
+                    @Html.AntiForgeryToken()
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tên người nhận</label>
+                            <input type="text" name="shippingName" class="form-control" maxlength="100" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Số điện thoại</label>
+                            <input type="text" name="shippingPhone" class="form-control" placeholder="0xxxxxxxxx" maxlength="20" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Địa chỉ giao hàng</label>
+                        <input type="text" name="shippingAddress" class="form-control" maxlength="500" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Phương thức thanh toán</label>
+                        <select name="paymentMethod" class="form-select">
+                            <option value="COD">Thanh toán khi nhận hàng (COD)</option>
+                            <option value="Bank Transfer">Chuyển khoản ngân hàng</option>
+                            <option value="E-Wallet">Ví điện tử</option>
+                        </select>
+                    </div>
+
+                    <hr />
+
+                    <div id="otpSection" style="display:none;" class="mt-4 p-3 border border-warning rounded bg-light">
+                        <h5 class="text-warning"><i class="fas fa-shield-alt"></i> Xác thực thanh toán</h5>
+                        <p class="small text-muted">Vui lòng nhập mã OTP đã được gửi đến email của bạn để hoàn tất đặt hàng.</p>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label font-weight-bold">Mã OTP (6 chữ số)</label>
+                            <input type="text" id="otpInput" class="form-control form-control-lg text-center"
+                                   placeholder="000000" maxlength="6" style="letter-spacing: 10px; font-size: 24px;">
+                            <div id="otpError" class="text-danger mt-2" style="display:none;"></div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="button" id="btnConfirmOtp" class="btn btn-success btn-lg px-4">
+                                <i class="fas fa-check-circle"></i> Xác nhận OTP
+                            </button>
+                            <button type="button" onclick="resendOtp()" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-sync"></i> Gửi lại mã
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btnSubmitOrder" class="btn btn-primary btn-lg w-100 mt-3">
+                        <i class="fas fa-check"></i> Xác nhận đơn hàng
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Tóm tắt đơn hàng</h5>
+            </div>
+            <div class="card-body">
+                @foreach (var item in cartItems)
+                {
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>@item.ProductName x @item.Quantity</span>
+                        <span>@item.TotalPrice.ToString("N0")đ</span>
+                    </div>
+                }
+                <hr>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Tạm tính:</span>
+                    <span>@total.ToString("N0")đ</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2 text-success">
+                    <span>Giảm giá:</span>
+                    <span id="summaryDiscount">-0đ</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Phí vận chuyển:</span>
+                    <span>30,000đ</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <strong class="h5">Tổng cộng:</strong>
+                    <strong class="h5 text-danger" id="summaryTotal">@((total + 30000).ToString("N0"))đ</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Xử lý khi nhấn "Xác nhận đơn hàng"
+            $('#checkoutForm').on('submit', function (e) {
+                e.preventDefault();
+
+                var btn = $('#btnSubmitOrder');
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Đang xử lý...');
+
+                $.post('@Url.Action("PlaceOrder", "Cart")', $(this).serialize(), function (response) {
+                    if (response.success) {
+                        // response.orderId sẽ là 0 theo logic mới
+                        sendPaymentOtp(response.orderId);
+                    } else {
+                        alert(response.message);
+                        btn.prop('disabled', false).html('<i class="fas fa-check"></i> Xác nhận đơn hàng');
+                    }
+                }).fail(function() {
+                    alert("Có lỗi xảy ra trong quá trình kết nối.");
+                    btn.prop('disabled', false).html('<i class="fas fa-check"></i> Xác nhận đơn hàng');
+                });
+            });
+
+            // Xử lý xác nhận OTP
+            $('#btnConfirmOtp').click(function() {
+                var otp = $('#otpInput').val();
+                if (otp.length < 6) {
+                    $('#otpError').text('Vui lòng nhập đủ 6 chữ số').show();
+                    return;
+                }
+
+                var btn = $(this);
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Đang xác thực...');
+
+                $.post('@Url.Action("ConfirmPaymentWithOtp", "Payment")', {
+                    orderId: 0, // Theo quy trình Session-based
+                    otp: otp,
+                    __RequestVerificationToken: $('[name=__RequestVerificationToken]').val()
+                }, function(response) {
+                    if (response.success) {
+                        window.location.href = response.redirectUrl;
+                    } else {
+                        $('#otpError').text(response.message).show();
+                        btn.prop('disabled', false).html('<i class="fas fa-check-circle"></i> Xác nhận OTP');
+                    }
+                }).fail(function() {
+                    $('#otpError').text('Lỗi kết nối server').show();
+                    btn.prop('disabled', false).html('<i class="fas fa-check-circle"></i> Xác nhận OTP');
+                });
+            });
+
+            // Chỉ cho phép nhập số vào ô OTP
+            $('#otpInput').on('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
+
+        function sendPaymentOtp(orderId) {
+            $.post('@Url.Action("SendOtpPayment", "Payment")', {
+                orderId: 0, // Luôn gửi 0 vì đơn đang nằm trong Session
+                __RequestVerificationToken: $('[name=__RequestVerificationToken]').val()
+            }, function(response) {
+                if (response.success) {
+                    $('#otpSection').slideDown();
+                    $('#btnSubmitOrder').fadeOut();
+                    $('#otpInput').focus();
+
+                    var message = '<div class="alert alert-info alert-otp-sent mt-3">' +
+                                  '<i class="fas fa-paper-plane"></i> ' + response.message + ' (' + response.email + ')' +
+                                  '</div>';
+                    $('.alert-otp-sent').remove();
+                    $('#checkoutForm').before(message);
+                } else {
+                    alert(response.message);
+                    $('#btnSubmitOrder').prop('disabled', false).html('<i class="fas fa-check"></i> Xác nhận đơn hàng');
+                }
+            });
+        }
+
+        function resendOtp() {
+            $.post('@Url.Action("SendOtpPayment", "Payment")', {
+                orderId: 0,
+                __RequestVerificationToken: $('[name=__RequestVerificationToken]').val()
+            }, function(response) {
+                if (response.success) {
+                    $('#otpError').hide();
+                    alert("Mã OTP mới đã được gửi!");
+                } else {
+                    $('#otpError').text(response.message).show();
+                }
+            });
+        }
+    </script>
+}

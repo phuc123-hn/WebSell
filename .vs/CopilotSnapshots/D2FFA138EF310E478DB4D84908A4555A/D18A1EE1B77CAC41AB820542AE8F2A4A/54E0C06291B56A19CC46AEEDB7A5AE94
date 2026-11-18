@@ -1,0 +1,324 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - TechWorld</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="@Url.Content("~/Content/theme.css")">
+    <link rel="stylesheet" href="@Url.Content("~/Content/effects.css")">
+    <style>
+        .container {
+            max-width: 1280px;
+        }
+
+        .carousel-item img {
+            height: 400px;
+            object-fit: cover;
+        }
+
+        .sidebar {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 20px;
+        }
+
+        .sidebar h5 {
+            color: var(--color-primary);
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .toast {
+            box-shadow: var(--shadow-xl);
+            border-radius: var(--border-radius-sm);
+            overflow: hidden;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-color);
+        }
+
+        .toast-header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 15px;
+            font-weight: 600;
+        }
+
+        .toast-body {
+            padding: 12px 15px;
+            color: var(--text-primary);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+    @RenderSection("Styles", false)
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            @Html.ActionLink("TechWorld", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="search-bar">
+                    <input type="text" class="form-control" id="searchKeyword" placeholder="Tìm kiếm sản phẩm...">
+                </div>
+
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="@Url.Action("Index", "Home")">Trang chủ</a>
+                    <a class="nav-link" href="@Url.Action("Index", "Product")">Sản phẩm</a>
+                    <a class="nav-link" href="@Url.Action("Index", "Showcase")">Trưng bày</a>
+                    <a class="nav-link" href="@Url.Action("Index", "News")">Tin tức</a>
+                    <a class="nav-link" href="@Url.Action("About", "Home")">Giới thiệu</a>
+                    <a class="nav-link" href="@Url.Action("Contact", "Home")">Liên hệ</a>
+                    <a class="nav-link" href="@Url.Action("Index", "Voucher")"><i class="fas fa-ticket-alt"></i> Giảm giá</a>
+                    <a class="nav-link" href="@Url.Action("Index", "Home", new { area = "Community" })" style="background: rgba(255,255,255,0.2); border-radius: 20px; padding: 8px 15px !important;">
+                        <i class="fas fa-comments"></i> Cộng Đồng
+                    </a>
+
+                    @if (Session["UserId"] != null)
+                    {
+                        <!-- ✅ Icon vòng quay may mắn -->
+                        <a href="@Url.Action("Index", "LuckySpin")" 
+                           class="nav-link position-relative me-2" 
+                           style="padding: 0 10px;"
+                           title="Vòng quay may mắn">
+                            <i class="fas fa-dharmachakra" style="font-size: 1.5rem; color: #FFD700;"></i>
+                            <span id="spinCountBadge" 
+                                  style="position: absolute; top: -8px; right: 2px; 
+                                         background: #ff4757; color: white; border-radius: 50%;
+                                         width: 20px; height: 20px; font-size: 11px; font-weight: bold;
+                                         display: flex; align-items: center; justify-content: center;">
+                                0
+                            </span>
+                        </a>
+                    }
+
+                    <div class="cart-icon" onclick="location.href='@Url.Action("Index", "Cart")';">
+                        <i class="fas fa-shopping-cart" style="font-size: 1.5rem; color: white;"></i>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </div>
+
+                    @if (Session["UserId"] != null)
+                    {
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> @Session["FullName"]
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                <li><a class="dropdown-item" href="@Url.Action("MyAccount", "AccountProfile")"><i class="fas fa-user-circle"></i> Tài khoản của tôi</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("MyOrders", "AccountProfile")"><i class="fas fa-box"></i> Đơn hàng</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("MyVouchers", "AccountProfile")"><i class="fas fa-ticket-alt"></i> Voucher của tôi</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("Index", "Profile", new { area = "Community" })"><i class="fas fa-user-circle"></i> Trang cá nhân (Community)</a></li>
+                                @if (Session["Role"] != null && Session["Role"].ToString() == "Admin")
+                                {
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Index", "Home", new { area = "Admin" })"><i class="fas fa-cogs"></i> Admin Panel</a></li>
+                                }
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="@Url.Action("Logout", "Account")"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <a class="nav-link" href="@Url.Action("Login", "Account")">Đăng nhập</a>
+                        <a class="nav-link" href="@Url.Action("Register", "Account")">Đăng ký</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        @RenderBody()
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><i class="fas fa-microchip"></i> TechWorld</h5>
+                    <p>Website bán hàng công nghệ hàng đầu Việt Nam.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Liên hệ</h5>
+                    <p>
+                        <i class="fas fa-phone"></i> 0777268757<br>
+                        <i class="fas fa-envelope"></i> phucngo2406@gmail.com<br>
+                        <i class="fas fa-map-marker-alt"></i>  phường Chánh Hiệp, thành phố Hồ Chí Minh
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Theo dõi</h5>
+                    <p>
+                        <a href="https://www.facebook.com/phuc.ngo.983966" target="_blank">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </p>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p>&copy; 2026 TechWorld. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        $(document).ready(function () {
+            updateCartCount();
+            updateSpinCount();
+            $('#searchKeyword').keypress(function (e) {
+                if (e.which == 13) {
+                    var keyword = $(this).val();
+                    window.location.href = '@Url.Action("Index", "Product")?searchKeyword=' + keyword;
+                    return false;
+                }
+            });
+        });
+
+        function updateCartCount() {
+            $.ajax({
+                url: '@Url.Action("GetCartCount", "Cart")',
+                method: 'GET',
+                success: function (data) {
+                    $('#cartCount').text(data.count);
+                }
+            });
+        }
+
+        // ✅ Cập nhật spin count
+        function updateSpinCount() {
+            if ('@Session["UserId"]' !== '') {
+                $.ajax({
+                    url: '@Url.Action("GetSpinCount", "LuckySpin")',
+                    method: 'GET',
+                    success: function(data) {
+                        var badge = $('#spinCountBadge');
+                        badge.text(data.spinCount);
+                        if (data.spinCount > 0) {
+                            badge.css('background', '#ff4757');
+                        } else {
+                            badge.css('background', '#999');
+                        }
+                    }
+                });
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            var toastHTML = `
+                <div class="toast" role="alert" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; min-width: 300px; animation: slideIn 0.3s ease;">
+                    <div class="toast-header" style="background: ${type === 'success' ? '#28a745' : '#dc3545'}; color: white;">
+                        <strong class="me-auto"><i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${type === 'success' ? 'Thành công' : 'Lỗi'}</strong>
+                        <button type="button" class="btn-close" style="filter: invert(1);" onclick="this.closest('.toast').remove()"></button>
+                    </div>
+                    <div class="toast-body" style="background: white; color: #333;">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            $('body').append(toastHTML);
+            
+            setTimeout(function() {
+                $('.toast').fadeOut(300, function() { $(this).remove(); });
+            }, 3000);
+        }
+
+        function addToCart(productId, quantity = 1) {
+            $.ajax({
+                url: '@Url.Action("Add", "Cart")',
+                method: 'POST',
+                data: { productId: productId, quantity: quantity },
+                success: function (data) {
+                    if (data.success) {
+                        showToast('✓ ' + data.message + ' (' + quantity + ' sản phẩm)', 'success');
+                        updateCartCount();
+                    } else {
+                        showToast('✗ Lỗi: ' + data.message, 'error');
+                    }
+                },
+                error: function() {
+                    showToast('✗ Không thể thêm vào giỏ. Vui lòng thử lại!', 'error');
+                }
+            });
+        }
+
+        // Notification System
+        function showNotification(title, message, type = 'info', duration = 5000) {
+            var icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+            var bgColor = type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : type === 'warning' ? '#ffc107' : '#17a2b8';
+            var textColor = type === 'warning' ? '#333' : 'white';
+
+            var notificationHTML = `
+                <div class="notification-box" style="position: fixed; top: 80px; right: 20px; z-index: 10000; animation: slideInRight 0.4s ease; background: ${bgColor}; color: ${textColor}; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); min-width: 350px; max-width: 450px;">
+                    <div style="display: flex; align-items: flex-start; gap: 15px;">
+                        <i class="fas fa-${icon}" style="font-size: 24px; margin-top: 2px; flex-shrink: 0;"></i>
+                        <div style="flex: 1;">
+                            <strong style="display: block; font-size: 16px; margin-bottom: 5px;">${title}</strong>
+                            <p style="margin: 0; font-size: 14px; line-height: 1.5;">${message}</p>
+                        </div>
+                        <button onclick="this.closest('.notification-box').remove()" style="background: none; border: none; color: inherit; font-size: 20px; cursor: pointer; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">×</button>
+                    </div>
+                </div>
+            `;
+
+            $('body').append(notificationHTML);
+
+            if (duration > 0) {
+                setTimeout(function() {
+                    $('.notification-box').fadeOut(300, function() { $(this).remove(); });
+                }, duration);
+            }
+        }
+
+        // Load notifications on page load
+        $(document).ready(function() {
+            if ('@Session["UserId"]' !== '') {
+                checkNotifications();
+                // Check every 30 seconds
+                setInterval(checkNotifications, 30000);
+            }
+        });
+
+        function checkNotifications() {
+            $.ajax({
+                url: '@Url.Action("GetNotifications", "Home")',
+                method: 'GET',
+                success: function(data) {
+                    if (data.notifications && data.notifications.length > 0) {
+                        data.notifications.forEach(function(notif) {
+                            showNotification(notif.title, notif.message, notif.type, 7000);
+                        });
+                    }
+                }
+            });
+        }
+    </script>
+
+    @RenderSection("scripts", false)
+
+</body>
+</html>

@@ -1,0 +1,152 @@
+﻿@model web1.Models.Voucher
+
+@{
+    ViewBag.Title = "Sửa Voucher - Admin";
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2 style="color: #FFD700;">Sửa Voucher</h2>
+    </div>
+    <div class="col-md-6 text-right">
+        <a href="@Url.Action("Index", "Voucher", new { area = "Admin" })" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+@if (ViewData.ModelState.Values.SelectMany(v => v.Errors).Any())
+{
+    <div class="alert alert-danger">
+        <strong>Lỗi:</strong>
+        <ul class="mb-0 mt-2">
+            @foreach (var modelState in ViewData.ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            }
+        </ul>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                @using (Html.BeginForm("Edit", "Voucher", new { area = "Admin" }, FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.HiddenFor(model => model.CreatedAt)
+                    @Html.HiddenFor(model => model.UpdatedAt)
+                    @Html.HiddenFor(model => model.UsedQuantity)
+
+                    <div class="mb-3">
+                        <label class="form-label" style="color:yellow"><strong>Mã voucher</strong></label>
+                        @Html.TextBoxFor(model => model.Code, new { @class = "form-control", @readonly = "readonly" })
+                        <small class="text-muted">Không thể sửa mã voucher</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" style="color:yellow"><strong>Tên voucher <span style="color: red;">*</span></strong></label>
+                        @Html.TextBoxFor(model => model.Name, new { @class = "form-control", placeholder = "VD: Giảm 50% sản phẩm" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" style="color:yellow"><strong>Mô tả</strong></label>
+                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 3, placeholder = "Mô tả chi tiết..." })
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="color:yellow"><strong>Giảm theo %</strong></label>
+                                @Html.TextBoxFor(model => model.DiscountPercent, new { @class = "form-control", type = "number", min = "0", max = "100", step = "0.01" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="color:yellow"><strong>Hoặc giảm theo số tiền</strong></label>
+                                @Html.TextBoxFor(model => model.DiscountAmount, new { @class = "form-control", type = "number", min = "0", step = "0.01" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="color:yellow"><strong>Ngày bắt đầu <span style="color: red;">*</span></strong></label>
+                                @Html.TextBoxFor(model => model.StartDate, new { @class = "form-control", type = "datetime-local" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="color:yellow"><strong>Ngày kết thúc <span style="color: red;">*</span></strong></label>
+                                @Html.TextBoxFor(model => model.EndDate, new { @class = "form-control", type = "datetime-local" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="color:yellow"><strong>Số lượng (0 = vô hạn)</strong></label>
+                                @Html.TextBoxFor(model => model.Quantity, new { @class = "form-control", type = "number", min = "0" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="color:yellow"><strong>Đơn hàng tối thiểu</strong></label>
+                                @Html.TextBoxFor(model => model.MinOrderAmount, new { @class = "form-control", type = "number", min = "0" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" style="color:yellow"><strong>Sự kiện (nếu có)</strong></label>
+                        @Html.DropDownListFor(model => model.EventId, ViewBag.Events as SelectList, "-- Chọn sự kiện --", new { @class = "form-select" })
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            @Html.CheckBoxFor(model => model.RequireEventParticipation, new { @class = "form-check-input" })
+                            <label class="form-check-label" style="color:yellow">
+                                Yêu cầu tham gia sự kiện để sử dụng voucher này
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            @Html.CheckBoxFor(model => model.IsActive, new { @class = "form-check-input" })
+                            <label class="form-check-label" style="color:yellow">
+                                Kích hoạt voucher
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i> Cập nhật
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Thông tin</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Đã sử dụng:</strong> @Model.UsedQuantity</p>
+                @if (Model.Quantity > 0)
+                {
+                    <p><strong>Còn lại:</strong> @(Model.Quantity - Model.UsedQuantity)</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

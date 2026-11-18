@@ -1,0 +1,239 @@
+﻿@model web1.Models.Order
+
+@{
+    ViewBag.Title = "Chi tiết đơn hàng - TechWorld";
+}
+
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-box"></i> Chi tiết đơn hàng #@Model.Id</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="@Url.Action("MyOrders", "AccountProfile")" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Thông tin đơn hàng</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Mã đơn hàng:</strong> #@Model.Id</p>
+                            <p><strong>Ngày đặt:</strong> @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                            <p><strong>Phương thức thanh toán:</strong> @Model.PaymentMethod</p>
+                        </div>
+                        <div class="col-md-6">
+                            @{
+                                string statusClass = "";
+                                string statusText = "";
+                                switch (Model.Status)
+                                {
+                                    case "Pending":
+                                        statusClass = "warning";
+                                        statusText = "Chờ xử lý";
+                                        break;
+                                    case "Processing":
+                                        statusClass = "info";
+                                        statusText = "Đang xử lý";
+                                        break;
+                                    case "Shipped":
+                                        statusClass = "primary";
+                                        statusText = "Đã gửi";
+                                        break;
+                                    case "Delivered":
+                                        statusClass = "success";
+                                        statusText = "Đã giao";
+                                        break;
+                                    case "Cancelled":
+                                        statusClass = "danger";
+                                        statusText = "Đã hủy";
+                                        break;
+                                }
+                            }
+                            <p>
+                                <strong>Trạng thái:</strong><br>
+                                <span class="badge bg-@statusClass" style="font-size: 1rem; padding: 10px 15px;">@statusText</span>
+                            </p>
+                            <p>
+                                <strong>Thanh toán:</strong><br>
+                                @if (Model.IsPaid)
+                                {
+                                    <span class="badge bg-success" style="font-size: 1rem; padding: 10px 15px;">
+                                        <i class="fas fa-check"></i> Đã thanh toán
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning" style="font-size: 1rem; padding: 10px 15px;">
+                                        <i class="fas fa-clock"></i> Chưa thanh toán
+                                    </span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-map-marker-alt"></i> Thông tin giao hàng</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Người nhận:</strong> @Model.ShippingName</p>
+                    <p><strong>Số điện thoại:</strong> @Model.ShippingPhone</p>
+                    <p><strong>Địa chỉ giao hàng:</strong> @Model.ShippingAddress</p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-list"></i> Chi tiết sản phẩm</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.OrderDetails != null && Model.OrderDetails.Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50%;">Sản phẩm</th>
+                                        <th style="width: 15%;">Giá</th>
+                                        <th style="width: 15%;">Số lượng</th>
+                                        <th style="width: 20%;">Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var detail in Model.OrderDetails)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (detail.Product != null)
+                                                {
+                                                    <a href="@Url.Action("Details", "Product", new { id = detail.Product.Id })">
+                                                        @detail.Product.Name
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">(Sản phẩm đã xóa)</span>
+                                                }
+                                            </td>
+                                            <td>@detail.UnitPrice.ToString("N0") đ</td>
+                                            <td>@detail.Quantity</td>
+                                            <td><strong>@detail.TotalPrice.ToString("N0") đ</strong></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Không có sản phẩm nào</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-receipt"></i> Tóm tắt</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tổng tiền hàng:</span>
+                            <strong>@Model.TotalAmount.ToString("N0") đ</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Phí vận chuyển:</span>
+                            <strong>30,000 đ</strong>
+                        </div>
+                        <hr />
+                        <div class="d-flex justify-content-between" style="font-size: 1.2rem;">
+                            <span><strong>Tổng cộng:</strong></span>
+                            <strong style="color: #667eea;">@((Model.TotalAmount + 30000).ToString("N0")) đ</strong>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-4">
+                        <strong><i class="fas fa-info-circle"></i> Trạng thái:</strong>
+                        <p class="mb-0 mt-2">
+                            @{
+                                string statusDescription = "";
+                                switch (Model.Status)
+                                {
+                                    case "Pending":
+                                        statusDescription = "Đơn hàng của bạn đang chờ được xử lý";
+                                        break;
+                                    case "Processing":
+                                        statusDescription = "Đơn hàng đang được chuẩn bị";
+                                        break;
+                                    case "Shipped":
+                                        statusDescription = "Đơn hàng đã được gửi đi";
+                                        break;
+                                    case "Delivered":
+                                        statusDescription = "Đơn hàng đã được giao thành công";
+                                        break;
+                                    case "Cancelled":
+                                        statusDescription = "Đơn hàng đã bị hủy";
+                                        break;
+                                }
+                            }
+                            @statusDescription
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="@Url.Action("Index", "Product")" class="btn btn-primary w-100 mb-2">
+                    <i class="fas fa-shopping-bag"></i> Tiếp tục mua sắm
+                </a>
+                <a href="@Url.Action("MyOrders", "AccountProfile")" class="btn btn-secondary w-100">
+                    <i class="fas fa-list"></i> Xem tất cả đơn hàng
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+
+    .card-header {
+        border-bottom: none;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .alert {
+        border-radius: 8px;
+        border: none;
+    }
+
+    a {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+        a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+</style>

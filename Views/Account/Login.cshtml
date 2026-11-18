@@ -1,0 +1,50 @@
+﻿@model web1.Models.User
+
+@{
+    ViewBag.Title = "Đăng nhập - TechWorld";
+}
+
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card mt-5">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="fas fa-sign-in-alt"></i> Đăng nhập</h3>
+            </div>
+
+            <div class="card-body">
+
+                @if (!string.IsNullOrEmpty(ViewBag.Error))
+                {
+                    <div class="alert alert-danger">@ViewBag.Error</div>
+                }
+
+                @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label">Tên đăng nhập</label>
+                        <input type="text" name="username" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Mật khẩu</label>
+                        <input type="password" name="password" class="form-control" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mb-3">
+                        Đăng nhập
+                    </button>
+                }
+
+                <hr>
+
+                <p class="text-center">
+                    Chưa có tài khoản?
+                    <a href="@Url.Action("Register", "Account")">Đăng ký ngay</a>
+                </p>
+
+            </div>
+        </div>
+    </div>
+</div>

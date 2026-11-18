@@ -1,0 +1,231 @@
+﻿@model web1.Models.Event
+
+@{
+    ViewBag.Title = "Sửa sự kiện - Admin";
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2 style="color: #FFD700;">Sửa sự kiện</h2>
+    </div>
+    <div class="col-md-6 text-right">
+        <a href="@Url.Action("Index", "Event", new { area = "Admin" })" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+@if (ViewData.ModelState.Values.SelectMany(v => v.Errors).Any())
+{
+    <div class="alert alert-danger">
+        <strong>Lỗi:</strong>
+        <ul class="mb-0 mt-2">
+            @foreach (var modelState in ViewData.ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            }
+        </ul>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                @using (Html.BeginForm("Edit", "Event", new { area = "Admin" }, FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.HiddenFor(model => model.CreatedAt)
+                    @Html.HiddenFor(model => model.UpdatedAt)
+
+                    <div class="mb-3">
+                        <label class="form-label" style="color:yellow"><strong>Tên sự kiện <span style="color: red;">*</span></strong></label>
+                        @Html.TextBoxFor(model => model.Name, new { @class = "form-control", placeholder = "VD: Flash Sale Tháng 3" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" style="color:yellow"><strong>Mô tả</strong></label>
+                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 4, placeholder = "Mô tả về sự kiện..." })
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="color:yellow"><strong>Ngày bắt đầu <span style="color: red;">*</span></strong></label>
+                                @Html.TextBoxFor(model => model.StartDate, new { @class = "form-control", type = "datetime-local" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" style="color:yellow"><strong>Ngày kết thúc <span style="color: red;">*</span></strong></label>
+                                @Html.TextBoxFor(model => model.EndDate, new { @class = "form-control", type = "datetime-local" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" style="color:yellow"><strong>Hình ảnh</strong></label>
+                        <div class="input-group mb-3">
+                            @Html.TextBoxFor(model => model.ImageUrl, new { @class = "form-control", placeholder = "Nhập URL hoặc upload file", id = "imageUrlInput" })
+                            <button class="btn btn-outline-primary" type="button" onclick="document.getElementById('imageFileInput').click()">
+                                <i class="fas fa-upload"></i> Upload
+                            </button>
+                        </div>
+                        <input type="file" id="imageFileInput" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+                        <small class="text-warning d-block mb-2" style="color: #FFD700 !important;">
+                            Thư mục: /Content/Event/ | Tối đa: 5MB | Định dạng: JPG, PNG, GIF
+                        </small>
+                        <div id="uploadStatus" style="display:none;" class="alert alert-info alert-sm mb-2 py-2 px-3">
+                            <span id="uploadStatusText"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" style="color:yellow"><strong>Xem trước ảnh</strong></label>
+                        <div id="imagePreview" style="width: 100%; height: 300px; background: #f5f5f5; border: 2px dashed #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            <p class="text-muted mb-0">Ảnh sẽ hiển thị ở đây</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            @Html.CheckBoxFor(model => model.IsActive, new { @class = "form-check-input" })
+                            <label class="form-check-label" style="color:yellow">
+                                Kích hoạt sự kiện
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i> Cập nhật
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Hướng dẫn</h5>
+            </div>
+            <div class="card-body" style="color: black;">
+                <p><strong>Tên sự kiện:</strong> Tên dễ nhớ cho sự kiện (VD: Flash Sale, Black Friday)</p>
+                <p><strong>Mô tả:</strong> Giải thích chi tiết về sự kiện</p>
+                <p><strong>Ngày bắt đầu/kết thúc:</strong> Thời gian diễn ra sự kiện</p>
+                <p><strong>Hình ảnh:</strong> Banner hoặc ảnh đại diện cho sự kiện</p>
+                <p><strong>Kích hoạt:</strong> Bật/tắt sự kiện hiển thị trên website</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    // Upload ảnh lên server
+    function handleImageUpload(event) {
+        var file = event.target.files[0];
+
+        if (!file) {
+            console.log('Không có file được chọn');
+            return;
+        }
+
+        console.log('File chọn:', file.name, 'Size:', file.size, 'Type:', file.type);
+
+        // Kiểm tra loại file
+        if (!file.type.match('image.*')) {
+            alert('Vui lòng chọn file ảnh!');
+            return;
+        }
+
+        // Kiểm tra kích thước (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Kích thước ảnh phải nhỏ hơn 5MB!');
+            return;
+        }
+
+        // Hiển thị status
+        showUploadStatus('Đang tải lên...');
+
+        // Tạo FormData
+        var formData = new FormData();
+        formData.append('file', file);
+
+        console.log('Bắt đầu upload...');
+
+        // Upload lên server
+        $.ajax({
+            url: '@Url.Action("UploadImage", "Event", new { area = "Admin" })',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            timeout: 30000,
+            success: function (response) {
+                console.log('Response:', response);
+
+                if (response.success) {
+                    // Cập nhật input với đường dẫn file
+                    $('#imageUrlInput').val(response.filePath);
+
+                    // Hiển thị preview
+                    showImagePreview(response.filePath);
+
+                    // Hiển thị thông báo thành công
+                    showUploadStatus('Upload thành công: ' + response.fileName);
+                    setTimeout(() => {
+                        showUploadStatus('');
+                    }, 4000);
+                } else {
+                    showUploadStatus('Lỗi: ' + response.message);
+                    setTimeout(() => {
+                        showUploadStatus('');
+                    }, 4000);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', xhr.status, error);
+                showUploadStatus('Lỗi kết nối! (' + xhr.status + ')');
+                setTimeout(() => {
+                    showUploadStatus('');
+                }, 4000);
+            }
+        });
+    }
+
+    function showUploadStatus(message) {
+        if (message && message.length > 0) {
+            $('#uploadStatusText').text(message);
+            $('#uploadStatus').show();
+        } else {
+            $('#uploadStatus').hide();
+        }
+    }
+
+    function showImagePreview(imageUrl) {
+        var preview = document.getElementById('imagePreview');
+        preview.innerHTML = '<img src="' + imageUrl + '" style="width: 100%; height: 100%; object-fit: contain;">';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var currentUrl = document.getElementById('imageUrlInput').value;
+        if (currentUrl && currentUrl.trim() !== '') {
+            showImagePreview(currentUrl);
+        }
+    });
+
+    $('#imageUrlInput').on('change', function () {
+        var url = this.value.trim();
+        if (url !== '') {
+            showImagePreview(url);
+        } else {
+            document.getElementById('imagePreview').innerHTML = '<p class="text-muted mb-0">Ảnh sẽ hiển thị ở đây</p>';
+        }
+    });
+</script>

@@ -1,0 +1,2171 @@
+﻿@model web1.Models.Product
+
+@{
+    Layout = null;
+    ViewBag.Title = "Trưng Bày 3D - " + Model.Name;
+
+    string nameLower = Model.Name.ToLower();
+    string deviceType = "phone";
+    if (nameLower.Contains("macbook") || nameLower.Contains("mac book")) { deviceType = "macbook"; }
+    else if (nameLower.Contains("ipad")) { deviceType = "ipad"; }
+    else if (nameLower.Contains("laptop")) { deviceType = "laptop"; }
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #03050a;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        .stage {
+            width: 100vw;
+            height: 100vh;
+            background: #03050a;
+            background-image: radial-gradient(circle at 25% 35%, rgba(80,120,255,.07) 0%, transparent 60%), radial-gradient(circle at 75% 65%, rgba(80,200,255,.05) 0%, transparent 65%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            user-select: none;
+        }
+
+        /* cursor changes based on drag state */
+        .stage {
+            cursor: grab;
+        }
+
+            .stage.dragging {
+                cursor: grabbing;
+            }
+
+            .stage::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(white 1.2px, transparent 1px), radial-gradient(#a0f0ff 1px, transparent 1px), radial-gradient(#d0a0ff 1.5px, transparent 1px);
+                background-size: 90px 90px, 140px 140px, 200px 200px;
+                background-position: 0 0, 30px 50px, 70px 20px;
+                opacity: 0;
+                animation: twinkle 6s infinite alternate ease-in-out;
+                pointer-events: none;
+            }
+
+        @@keyframes twinkle {
+            0% {
+                opacity: .45
+            }
+
+            100% {
+                opacity: .85
+            }
+        }
+
+        canvas.particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 9px 18px;
+            background: rgba(255,255,255,.07);
+            color: rgba(255,255,255,.7);
+            border: .5px solid rgba(255,255,255,.14);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            z-index: 100;
+            letter-spacing: .04em;
+            transition: all .2s;
+        }
+
+            .back-btn:hover {
+                background: rgba(255,255,255,.13);
+                color: #fff;
+            }
+
+        /* drag hint badge */
+        .drag-hint {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 7px 14px;
+            background: rgba(255,255,255,.06);
+            color: rgba(255,255,255,.38);
+            border: .5px solid rgba(255,255,255,.1);
+            border-radius: 20px;
+            font-size: 11px;
+            letter-spacing: .08em;
+            z-index: 100;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity .6s;
+        }
+
+            .drag-hint.visible {
+                opacity: 1;
+            }
+
+        .drag-hint-icon {
+            width: 14px;
+            height: 14px;
+            border: 1.5px solid rgba(255,255,255,.4);
+            border-radius: 50%;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+            .drag-hint-icon::after {
+                content: '';
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%,-60%);
+                width: 3px;
+                height: 5px;
+                border-radius: 2px;
+                background: rgba(255,255,255,.4);
+            }
+
+        .hero-text {
+            position: absolute;
+            top: 44px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity .8s ease;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .hero-title {
+            font-size: 26px;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .hero-sub {
+            font-size: 12px;
+            color: rgba(100,150,255,.7);
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            letter-spacing: .14em;
+            color: rgba(255,255,255,.28);
+            text-transform: uppercase;
+            white-space: nowrap;
+            z-index: 10;
+            transition: opacity .4s;
+        }
+
+        .scene {
+            perspective: 1200px;
+            perspective-origin: 50% 45%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .layer {
+            position: absolute;
+            transform-style: preserve-3d;
+            transition: transform 1s cubic-bezier(.23,1,.32,1), opacity .8s ease;
+        }
+
+        /* ── PHONE ── */
+        .phone-wrap {
+            transform-style: preserve-3d;
+            position: relative;
+            width: 220px;
+            height: 440px;
+            transition: transform 1.2s cubic-bezier(.23,1,.32,1);
+        }
+
+        .l-glow-phone {
+            width: 220px;
+            height: 440px;
+            border-radius: 44px;
+            background: radial-gradient(ellipse at 50% 50%,rgba(100,140,255,.15) 0%,transparent 70%);
+            top: 0;
+            left: 0;
+            transform: translateZ(-10px) scale(1.18);
+            pointer-events: none;
+        }
+
+        .l-shadow-phone {
+            width: 160px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(0,0,0,.75);
+            bottom: -58px;
+            left: 30px;
+            top: auto;
+        }
+
+        .l-frame-phone {
+            width: 220px;
+            height: 440px;
+            border-radius: 44px;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+        }
+
+        .frame-inner-p {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(165deg,#2c2f38 0%,#1c1e25 40%,#0f1015 100%);
+            border-radius: 44px;
+            border: 1.5px solid rgba(255,255,255,.12);
+            position: relative;
+        }
+
+            .frame-inner-p::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                border-radius: 44px;
+                background: linear-gradient(#1c1e25,#1c1e25) padding-box,linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.02),rgba(255,255,255,.18)) border-box;
+                border: 2px solid transparent;
+            }
+
+        .frame-hl {
+            position: absolute;
+            left: 0;
+            top: 60px;
+            bottom: 60px;
+            width: 3px;
+            background: linear-gradient(180deg,transparent,rgba(255,255,255,.09),transparent);
+        }
+
+        .frame-hr {
+            position: absolute;
+            right: 0;
+            top: 60px;
+            bottom: 60px;
+            width: 3px;
+            background: linear-gradient(180deg,transparent,rgba(255,255,255,.06),transparent);
+        }
+
+        .btn-v1 {
+            position: absolute;
+            left: -4px;
+            top: 100px;
+            width: 3px;
+            height: 28px;
+            background: #191b20;
+            border-radius: 2px 0 0 2px;
+        }
+
+        .btn-v2 {
+            position: absolute;
+            left: -4px;
+            top: 136px;
+            width: 3px;
+            height: 28px;
+            background: #191b20;
+            border-radius: 2px 0 0 2px;
+        }
+
+        .btn-pw {
+            position: absolute;
+            right: -4px;
+            top: 118px;
+            width: 3px;
+            height: 42px;
+            background: #191b20;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .notch-bar {
+            position: absolute;
+            top: 17px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 78px;
+            height: 6px;
+            background: #09090e;
+            border-radius: 3px;
+        }
+
+        .notch-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #161820;
+            border: .5px solid rgba(255,255,255,.08);
+            position: absolute;
+            right: 7px;
+            top: .5px;
+        }
+
+        .l-screen-phone {
+            width: 196px;
+            height: 416px;
+            border-radius: 38px;
+            top: 12px;
+            left: 12px;
+            overflow: hidden;
+            background: #04061a;
+        }
+
+        .screen-bg-p {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(160deg,#040d2e 0%,#08052a 50%,#0c0818 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sbar {
+            padding: 10px 16px 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stime {
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255,255,255,.9);
+        }
+
+        .sicons {
+            display: flex;
+            gap: 3px;
+            align-items: flex-end;
+        }
+
+        .sb {
+            width: 3px;
+            border-radius: 1px;
+        }
+
+        .wp-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .wp {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            background: linear-gradient(135deg,#091526,#18092e,#091a26);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .wp-c1 {
+            position: absolute;
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 1px solid rgba(100,140,255,.13);
+            top: 16px;
+            left: 16px;
+        }
+
+        .wp-c2 {
+            position: absolute;
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            border: 1px solid rgba(130,90,255,.1);
+            bottom: 28px;
+            right: 18px;
+        }
+
+        .wp-t {
+            font-size: 24px;
+            font-weight: 500;
+            color: rgba(255,255,255,.88);
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .wp-s {
+            font-size: 9px;
+            color: rgba(100,160,255,.65);
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .dock {
+            padding: 6px 12px 13px;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .di {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dd {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.55);
+        }
+
+        .l-spena-phone {
+            width: 180px;
+            height: 8px;
+            top: 430px;
+            left: 20px;
+            border-radius: 4px;
+            background: linear-gradient(90deg,#0f1015,#151820,#0f1015);
+            border: .5px solid rgba(255,255,255,.06);
+            display: flex;
+            gap: 2px;
+            align-items: center;
+            padding: 0 8px;
+        }
+
+        .sp-d {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.14);
+        }
+
+        .l-camera-phone {
+            width: 110px;
+            height: 96px;
+            top: -12px;
+            left: 55px;
+            border-radius: 22px;
+            background: linear-gradient(145deg,#10131a,#090b10);
+            border: 1.5px solid rgba(255,255,255,.07);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            pointer-events: none;
+        }
+
+        .cam-lens {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 33% 33%,#1a2240,#040810);
+            border: 2px solid rgba(255,255,255,.11);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cam-li {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 33% 33%,#0d1632,#020306);
+            border: 1px solid rgba(100,140,255,.18);
+        }
+
+        .cam-row {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .cam-mini {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 33% 33%,#101828,#020306);
+            border: 1px solid rgba(255,255,255,.09);
+        }
+
+        .cam-lbl {
+            font-size: 7.5px;
+            color: rgba(255,255,255,.35);
+            letter-spacing: .1em;
+            font-weight: 500;
+        }
+
+        .l-chip {
+            width: 78px;
+            height: 30px;
+            top: 195px;
+            left: 71px;
+            background: linear-gradient(135deg,#181c26,#0e1018);
+            border-radius: 6px;
+            border: .5px solid rgba(255,255,255,.09);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+
+        .chip-lbl {
+            font-size: 6.5px;
+            color: rgba(150,180,255,.45);
+            letter-spacing: .09em;
+            font-weight: 500;
+        }
+
+        .chip-sub {
+            font-size: 5.5px;
+            color: rgba(100,140,255,.3);
+            letter-spacing: .07em;
+        }
+
+        .l-battery {
+            width: 56px;
+            height: 24px;
+            top: 238px;
+            left: 82px;
+            background: linear-gradient(135deg,#0f1a10,#080f08);
+            border-radius: 5px;
+            border: .5px solid rgba(80,200,100,.18);
+            display: flex;
+            align-items: center;
+            padding: 4px 6px;
+            gap: 3px;
+        }
+
+        .batt-fill {
+            height: 12px;
+            border-radius: 2px;
+            background: linear-gradient(90deg,rgba(60,200,100,.6),rgba(80,220,120,.4));
+        }
+
+        .batt-lbl {
+            font-size: 6px;
+            color: rgba(80,200,100,.55);
+            letter-spacing: .05em;
+        }
+
+        .l-ram {
+            width: 60px;
+            height: 22px;
+            top: 240px;
+            left: 3px;
+            background: linear-gradient(135deg,#1a1028,#0f0a18);
+            border-radius: 5px;
+            border: .5px solid rgba(160,80,255,.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ram-lbl {
+            font-size: 7px;
+            color: rgba(160,100,255,.5);
+            letter-spacing: .08em;
+            font-weight: 500;
+        }
+
+        .l-display {
+            width: 68px;
+            height: 22px;
+            top: 195px;
+            left: 150px;
+            background: linear-gradient(135deg,#0a1828,#060f18);
+            border-radius: 5px;
+            border: .5px solid rgba(60,160,255,.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .disp-lbl {
+            font-size: 7px;
+            color: rgba(80,160,255,.5);
+            letter-spacing: .08em;
+            font-weight: 500;
+        }
+
+        .l-wifi {
+            width: 56px;
+            height: 22px;
+            top: 280px;
+            left: 3px;
+            background: linear-gradient(135deg,#0a180a,#060f06);
+            border-radius: 5px;
+            border: .5px solid rgba(60,220,120,.16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wifi-lbl {
+            font-size: 7px;
+            color: rgba(60,200,100,.5);
+            letter-spacing: .08em;
+            font-weight: 500;
+        }
+
+        /* ── IPAD ── */
+        .ipad-wrap {
+            transform-style: preserve-3d;
+            position: relative;
+            width: 320px;
+            height: 430px;
+            transition: transform 1.2s cubic-bezier(.23,1,.32,1);
+        }
+
+        .l-glow-ipad {
+            width: 320px;
+            height: 430px;
+            border-radius: 30px;
+            background: radial-gradient(ellipse at 50% 50%,rgba(80,200,220,.12) 0%,transparent 70%);
+            top: 0;
+            left: 0;
+            transform: translateZ(-10px) scale(1.12);
+            pointer-events: none;
+        }
+
+        .l-shadow-ipad {
+            width: 240px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(0,0,0,.7);
+            bottom: -55px;
+            left: 40px;
+            top: auto;
+        }
+
+        .l-frame-ipad {
+            width: 320px;
+            height: 430px;
+            border-radius: 28px;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+        }
+
+        .frame-inner-i {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(165deg,#2a2d36 0%,#1a1c22 40%,#0e1014 100%);
+            border-radius: 28px;
+            border: 1.5px solid rgba(255,255,255,.12);
+            position: relative;
+        }
+
+        .ipad-btn-pw {
+            position: absolute;
+            top: -4px;
+            right: 80px;
+            height: 3px;
+            width: 36px;
+            background: #191b20;
+            border-radius: 0 0 2px 2px;
+        }
+
+        .ipad-btn-vol1 {
+            position: absolute;
+            top: -4px;
+            right: 130px;
+            height: 3px;
+            width: 24px;
+            background: #191b20;
+            border-radius: 0 0 2px 2px;
+        }
+
+        .ipad-btn-vol2 {
+            position: absolute;
+            top: -4px;
+            right: 160px;
+            height: 3px;
+            width: 24px;
+            background: #191b20;
+            border-radius: 0 0 2px 2px;
+        }
+
+        .ipad-home-btn {
+            position: absolute;
+            bottom: 14px;
+            right: 14px;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: #151820;
+            border: 1px solid rgba(255,255,255,.1);
+        }
+
+        .ipad-front-cam {
+            position: absolute;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #0a0b10;
+            border: .5px solid rgba(255,255,255,.1);
+        }
+
+        .l-screen-ipad {
+            width: 286px;
+            height: 390px;
+            border-radius: 20px;
+            top: 20px;
+            left: 17px;
+            overflow: hidden;
+            background: #04061a;
+        }
+
+        .screen-bg-i {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(160deg,#040d2e 0%,#08052a 50%,#0c0818 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ipad-sbar {
+            padding: 12px 20px 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ipad-stime {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255,255,255,.9);
+        }
+
+        .ipad-sicons {
+            display: flex;
+            gap: 4px;
+            align-items: flex-end;
+        }
+
+        .ipad-content {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+            padding: 10px 12px 12px;
+        }
+
+        .ipad-sidebar {
+            width: 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ipad-sidebar-item {
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(255,255,255,.04);
+            border: .5px solid rgba(255,255,255,.07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ipad-main-area {
+            flex: 1;
+            border-radius: 10px;
+            background: rgba(255,255,255,.03);
+            border: .5px solid rgba(255,255,255,.06);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .ipad-main-t {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255,255,255,.8);
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .ipad-main-s {
+            font-size: 8px;
+            color: rgba(100,160,255,.6);
+            letter-spacing: .14em;
+            text-transform: uppercase;
+        }
+
+        .l-chip-i {
+            width: 88px;
+            height: 32px;
+            top: 190px;
+            left: 116px;
+            background: linear-gradient(135deg,#181c26,#0e1018);
+            border-radius: 6px;
+            border: .5px solid rgba(255,255,255,.09);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+
+        .l-battery-i {
+            width: 64px;
+            height: 26px;
+            top: 236px;
+            left: 128px;
+            background: linear-gradient(135deg,#0f1a10,#080f08);
+            border-radius: 5px;
+            border: .5px solid rgba(80,200,100,.18);
+            display: flex;
+            align-items: center;
+            padding: 4px 6px;
+            gap: 3px;
+        }
+
+        .l-ram-i {
+            width: 68px;
+            height: 24px;
+            top: 236px;
+            left: 4px;
+            background: linear-gradient(135deg,#1a1028,#0f0a18);
+            border-radius: 5px;
+            border: .5px solid rgba(160,80,255,.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .l-display-i {
+            width: 76px;
+            height: 24px;
+            top: 190px;
+            left: 236px;
+            background: linear-gradient(135deg,#0a1828,#060f18);
+            border-radius: 5px;
+            border: .5px solid rgba(60,160,255,.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .l-camera-i {
+            width: 70px;
+            height: 60px;
+            top: -6px;
+            left: 125px;
+            border-radius: 14px;
+            background: linear-gradient(145deg,#10131a,#090b10);
+            border: 1.5px solid rgba(255,255,255,.07);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            pointer-events: none;
+        }
+
+        .l-wifi-i {
+            width: 64px;
+            height: 24px;
+            top: 275px;
+            left: 4px;
+            background: linear-gradient(135deg,#0a180a,#060f06);
+            border-radius: 5px;
+            border: .5px solid rgba(60,220,120,.16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── MACBOOK ── */
+        .macbook-wrap {
+            transform-style: preserve-3d;
+            position: relative;
+            width: 480px;
+            height: 310px;
+            transition: transform 1.2s cubic-bezier(.23,1,.32,1);
+        }
+
+        .l-glow-mac {
+            width: 480px;
+            height: 310px;
+            border-radius: 16px;
+            background: radial-gradient(ellipse at 50% 50%,rgba(180,180,220,.08) 0%,transparent 70%);
+            top: 0;
+            left: 0;
+            transform: translateZ(-10px) scale(1.08);
+            pointer-events: none;
+        }
+
+        .l-shadow-mac {
+            width: 380px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(0,0,0,.75);
+            bottom: -42px;
+            left: 50px;
+            top: auto;
+        }
+
+        .l-lid-mac {
+            width: 480px;
+            height: 296px;
+            border-radius: 14px 14px 4px 4px;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+        }
+
+        .lid-inner-mac {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(165deg,#2a2c34 0%,#1a1c22 40%,#0f1015 100%);
+            border-radius: 14px 14px 4px 4px;
+            border: 1.5px solid rgba(255,255,255,.12);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mac-screen {
+            width: 450px;
+            height: 270px;
+            border-radius: 8px;
+            background: linear-gradient(160deg,#040d2e,#08052a);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mac-menubar {
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: .5px solid rgba(255,255,255,.06);
+        }
+
+        .mac-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .mac-dot-r {
+            background: rgba(255,80,80,.7);
+        }
+
+        .mac-dot-y {
+            background: rgba(255,180,0,.6);
+        }
+
+        .mac-dot-g {
+            background: rgba(40,200,80,.65);
+        }
+
+        .mac-menubar-label {
+            font-size: 10px;
+            color: rgba(255,255,255,.5);
+            margin-left: 8px;
+            letter-spacing: .08em;
+        }
+
+        .mac-desktop {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .mac-desktop-t {
+            font-size: 18px;
+            font-weight: 500;
+            color: rgba(255,255,255,.8);
+            letter-spacing: .02em;
+        }
+
+        .mac-desktop-s {
+            font-size: 9px;
+            color: rgba(100,160,255,.6);
+            letter-spacing: .14em;
+            text-transform: uppercase;
+        }
+
+        .mac-cam-notch {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 5px;
+            background: #08090e;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mac-cam-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #151820;
+            border: .5px solid rgba(255,255,255,.1);
+        }
+
+        .mac-dock-row {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            background: rgba(255,255,255,.06);
+            padding: 6px 10px;
+            border-radius: 12px;
+            border: .5px solid rgba(255,255,255,.1);
+        }
+
+        .mac-dock-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+        }
+
+        .l-base-mac {
+            width: 510px;
+            height: 18px;
+            background: linear-gradient(180deg,#1e2028,#14151c);
+            border-radius: 0 0 8px 8px;
+            top: 296px;
+            left: -15px;
+            border: 1.5px solid rgba(255,255,255,.08);
+            border-top: none;
+            position: absolute;
+        }
+
+            .l-base-mac::after {
+                content: '';
+                position: absolute;
+                bottom: -8px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 80px;
+                height: 8px;
+                background: #0a0b10;
+                border-radius: 0 0 6px 6px;
+                border: 1px solid rgba(255,255,255,.06);
+                border-top: none;
+            }
+
+        .l-keyboard-mac {
+            width: 460px;
+            height: 130px;
+            top: 205px;
+            left: 10px;
+            background: linear-gradient(180deg,#1a1c22,#0f1015);
+            border-radius: 4px;
+            border: .5px solid rgba(255,255,255,.07);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px;
+        }
+
+        .mac-key-row {
+            display: flex;
+            gap: 3px;
+        }
+
+        .mac-key {
+            height: 14px;
+            border-radius: 3px;
+            background: rgba(255,255,255,.07);
+            border: .5px solid rgba(255,255,255,.1);
+        }
+
+        .l-chip-mac {
+            width: 96px;
+            height: 34px;
+            top: 260px;
+            left: 192px;
+            background: linear-gradient(135deg,#181c26,#0e1018);
+            border-radius: 6px;
+            border: .5px solid rgba(255,255,255,.09);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+
+        .l-battery-mac {
+            width: 72px;
+            height: 28px;
+            top: 168px;
+            left: 204px;
+            background: linear-gradient(135deg,#0f1a10,#080f08);
+            border-radius: 5px;
+            border: .5px solid rgba(80,200,100,.18);
+            display: flex;
+            align-items: center;
+            padding: 5px 7px;
+            gap: 3px;
+        }
+
+        .l-ram-mac {
+            width: 76px;
+            height: 26px;
+            top: 168px;
+            left: 4px;
+            background: linear-gradient(135deg,#1a1028,#0f0a18);
+            border-radius: 5px;
+            border: .5px solid rgba(160,80,255,.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .l-display-mac {
+            width: 84px;
+            height: 26px;
+            top: 260px;
+            left: 380px;
+            background: linear-gradient(135deg,#0a1828,#060f18);
+            border-radius: 5px;
+            border: .5px solid rgba(60,160,255,.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .l-wifi-mac {
+            width: 72px;
+            height: 26px;
+            top: 208px;
+            left: 4px;
+            background: linear-gradient(135deg,#0a180a,#060f06);
+            border-radius: 5px;
+            border: .5px solid rgba(60,220,120,.16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── LAPTOP ── */
+        .laptop-wrap {
+            transform-style: preserve-3d;
+            position: relative;
+            width: 460px;
+            height: 300px;
+            transition: transform 1.2s cubic-bezier(.23,1,.32,1);
+        }
+
+        .l-glow-laptop {
+            width: 460px;
+            height: 300px;
+            border-radius: 12px;
+            background: radial-gradient(ellipse at 50% 50%,rgba(100,200,120,.07) 0%,transparent 70%);
+            top: 0;
+            left: 0;
+            transform: translateZ(-10px) scale(1.08);
+            pointer-events: none;
+        }
+
+        .l-shadow-laptop {
+            width: 360px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgba(0,0,0,.75);
+            bottom: -40px;
+            left: 50px;
+            top: auto;
+        }
+
+        .l-lid-laptop {
+            width: 460px;
+            height: 284px;
+            border-radius: 10px 10px 3px 3px;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+        }
+
+        .lid-inner-laptop {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(165deg,#22252e 0%,#141620 40%,#0c0e14 100%);
+            border-radius: 10px 10px 3px 3px;
+            border: 1.5px solid rgba(255,255,255,.1);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lt-screen {
+            width: 432px;
+            height: 258px;
+            border-radius: 6px;
+            background: linear-gradient(160deg,#040d2e,#08052a);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lt-menubar {
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: .5px solid rgba(255,255,255,.05);
+        }
+
+        .lt-menubar-label {
+            font-size: 10px;
+            color: rgba(255,255,255,.4);
+            margin-left: 8px;
+            letter-spacing: .06em;
+        }
+
+        .lt-desktop {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .lt-desktop-t {
+            font-size: 17px;
+            font-weight: 500;
+            color: rgba(255,255,255,.8);
+            letter-spacing: .02em;
+        }
+
+        .lt-desktop-s {
+            font-size: 9px;
+            color: rgba(100,200,130,.55);
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        .lt-cam-dot {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #101218;
+            border: .5px solid rgba(255,255,255,.1);
+        }
+
+        .lt-taskbar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 22px;
+            background: rgba(0,20,50,.6);
+            border-top: .5px solid rgba(255,255,255,.06);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            gap: 6px;
+        }
+
+        .lt-task-icon {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+
+        .l-base-laptop {
+            width: 490px;
+            height: 16px;
+            background: linear-gradient(180deg,#191b22,#0f1015);
+            border-radius: 0 0 6px 6px;
+            top: 284px;
+            left: -15px;
+            border: 1.5px solid rgba(255,255,255,.07);
+            border-top: none;
+            position: absolute;
+        }
+
+            .l-base-laptop::after {
+                content: '';
+                position: absolute;
+                bottom: -7px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 70px;
+                height: 7px;
+                background: #09090e;
+                border-radius: 0 0 5px 5px;
+                border: 1px solid rgba(255,255,255,.05);
+                border-top: none;
+            }
+
+        .l-chip-lt {
+            width: 88px;
+            height: 30px;
+            top: 248px;
+            left: 186px;
+            background: linear-gradient(135deg,#181c26,#0e1018);
+            border-radius: 6px;
+            border: .5px solid rgba(255,255,255,.09);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+
+        .l-battery-lt {
+            width: 68px;
+            height: 26px;
+            top: 162px;
+            left: 196px;
+            background: linear-gradient(135deg,#0f1a10,#080f08);
+            border-radius: 5px;
+            border: .5px solid rgba(80,200,100,.18);
+            display: flex;
+            align-items: center;
+            padding: 5px 7px;
+            gap: 3px;
+        }
+
+        .l-ram-lt {
+            width: 70px;
+            height: 24px;
+            top: 162px;
+            left: 2px;
+            background: linear-gradient(135deg,#1a1028,#0f0a18);
+            border-radius: 5px;
+            border: .5px solid rgba(160,80,255,.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .l-display-lt {
+            width: 78px;
+            height: 24px;
+            top: 248px;
+            left: 374px;
+            background: linear-gradient(135deg,#0a1828,#060f18);
+            border-radius: 5px;
+            border: .5px solid rgba(60,160,255,.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .l-wifi-lt {
+            width: 68px;
+            height: 24px;
+            top: 200px;
+            left: 2px;
+            background: linear-gradient(135deg,#0a180a,#060f06);
+            border-radius: 5px;
+            border: .5px solid rgba(60,220,120,.16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── COMPONENT TAGS ── */
+        .comp-tag {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .5s ease;
+            z-index: 10;
+        }
+
+        .tag-line {
+            height: 1px;
+            background: rgba(255,255,255,.12);
+            flex-shrink: 0;
+        }
+
+        .tag-pill {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 500;
+            white-space: nowrap;
+            border: .5px solid;
+            cursor: pointer;
+            transition: filter .2s,transform .2s;
+            flex-shrink: 0;
+        }
+
+            .tag-pill:hover {
+                filter: brightness(1.3);
+                transform: scale(1.05);
+            }
+
+        .tc-blue {
+            color: rgba(120,180,255,.95);
+            border-color: rgba(80,140,255,.5);
+            background: rgba(20,50,140,.7);
+        }
+
+        .tc-green {
+            color: rgba(80,220,130,.95);
+            border-color: rgba(60,200,100,.4);
+            background: rgba(15,75,40,.7);
+        }
+
+        .tc-purple {
+            color: rgba(190,130,255,.95);
+            border-color: rgba(150,80,255,.4);
+            background: rgba(60,20,120,.7);
+        }
+
+        .tc-amber {
+            color: rgba(255,195,70,.95);
+            border-color: rgba(220,160,40,.4);
+            background: rgba(90,50,5,.7);
+        }
+
+        .tc-teal {
+            color: rgba(80,220,210,.95);
+            border-color: rgba(60,200,190,.4);
+            background: rgba(10,70,75,.7);
+        }
+
+        .tc-red {
+            color: rgba(255,120,110,.95);
+            border-color: rgba(220,80,70,.4);
+            background: rgba(90,15,15,.7);
+        }
+
+        .tc-gray {
+            color: rgba(200,210,230,.95);
+            border-color: rgba(160,170,190,.4);
+            background: rgba(30,35,50,.7);
+        }
+
+        /* ── SPECS POPUP ── */
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0);
+            transition: background .3s;
+            pointer-events: none;
+        }
+
+            .popup-overlay.open {
+                background: rgba(0,0,10,.78);
+                pointer-events: all;
+            }
+
+        .popup-card {
+            background: linear-gradient(145deg,#0d111e,#090c16);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 20px;
+            width: 340px;
+            max-width: 92vw;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(.88) translateY(24px);
+            opacity: 0;
+            transition: transform .38s cubic-bezier(.23,1,.32,1),opacity .3s;
+        }
+
+        .popup-overlay.open .popup-card {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        .popup-head {
+            padding: 20px 22px 16px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            background: linear-gradient(145deg,#0d111e,#090c16);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .popup-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .04em;
+        }
+
+        .popup-titles {
+            flex: 1;
+        }
+
+        .popup-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        .popup-sub {
+            font-size: 11px;
+            color: rgba(255,255,255,.32);
+            margin-top: 3px;
+            letter-spacing: .04em;
+        }
+
+        .popup-close {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.07);
+            border: .5px solid rgba(255,255,255,.1);
+            color: rgba(255,255,255,.6);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background .2s;
+        }
+
+            .popup-close:hover {
+                background: rgba(255,255,255,.15);
+            }
+
+        .popup-body {
+            padding: 16px 22px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .spec-row {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .spec-label {
+            font-size: 9.5px;
+            color: rgba(255,255,255,.28);
+            letter-spacing: .11em;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .spec-val {
+            font-size: 12.5px;
+            color: rgba(255,255,255,.82);
+            line-height: 1.6;
+        }
+
+        .spec-bar-wrap {
+            height: 3px;
+            background: rgba(255,255,255,.06);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .spec-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 1.1s cubic-bezier(.23,1,.32,1);
+        }
+
+        .spec-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .spec-tag {
+            padding: 3px 9px;
+            border-radius: 12px;
+            font-size: 9.5px;
+            font-weight: 500;
+            border: .5px solid;
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(255,255,255,.05);
+        }
+    </style>
+</head>
+<body>
+
+    <button class="back-btn" onclick="window.history.back()">← Quay lại</button>
+
+    <div class="drag-hint" id="dragHint">
+        <div class="drag-hint-icon"></div>
+        Kéo để xoay
+    </div>
+
+    <div class="stage" id="stage">
+        <canvas class="particles" id="cvs"></canvas>
+
+        <div class="hero-text" id="heroText">
+            <div class="hero-title">@Model.Name</div>
+            <div class="hero-sub">Chi tiết kỹ thuật · Hiệu suất · Tính năng</div>
+        </div>
+
+        <div class="scene" id="scene">
+            <!-- Device injected by JS -->
+        </div>
+
+        <div class="hint" id="hint">Chạm để khám phá</div>
+
+        <div class="popup-overlay" id="popupOverlay">
+            <div class="popup-card">
+                <div class="popup-head">
+                    <div class="popup-icon" id="popupIcon"></div>
+                    <div class="popup-titles">
+                        <div class="popup-name" id="popupName"></div>
+                        <div class="popup-sub" id="popupSub"></div>
+                    </div>
+                    <div class="popup-close" id="popupClose">✕</div>
+                </div>
+                <div class="popup-body" id="popupBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+const PRODUCT_ID   = @Model.Id;
+const PRODUCT_NAME = '@Html.Raw(Model.Name.Replace("'", "\\'"))';
+const DEVICE_TYPE  = '@deviceType';
+
+const DIM = {
+    phone:   { w: 220, h: 440 },
+    ipad:    { w: 320, h: 430 },
+    macbook: { w: 480, h: 310 },
+    laptop:  { w: 460, h: 300 },
+};
+
+function buildDeviceHTML(type, name) {
+    const short = name.split(' ').slice(0,2).join(' ');
+    const cat   = name.split(' ')[0];
+
+    if (type === 'phone') return `
+      <div class="${type}-wrap" id="deviceWrap">
+        <div class="layer l-glow-${type}"></div>
+        <div class="layer l-shadow-${type}" id="lShadow"></div>
+        <div class="layer l-spena-${type}" id="lSpena">
+          <div class="sp-d"></div><div class="sp-d"></div><div class="sp-d"></div><div class="sp-d"></div><div class="sp-d"></div>
+        </div>
+        <div class="layer l-frame-${type}" id="lFrame">
+          <div class="frame-inner-p">
+            <div class="frame-hl"></div><div class="frame-hr"></div>
+            <div class="btn-v1"></div><div class="btn-v2"></div><div class="btn-pw"></div>
+            <div class="notch-bar"><div class="notch-dot"></div></div>
+          </div>
+        </div>
+        <div class="layer l-screen-${type}" id="lScreen">
+          <div class="screen-bg-p">
+            <div class="sbar"><span class="stime">9:41</span><div class="sicons"><div class="sb" style="height:8px;background:rgba(255,255,255,.8)"></div><div class="sb" style="height:6px;background:rgba(255,255,255,.55)"></div><div class="sb" style="height:4px;background:rgba(255,255,255,.35)"></div></div></div>
+            <div class="wp-area"><div class="wp"><div class="wp-c1"></div><div class="wp-c2"></div><div class="wp-t">${name.split(' ').slice(0,2).join('<br>')}</div><div class="wp-s">${cat}</div></div></div>
+            <div class="dock"><div class="di" style="background:rgba(30,90,220,.5)"><div class="dd"></div></div><div class="di" style="background:rgba(20,180,120,.4)"><div class="dd"></div></div><div class="di" style="background:rgba(200,60,60,.4)"><div class="dd"></div></div><div class="di" style="background:rgba(180,120,20,.4)"><div class="dd"></div></div></div>
+          </div>
+        </div>
+        <div class="layer l-camera-${type}" id="lCamera"><div class="cam-row"><div class="cam-lens"><div class="cam-li"></div></div><div style="display:flex;flex-direction:column;gap:3px"><div class="cam-mini"></div><div class="cam-mini"></div></div></div><div class="cam-lbl">CAM · ZOOM</div></div>
+        <div class="layer l-chip" id="lChip"><div class="chip-lbl">PROCESSOR</div><div class="chip-sub">AI ENGINE</div></div>
+        <div class="layer l-battery" id="lBattery"><div class="batt-fill" style="width:32px"></div><div class="batt-lbl">BATTERY</div></div>
+        <div class="layer l-ram" id="lRam"><div class="ram-lbl">RAM</div></div>
+        <div class="layer l-display" id="lDisplay"><div class="disp-lbl">DISPLAY</div></div>
+        <div class="layer l-wifi" id="lWifi"><div class="wifi-lbl">5G · WiFi</div></div>
+      </div>`;
+
+    if (type === 'ipad') return `
+      <div class="${type}-wrap" id="deviceWrap">
+        <div class="layer l-glow-${type}"></div>
+        <div class="layer l-shadow-${type}" id="lShadow"></div>
+        <div class="layer l-frame-${type}" id="lFrame"><div class="frame-inner-i"><div class="ipad-btn-pw"></div><div class="ipad-btn-vol1"></div><div class="ipad-btn-vol2"></div><div class="ipad-front-cam"></div><div class="ipad-home-btn"></div></div></div>
+        <div class="layer l-screen-${type}" id="lScreen"><div class="screen-bg-i"><div class="ipad-sbar"><span class="ipad-stime">9:41</span><div class="ipad-sicons"><div class="sb" style="height:8px;background:rgba(255,255,255,.8)"></div><div class="sb" style="height:6px;background:rgba(255,255,255,.55)"></div></div></div><div class="ipad-content"><div class="ipad-sidebar"><div class="ipad-sidebar-item"></div><div class="ipad-sidebar-item"></div><div class="ipad-sidebar-item"></div><div class="ipad-sidebar-item"></div></div><div class="ipad-main-area"><div class="ipad-main-t">${short}</div><div class="ipad-main-s">${cat}</div></div></div></div></div>
+        <div class="layer l-camera-i" id="lCamera"><div class="cam-lens" style="width:30px;height:30px"><div class="cam-li" style="width:14px;height:14px"></div></div><div class="cam-lbl">CAMERA</div></div>
+        <div class="layer l-chip-i" id="lChip"><div class="chip-lbl">CHIP APPLE</div><div class="chip-sub">NEURAL ENGINE</div></div>
+        <div class="layer l-battery-i" id="lBattery"><div class="batt-fill" style="width:36px"></div><div class="batt-lbl">BATTERY</div></div>
+        <div class="layer l-ram-i" id="lRam"><div class="ram-lbl">RAM</div></div>
+        <div class="layer l-display-i" id="lDisplay"><div class="disp-lbl">DISPLAY</div></div>
+        <div class="layer l-wifi-i" id="lWifi"><div class="wifi-lbl">WiFi · 5G</div></div>
+      </div>`;
+
+    if (type === 'macbook') return `
+      <div class="${type}-wrap" id="deviceWrap">
+        <div class="layer l-glow-${type}"></div>
+        <div class="layer l-shadow-${type}" id="lShadow"></div>
+        <div class="layer l-lid-${type}" id="lLid"><div class="lid-inner-mac"><div class="mac-screen"><div class="mac-menubar"><div class="mac-dot mac-dot-r"></div><div class="mac-dot mac-dot-y"></div><div class="mac-dot mac-dot-g"></div><div class="mac-menubar-label">${short}</div></div><div class="mac-desktop"><div class="mac-desktop-t">${short}</div><div class="mac-desktop-s">${cat}</div></div><div class="mac-dock-row"><div class="mac-dock-icon" style="background:rgba(30,120,255,.5)"></div><div class="mac-dock-icon" style="background:rgba(20,180,80,.4)"></div><div class="mac-dock-icon" style="background:rgba(200,60,60,.4)"></div><div class="mac-dock-icon" style="background:rgba(255,180,20,.4)"></div><div class="mac-dock-icon" style="background:rgba(120,80,200,.4)"></div></div></div><div class="mac-cam-notch"><div class="mac-cam-dot"></div></div></div></div>
+        <div class="layer l-base-mac" id="lBase"></div>
+        <div class="layer l-keyboard-mac" id="lKeyboard"><div class="mac-key-row">${[20,16,16,20,16,16,16,16,16,20].map(w=>`<div class="mac-key" style="width:${w}px"></div>`).join('')}</div><div class="mac-key-row">${[24,14,14,14,14,14,14,14,14,14,14,24].map(w=>`<div class="mac-key" style="width:${w}px"></div>`).join('')}</div><div class="mac-key-row">${[30,14,14,14,14,14,14,14,14,14,30].map(w=>`<div class="mac-key" style="width:${w}px"></div>`).join('')}</div><div class="mac-key-row" style="justify-content:center"><div class="mac-key" style="width:120px"></div></div></div>
+        <div class="layer l-chip-mac" id="lChip"><div class="chip-lbl">APPLE SILICON</div><div class="chip-sub">NEURAL ENGINE</div></div>
+        <div class="layer l-battery-mac" id="lBattery"><div class="batt-fill" style="width:42px"></div><div class="batt-lbl">BATTERY</div></div>
+        <div class="layer l-ram-mac" id="lRam"><div class="ram-lbl">UNIFIED RAM</div></div>
+        <div class="layer l-display-mac" id="lDisplay"><div class="disp-lbl">RETINA DSP</div></div>
+        <div class="layer l-wifi-mac" id="lWifi"><div class="wifi-lbl">WiFi 6E · BT</div></div>
+      </div>`;
+
+    return `
+    <div class="${type}-wrap" id="deviceWrap">
+      <div class="layer l-glow-${type}"></div>
+      <div class="layer l-shadow-${type}" id="lShadow"></div>
+      <div class="layer l-lid-${type}" id="lLid"><div class="lid-inner-laptop"><div class="lt-screen"><div class="lt-menubar"><div class="mac-dot mac-dot-r"></div><div class="mac-dot mac-dot-y"></div><div class="mac-dot mac-dot-g"></div><div class="lt-menubar-label">${short}</div></div><div class="lt-desktop"><div class="lt-desktop-t">${short}</div><div class="lt-desktop-s">${cat}</div></div><div class="lt-taskbar"><div class="lt-task-icon" style="background:rgba(255,255,255,.2)"></div><div class="lt-task-icon" style="background:rgba(30,120,255,.5)"></div><div class="lt-task-icon" style="background:rgba(20,180,80,.4)"></div><div class="lt-task-icon" style="background:rgba(200,60,60,.4)"></div></div></div><div class="lt-cam-dot"></div></div></div>
+      <div class="layer l-base-laptop" id="lBase"></div>
+      <div class="layer l-chip-lt" id="lChip"><div class="chip-lbl">PROCESSOR</div><div class="chip-sub">AI ENGINE</div></div>
+      <div class="layer l-battery-lt" id="lBattery"><div class="batt-fill" style="width:40px"></div><div class="batt-lbl">BATTERY</div></div>
+      <div class="layer l-ram-lt" id="lRam"><div class="ram-lbl">RAM DDR5</div></div>
+      <div class="layer l-display-lt" id="lDisplay"><div class="disp-lbl">DISPLAY</div></div>
+      <div class="layer l-wifi-lt" id="lWifi"><div class="wifi-lbl">WiFi 6E · BT</div></div>
+    </div>`;
+}
+
+function getTagsConfig(type) {
+    if (type === 'phone') return [
+        { id:'camera',  style:'top:-30px;left:195px',  dir:'right', cls:'tc-amber',  label:'Hệ thống Camera' },
+        { id:'display', style:'top:90px;left:215px',   dir:'right', cls:'tc-teal',   label:'Màn hình' },
+        { id:'chip',    style:'top:155px;left:215px',  dir:'right', cls:'tc-blue',   label:'Bộ vi xử lý' },
+        { id:'battery', style:'top:215px;left:215px',  dir:'right', cls:'tc-green',  label:'Pin' },
+        { id:'ram',     style:'top:155px;right:215px', dir:'left',  cls:'tc-purple', label:'RAM' },
+        { id:'wifi',    style:'top:215px;right:215px', dir:'left',  cls:'tc-red',    label:'Kết nối' },
+    ];
+    if (type === 'ipad') return [
+        { id:'camera',  style:'top:-30px;left:195px',  dir:'right', cls:'tc-amber',  label:'Camera' },
+        { id:'display', style:'top:60px;left:330px',   dir:'right', cls:'tc-teal',   label:'Màn hình Retina' },
+        { id:'chip',    style:'top:140px;left:330px',  dir:'right', cls:'tc-blue',   label:'Chip Apple' },
+        { id:'battery', style:'top:210px;left:330px',  dir:'right', cls:'tc-green',  label:'Pin' },
+        { id:'ram',     style:'top:140px;right:330px', dir:'left',  cls:'tc-purple', label:'RAM' },
+        { id:'wifi',    style:'top:210px;right:330px', dir:'left',  cls:'tc-red',    label:'Kết nối' },
+    ];
+    if (type === 'macbook') return [
+        { id:'display', style:'top:30px;left:490px',   dir:'right', cls:'tc-teal',   label:'Liquid Retina' },
+        { id:'chip',    style:'top:90px;left:490px',   dir:'right', cls:'tc-blue',   label:'Apple Silicon' },
+        { id:'battery', style:'top:150px;left:490px',  dir:'right', cls:'tc-green',  label:'Pin' },
+        { id:'ram',     style:'top:90px;right:490px',  dir:'left',  cls:'tc-purple', label:'RAM Hợp nhất' },
+        { id:'wifi',    style:'top:150px;right:490px', dir:'left',  cls:'tc-red',    label:'WiFi 6E · BT 5.3' },
+    ];
+    return [
+        { id:'display', style:'top:30px;left:470px',   dir:'right', cls:'tc-teal',   label:'Màn hình' },
+        { id:'chip',    style:'top:90px;left:470px',   dir:'right', cls:'tc-blue',   label:'Bộ vi xử lý' },
+        { id:'battery', style:'top:150px;left:470px',  dir:'right', cls:'tc-green',  label:'Pin' },
+        { id:'ram',     style:'top:90px;right:470px',  dir:'left',  cls:'tc-purple', label:'RAM DDR5' },
+        { id:'wifi',    style:'top:150px;right:470px', dir:'left',  cls:'tc-red',    label:'WiFi 6E · BT' },
+    ];
+}
+
+function getLayerZValues(type, exploded) {
+    const e = exploded;
+    if (type === 'phone') return { lShadow:e?-88:-28, lSpena:e?16:7, lFrame:e?52:20, lScreen:e?118:48, lCamera:e?208:88, lChip:e?168:72, lBattery:e?188:82, lRam:e?172:78, lDisplay:e?130:52, lWifi:e?158:68 };
+    if (type === 'ipad')  return { lShadow:e?-80:-24, lFrame:e?44:16, lScreen:e?100:40, lCamera:e?170:70, lChip:e?140:58, lBattery:e?156:64, lRam:e?144:60, lDisplay:e?110:44, lWifi:e?132:54 };
+    if (type === 'macbook') return { lShadow:e?-70:-20, lLid:e?90:30, lBase:e?-20:-4, lKeyboard:e?50:16, lChip:e?130:52, lBattery:e?110:44, lRam:e?120:48, lDisplay:e?140:58, lWifi:e?100:40 };
+    return { lShadow:e?-65:-18, lLid:e?84:28, lBase:e?-18:-4, lChip:e?120:48, lBattery:e?100:40, lRam:e?110:44, lDisplay:e?128:52, lWifi:e?90:36 };
+}
+
+/* ── INIT DOM ── */
+const scene = document.getElementById('scene');
+scene.innerHTML = buildDeviceHTML(DEVICE_TYPE, PRODUCT_NAME);
+
+const tagsConfig = getTagsConfig(DEVICE_TYPE);
+const deviceWrapEl = document.getElementById('deviceWrap');
+
+tagsConfig.forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'comp-tag';
+    div.id = 'tag-' + t.id;
+    div.style.cssText = t.style;
+    if (t.dir === 'left') div.style.flexDirection = 'row-reverse';
+    div.innerHTML = `<div class="tag-line" style="width:30px"></div>
+                     <div class="tag-pill ${t.cls}" data-comp="${t.id}">${t.label}</div>`;
+    deviceWrapEl.appendChild(div);
+});
+
+/* ── SPECS ── */
+let specsData = null;
+fetch(`/Showcase/GetProductSpecs?id=${PRODUCT_ID}`)
+    .then(r => r.json())
+    .then(d => { specsData = d.specs; })
+    .catch(e => console.error('Specs error:', e));
+
+/* ──────────────────────────────────────────────────
+   ROTATION STATE
+   All rotation lives in curRX / curRY.
+   targetRX / targetRY is the "destination" for lerp.
+   In drag mode we update both simultaneously for 1:1 feel.
+   Inertia: on mouseup/touchend we carry over the velocity.
+────────────────────────────────────────────────── */
+let phase     = 0;
+let autoAngle = 0;
+let curRX = 12,  curRY = -18;
+let targetRX = 12, targetRY = -18;
+
+/* drag state */
+let isDragging = false;
+let lastMouseX = 0, lastMouseY = 0;
+let velX = 0, velY = 0;          // velocity in deg/px accumulated
+let prevMouseX = 0, prevMouseY = 0;
+
+/* limits (clamped more tightly in phase 2 so layers stay visible) */
+const CLAMP_RX_MIN = -55, CLAMP_RX_MAX = 55;
+const CLAMP_RY_MIN = -75, CLAMP_RY_MAX = 75;
+
+let popupOpen = false;
+const hint     = document.getElementById('hint');
+const heroText = document.getElementById('heroText');
+const overlay  = document.getElementById('popupOverlay');
+const stageEl  = document.getElementById('stage');
+const dragHint = document.getElementById('dragHint');
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function setLayerZ(id, z, delay) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.transition = `transform ${1.0 + delay*.1}s cubic-bezier(.23,1,.32,1) ${delay}s, opacity .8s ${delay}s`;
+    el.style.transform  = `translateZ(${z}px)`;
+}
+
+function applyZValues(exploded) {
+    const zv  = getLayerZValues(DEVICE_TYPE, exploded);
+    const del = { lShadow:0, lBase:0, lKeyboard:.04, lFrame:.06, lLid:.08, lSpena:.04, lScreen:.12, lDisplay:.13, lCamera:.16, lChip:.18, lBattery:.20, lRam:.22, lWifi:.26 };
+    let i = 0;
+    for (const [id, z] of Object.entries(zv)) { setLayerZ(id, z, del[id] ?? (i * .04)); i++; }
+}
+
+function showTags(show) {
+    tagsConfig.forEach(t => {
+        const el = document.getElementById('tag-' + t.id);
+        if (el) { el.style.opacity = show ? '1' : '0'; el.style.pointerEvents = show ? 'all' : 'none'; }
+    });
+}
+
+function flatMode() {
+    deviceWrapEl.querySelectorAll('.layer').forEach(l => { l.style.transform = 'translateZ(0px)'; });
+    showTags(false);
+}
+
+function applyRotation() {
+    deviceWrapEl.style.transform = `rotateX(${curRX.toFixed(2)}deg) rotateY(${curRY.toFixed(2)}deg)`;
+}
+
+function phase1Mode() {
+    heroText.style.opacity = '1';
+    hint.textContent = 'Nhấn để tách rời linh kiện · Kéo để xoay';
+    applyZValues(false);
+    dragHint.classList.add('visible');
+}
+
+function phase2Mode() {
+    hint.textContent = 'Kéo để xoay · Click tên linh kiện để xem thông số';
+    /* snap to a nice exploded view angle */
+    targetRX = 16; targetRY = -18;
+    curRX = 16;    curRY = -18;
+    applyZValues(true);
+    setTimeout(() => showTags(true), 900);
+}
+
+/* ── CLICK (phase advance, not fired during drag) ── */
+let wasDragging = false;
+stageEl.addEventListener('click', e => {
+    if (popupOpen) return;
+    if (wasDragging) { wasDragging = false; return; }   // swallowed by drag
+    if (phase === 2 && e.target.closest('[data-comp]')) return;
+    phase++;
+    if (phase === 1) phase1Mode();
+    else if (phase === 2) phase2Mode();
+    else {
+        phase = 0;
+        hint.textContent = 'Chạm để khám phá';
+        heroText.style.opacity = '0';
+        showTags(false);
+        flatMode();
+        targetRX = 12; targetRY = -18;
+        dragHint.classList.remove('visible');
+    }
+});
+
+/* ────────────────────────────────────────
+   MOUSE DRAG (works in all phases)
+──────────────────────────────────────── */
+const DRAG_SENS_X = 0.35;   // drag speed for rotateX (vertical drag)
+const DRAG_SENS_Y = 0.55;   // drag speed for rotateY (horizontal drag)
+const INERTIA     = 0.88;   // velocity decay per frame (higher = slides longer)
+const HOVER_SENS  = 0.5;    // hover (non-drag) sensitivity scale
+
+stageEl.addEventListener('mousedown', e => {
+    if (popupOpen) return;
+    if (phase === 0) return;   // let auto-rotation handle phase 0, feels nicer
+    isDragging  = true;
+    wasDragging = false;
+    lastMouseX  = e.clientX;
+    lastMouseY  = e.clientY;
+    prevMouseX  = e.clientX;
+    prevMouseY  = e.clientY;
+    velX = velY = 0;
+    stageEl.classList.add('dragging');
+    e.preventDefault();
+});
+
+window.addEventListener('mousemove', e => {
+    if (!isDragging) {
+        /* hover parallax in phase 0 and 1 only */
+        if (phase >= 2 || popupOpen) return;
+        const r = stageEl.getBoundingClientRect();
+        targetRX = 12 - ((e.clientY - r.top)  / r.height - .5) * 20 * HOVER_SENS;
+        targetRY = -18 + ((e.clientX - r.left) / r.width  - .5) * 30 * HOVER_SENS;
+        return;
+    }
+
+    const dx = e.clientX - lastMouseX;
+    const dy = e.clientY - lastMouseY;
+    if (Math.abs(dx) > 2 || Math.abs(dy) > 2) wasDragging = true;
+
+    /* immediate response — move curRX/curRY directly */
+    curRY = clamp(curRY + dx * DRAG_SENS_Y, CLAMP_RY_MIN, CLAMP_RY_MAX);
+    curRX = clamp(curRX - dy * DRAG_SENS_X, CLAMP_RX_MIN, CLAMP_RX_MAX);
+    targetRX = curRX;
+    targetRY = curRY;
+
+    /* track velocity for inertia (use short interval delta) */
+    velX = (e.clientX - prevMouseX) * DRAG_SENS_Y * 0.6;
+    velY = (e.clientY - prevMouseY) * DRAG_SENS_X * 0.6;
+    prevMouseX = e.clientX;
+    prevMouseY = e.clientY;
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+});
+
+window.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    stageEl.classList.remove('dragging');
+    /* apply inertia by nudging target */
+    targetRY = clamp(curRY + velX * 4, CLAMP_RY_MIN, CLAMP_RY_MAX);
+    targetRX = clamp(curRX - velY * 4, CLAMP_RX_MIN, CLAMP_RX_MAX);
+});
+
+/* ────────────────────────────────────────
+   TOUCH DRAG
+──────────────────────────────────────── */
+let touchStartX = 0, touchStartY = 0;
+let touchLastX = 0,  touchLastY = 0;
+let touchVelX = 0,   touchVelY = 0;
+let touchMoved = false;
+
+stageEl.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    touchStartX = t.clientX; touchStartY = t.clientY;
+    touchLastX  = t.clientX; touchLastY  = t.clientY;
+    touchMoved  = false;
+    velX = velY = touchVelX = touchVelY = 0;
+}, { passive: true });
+
+stageEl.addEventListener('touchmove', e => {
+    const t = e.touches[0];
+    const dx = t.clientX - touchLastX;
+    const dy = t.clientY - touchLastY;
+
+    if (Math.abs(t.clientX - touchStartX) > 5 || Math.abs(t.clientY - touchStartY) > 5) touchMoved = true;
+
+    if (phase >= 1) {
+        curRY = clamp(curRY + dx * DRAG_SENS_Y, CLAMP_RY_MIN, CLAMP_RY_MAX);
+        curRX = clamp(curRX - dy * DRAG_SENS_X, CLAMP_RX_MIN, CLAMP_RX_MAX);
+        targetRX = curRX; targetRY = curRY;
+        touchVelX = dx * DRAG_SENS_Y * 0.6;
+        touchVelY = dy * DRAG_SENS_X * 0.6;
+    }
+
+    touchLastX = t.clientX; touchLastY = t.clientY;
+}, { passive: true });
+
+stageEl.addEventListener('touchend', e => {
+    if (touchMoved) {
+        targetRY = clamp(curRY + touchVelX * 4, CLAMP_RY_MIN, CLAMP_RY_MAX);
+        targetRX = clamp(curRX - touchVelY * 4, CLAMP_RX_MIN, CLAMP_RX_MAX);
+        /* prevent the touchend from firing a click */
+        wasDragging = true;
+        setTimeout(() => { wasDragging = false; }, 300);
+    }
+});
+
+/* ────────────────────────────────────────
+   ANIMATION LOOP
+──────────────────────────────────────── */
+(function tick() {
+    autoAngle += .005;
+
+    if (!isDragging) {
+        if (phase === 0) {
+            /* gentle auto-bob */
+            targetRX = 12 + Math.cos(autoAngle * .7) * 4;
+            targetRY = -18 + Math.sin(autoAngle) * 12;
+        }
+        /* lerp toward target (handles hover, inertia settle, phase snap) */
+        const lerpSpeed = isDragging ? 1 : 0.06;
+        curRX = lerp(curRX, targetRX, lerpSpeed);
+        curRY = lerp(curRY, targetRY, lerpSpeed);
+    }
+
+    applyRotation();
+    requestAnimationFrame(tick);
+})();
+
+/* ── TAG CLICKS → POPUP ── */
+tagsConfig.forEach(t => {
+    setTimeout(() => {
+        const pill = deviceWrapEl.querySelector(`[data-comp="${t.id}"]`);
+        if (pill) pill.addEventListener('click', e => {
+            if (phase < 2) return;
+            e.stopPropagation();
+            openPopup(t.id);
+        });
+    }, 100);
+});
+
+function openPopup(key) {
+    if (!specsData || !specsData[key]) {
+        document.getElementById('popupName').textContent = key;
+        document.getElementById('popupSub').textContent  = 'Đang tải...';
+        document.getElementById('popupBody').innerHTML   = '<p style="color:rgba(255,255,255,.5);font-size:13px">Đang tải thông số kỹ thuật...</p>';
+        overlay.classList.add('open');
+        popupOpen = true;
+        return;
+    }
+    const d = specsData[key];
+    popupOpen = true;
+
+    const icon = document.getElementById('popupIcon');
+    icon.style.background = d.iconBg    || 'rgba(40,50,80,.9)';
+    icon.style.color      = d.iconColor || 'rgba(200,210,255,.9)';
+    icon.style.fontSize   = '10px';
+    icon.style.fontWeight = '600';
+    icon.textContent = d.iconSymbol || key.toUpperCase().slice(0,3);
+
+    document.getElementById('popupName').textContent = d.name || key;
+    document.getElementById('popupSub').textContent  = d.sub  || '';
+
+    const body = document.getElementById('popupBody');
+    body.innerHTML = '';
+
+    (d.sections || []).forEach((s, i) => {
+        if (i > 0) { const dv = document.createElement('div'); dv.className = 'divider'; body.appendChild(dv); }
+        const row = document.createElement('div'); row.className = 'spec-row';
+        let html = `<div class="spec-label">${s.label}</div><div class="spec-val">${(s.val||'').replace(/\n/g,'<br>')}</div>`;
+        if (s.bar !== undefined)
+            html += `<div class="spec-bar-wrap"><div class="spec-bar-fill" style="width:0%;background:${s.barColor||'#4488ff'}" data-w="${s.bar}"></div></div>`;
+        if (s.tags)
+            html += `<div class="spec-tags">${s.tags.map(t=>`<span class="spec-tag" style="color:${d.iconColor};border-color:rgba(255,255,255,.12);background:${(d.iconBg||'rgba(30,40,80,.7)').replace('.85','.4')}">${t}</span>`).join('')}</div>`;
+        row.innerHTML = html;
+        body.appendChild(row);
+    });
+
+    overlay.classList.add('open');
+    setTimeout(() => {
+        body.querySelectorAll('.spec-bar-fill').forEach(el => { el.style.width = el.dataset.w + '%'; });
+    }, 380);
+}
+
+function closePopup() {
+    popupOpen = false;
+    overlay.classList.remove('open');
+}
+
+document.getElementById('popupClose').addEventListener('click', e => { e.stopPropagation(); closePopup(); });
+overlay.addEventListener('click', e => { if (e.target === overlay) closePopup(); });
+
+/* ── PARTICLES ── */
+const cvs = document.getElementById('cvs');
+const ctx = cvs.getContext('2d');
+let pts = [];
+function initPts() {
+    cvs.width = cvs.offsetWidth; cvs.height = cvs.offsetHeight;
+    pts = Array.from({ length: 80 }, () => ({
+        x: Math.random() * cvs.width, y: Math.random() * cvs.height,
+        vx: (Math.random()-.5)*.3, vy: (Math.random()-.5)*.3,
+        r: Math.random()*1.6+.3, op: Math.random()*.35+.04,
+    }));
+}
+(function drawPts() {
+    ctx.clearRect(0, 0, cvs.width, cvs.height);
+    pts.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > cvs.width)  p.vx *= -1;
+        if (p.y < 0 || p.y > cvs.height) p.vy *= -1;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(100,150,255,${p.op})`; ctx.fill();
+    });
+    requestAnimationFrame(drawPts);
+})();
+initPts();
+window.addEventListener('resize', initPts);
+
+setTimeout(flatMode, 100);
+    </script>
+</body>
+</html>

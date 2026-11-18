@@ -1,0 +1,111 @@
+﻿@model List<web1.Models.LuckySpinPrize>
+
+@{
+    ViewBag.Title = "Quản lý vòng quay may mắn - Admin";
+}
+
+<div class="row mb-3">
+    <div class="col-md-8">
+        <h2 style="color: #FFD700;">Quản lý Vòng Quay May Mắn</h2>
+    </div>
+    <div class="col-md-4 text-right">
+        <a href="@Url.Action("History", "LuckySpinPrize", new { area = "Admin" })" class="btn btn-info">
+            <i class="fas fa-history"></i> Lịch sử quay
+        </a>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th style="color: #FFD700;">Thứ tự</th>
+                <th style="color: #FFD700;">Tên giải thưởng</th>
+                <th style="color: #FFD700;">Loại</th>
+                <th style="color: #FFD700;">Tỷ lệ trúng (%)</th>
+                <th style="color: #FFD700;">Chi tiết</th>
+                <th style="color: #FFD700;">Trạng thái</th>
+                <th style="color: #FFD700;">Sửa</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                foreach (var prize in Model)
+                {
+                    var typeDisplay = "";
+                    var detail = "";
+
+                    switch (prize.PrizeType)
+                    {
+                        case "Message":
+                            typeDisplay = "<span class='badge bg-warning text-dark'>Lời chúc</span>";
+                            detail = prize.Name;
+                            break;
+                        case "Voucher":
+                            typeDisplay = "<span class='badge bg-info'>Voucher</span>";
+                            detail = "Giảm " + (prize.VoucherId.HasValue ? "theo voucher" : "N/A");
+                            break;
+                        case "Product":
+                            typeDisplay = "<span class='badge bg-success'>Sản phẩm</span>";
+                            detail = prize.ProductId.HasValue ? "Sản phẩm #" + prize.ProductId : "N/A";
+                            break;
+                    }
+
+                    <tr style="color: #FFD700;">
+                        <td>
+                            <strong>@prize.DisplayOrder</strong>
+                        </td>
+                        <td>@prize.Name</td>
+                        <td>@Html.Raw(typeDisplay)</td>
+                        <td>
+                            <strong>@prize.WinRate%</strong>
+                        </td>
+                        <td>
+                            <small>@detail</small>
+                        </td>
+                        <td>
+                            @if (prize.IsActive)
+                            {
+                                <span class="badge bg-success">Hoạt động</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Tắt</span>
+                            }
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Edit", "LuckySpinPrize", new { area = "Admin", id = prize.Id })" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> Sửa
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center" style="color: #FFD700;">Chưa có giải thưởng nào</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="alert alert-info mt-3">
+    <h6>Hướng dẫn:</h6>
+    <ul class="mb-0">
+        <li>Mỗi giải thưởng có tỷ lệ trúng riêng (tổng tất cả = 100%)</li>
+        <li>Sau khi customer thanh toán thành công, họ sẽ được quay một lần</li>
+        <li>Nếu trúng voucher, hệ thống tự tạo voucher riêng tư (Private) cho họ</li>
+        <li>Voucher riêng tư chỉ người đó có thể sử dụng</li>
+        <li>Click "Lịch sử quay" để xem tất cả người dùng đã quay được cái gì</li>
+    </ul>
+</div>

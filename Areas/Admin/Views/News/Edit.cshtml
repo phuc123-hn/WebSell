@@ -1,0 +1,73 @@
+﻿@model web1.Models.News
+
+@{
+    ViewBag.Title = "Sửa tin tức - Admin";
+}
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h2>Sửa tin tức #@Model.Id</h2>
+
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <div class="card">
+                <div class="card-body">
+                    @Html.HiddenFor(m => m.Id)
+
+                    <div class="mb-3">
+                        <label class="form-label">Tiêu đề</label>
+                        @Html.TextBoxFor(m => m.Title, new { @class = "form-control", placeholder = "Nhập tiêu đề tin tức" })
+                        @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Danh mục</label>
+                        @Html.DropDownListFor(m => m.Category, 
+                            ViewBag.Categories as List<string> != null 
+                                ? new SelectList(ViewBag.Categories as List<string>, Model.Category)
+                                : new SelectList(new[] { "Technology", "Defense" }, Model.Category),
+                            "-- Chọn danh mục --",
+                            new { @class = "form-select" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tóm tắt</label>
+                        @Html.TextBoxFor(m => m.Summary, new { @class = "form-control", placeholder = "Nhập tóm tắt ngắn" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nội dung</label>
+                        @Html.TextAreaFor(m => m.Content, new { @class = "form-control", rows = 10, placeholder = "Nhập nội dung tin tức" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Link ảnh</label>
+                        @Html.TextBoxFor(m => m.ImageUrl, new { @class = "form-control", placeholder = "~/Content/Images/news.jpg" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Ngày đăng</label>
+                        @Html.TextBoxFor(m => m.PublishDate, "{0:yyyy-MM-dd HH:mm}", new { @class = "form-control", type = "datetime-local", disabled = "disabled" })
+                        <small class="text-muted">Ngày đăng được lưu tự động, không thể thay đổi</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-check-input" })
+                            <label class="form-check-label" for="IsActive">Kích hoạt (hiển thị trên trang chủ)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu thay đổi
+                    </button>
+                    <a href="@Url.Action("Index", "News", new { area = "Admin" })" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Hủy
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

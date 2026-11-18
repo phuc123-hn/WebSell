@@ -1,0 +1,337 @@
+﻿@model web1.Models.Post
+
+@{
+    ViewBag.Title = Model.Title;
+    ViewBag.CurrentTab = "detail";
+    Layout = "~/Areas/Community/Views/Shared/_CommunityLayout.cshtml";
+    var likeCount = Model.Likes != null ? Model.Likes.Count : 0;
+    var comments = Model.Comments != null ? Model.Comments.Where(c => !c.IsDeleted).ToList() : new List<web1.Models.Comment>();
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <!-- Post Detail -->
+        <div class="post-card" style="margin-bottom: 30px;">
+            <div class="post-header">
+                <div>
+                    <span class="post-type-badge @(Model.Type == 0 ? "post-type-review" : "post-type-rent")">
+                        @if (Model.Type == 0)
+                        {
+                            <text><i class="fas fa-star"></i> Đánh Giá</text>
+                        }
+                        else
+                        {
+                            <text><i class="fas fa-tools"></i> Thuê Đồ</text>
+                        }
+                    </span>
+                </div>
+                @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || Model.UserId == (int)(Session["UserId"] ?? 0)))
+                {
+                    <div>
+                        <a href="@Url.Action("Edit", "Post", new { area = "Community", id = Model.Id })" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i> Sửa
+                        </a>
+                        <button onclick="deletePost(@Model.Id)" class="btn btn-sm btn-danger">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </div>
+                }
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <span class="post-author">@Model.User.FullName</span>
+                <span class="post-date" style="margin-left: 10px;">
+                    <i class="fas fa-calendar"></i> @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                </span>
+                @if (Model.UpdatedAt.HasValue)
+                {
+                    <span class="post-date" style="margin-left: 10px;">
+                        (Cập nhật: @Model.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm"))
+                    </span>
+                }
+            </div>
+
+            @if (Model.Type == 0 && Model.Rating.HasValue)
+            {
+                <div class="post-rating" style="margin-bottom: 15px;">
+                    <span class="stars">
+                        @for (int i = 0; i < Model.Rating.Value; i++)
+                        {
+                            <i class="fas fa-star"></i>
+                        }
+                        @for (int i = Model.Rating.Value; i < 5; i++)
+                        {
+                            <i class="far fa-star"></i>
+                        }
+                    </span>
+                    <span style="margin-left: 10px; color: #666; font-size: 18px; font-weight: 600;">@Model.Rating/5</span>
+                </div>
+            }
+
+            <h2 class="post-title">@Model.Title</h2>
+
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <div style="margin-bottom: 20px;">
+                    <img src="@Model.ImageUrl" style="max-width: 100%; max-height: 400px; border-radius: 10px; border: 1px solid #e0e0e0;">
+                </div>
+            }
+
+            <div class="post-content" style="font-size: 16px; line-height: 1.8; padding: 20px 0; border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0;">
+                @Model.Content
+            </div>
+
+            <!-- Actions -->
+            <div class="post-actions" style="display: flex; gap: 10px; margin-top: 20px; align-items: center;">
+                <div style="position: relative;">
+                    <button class="action-btn reaction-btn" id="reactionBtn" style="padding: 10px 16px; background: #f0f0f0; color: #333; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        <i class="fas fa-heart"></i> Phản Ứng
+                    </button>
+                    
+                    <!-- Reaction Menu -->
+                    <div id="reactionMenu" style="position: absolute; bottom: 100%; left: 0; background: white; border: 1px solid #ddd; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px; display: none; z-index: 1000; flex-direction: row; gap: 5px;">
+                        <button onclick="toggleReaction('like')" style="background: none; border: none; font-size: 24px; cursor: pointer; transition: transform 0.2s;" title="Thích">👍</button>
+                        <button onclick="toggleReaction('love')" style="background: none; border: none; font-size: 24px; cursor: pointer; transition: transform 0.2s;" title="Yêu thích">❤️</button>
+                        <button onclick="toggleReaction('haha')" style="background: none; border: none; font-size: 24px; cursor: pointer; transition: transform 0.2s;" title="Haha">😆</button>
+                        <button onclick="toggleReaction('wow')" style="background: none; border: none; font-size: 24px; cursor: pointer; transition: transform 0.2s;" title="Wow">😮</button>
+                        <button onclick="toggleReaction('angry')" style="background: none; border: none; font-size: 24px; cursor: pointer; transition: transform 0.2s;" title="Giận dữ">😠</button>
+                    </div>
+                </div>
+
+                <!-- Reaction Counts -->
+                <div id="reactionCounts" style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: #666;">
+                </div>
+
+                <span class="action-btn" style="background: none; border: none; color: #999; cursor: default; margin-left: auto;">
+                    <i class="fas fa-comment"></i> @comments.Count Bình luận
+                </span>
+            </div>
+        </div>
+
+        <!-- Comments Section -->
+        <div class="comment-section">
+            <h4 style="margin-bottom: 20px; color: #333;">
+                <i class="fas fa-comments"></i> Bình Luận (@comments.Count)
+            </h4>
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="comment-form">
+                    <input type="text" id="commentInput" placeholder="Viết bình luận của bạn..." style="flex: 1; padding: 10px 15px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px;" />
+                    <button type="button" onclick="addComment(@Model.Id)" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                        <i class="fas fa-paper-plane"></i> Gửi
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <a href="@Url.Action("Login", "Account", new { area = "" })">Đăng nhập</a> để bình luận
+                </div>
+            }
+
+            <!-- Comments List -->
+            <div id="commentsList">
+                @if (comments.Any())
+                {
+                    foreach (var comment in comments.OrderByDescending(c => c.CreatedAt))
+                    {
+                        <div class="comment-item" data-comment-id="@comment.Id">
+                            <div>
+                                <span class="comment-author">@comment.User.FullName</span>
+                                <span class="comment-date">@comment.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                                @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || comment.UserId == (int)(Session["UserId"] ?? 0)))
+                                {
+                                    <button onclick="deleteComment(@comment.Id)" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px; margin-left: 10px;">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
+                                }
+                            </div>
+                            <div class="comment-content">@comment.Content</div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div style="text-align: center; color: #999; padding: 30px;">
+                        <i class="fas fa-inbox" style="font-size: 32px; opacity: 0.5; margin-bottom: 10px; display: block;"></i>
+                        Chưa có bình luận. Hãy là người đầu tiên!
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="@Url.Action("Index", "Home", new { area = "Community" })" class="btn btn-secondary" style="padding: 12px 30px; border-radius: 25px;">
+                <i class="fas fa-arrow-left"></i> Quay Lại
+            </a>
+        </div>
+    </div>
+
+    <!-- Close Button (X) - Fixed Top Right -->
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        <a href="@Url.Action("Index", "Home", new { area = "Community" })" class="btn btn-outline-secondary" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 24px; line-height: 1;">
+            ✕
+        </a>
+    </div>
+</div>
+
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var spinHistoryId = null;
+
+        // Toggle Reaction Menu
+        $('#reactionBtn').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var menu = $('#reactionMenu');
+            menu.stop(true, true).fadeToggle(200);
+        });
+
+        // Close reaction menu when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('#reactionBtn, #reactionMenu').length) {
+                $('#reactionMenu').fadeOut(200);
+            }
+        });
+
+        // Toggle Reaction
+        function toggleReaction(reactionType) {
+            $('#reactionMenu').fadeOut(200);
+            
+            $.ajax({
+                url: '@Url.Action("Toggle", "Reaction", new { area = "Community" })',
+                method: 'POST',
+                data: { postId: @Model.Id, reactionType: reactionType },
+                success: function(data) {
+                    if (data.success) {
+                        updateReactionCounts();
+                    } else {
+                        alert('Lỗi: ' + data.message);
+                    }
+                },
+                error: function() {
+                    alert('Lỗi kết nối');
+                }
+            });
+        }
+
+        // Update Reaction Counts Display
+        function updateReactionCounts() {
+            $.ajax({
+                url: '@Url.Action("GetCounts", "Reaction", new { area = "Community" })',
+                method: 'GET',
+                data: { postId: @Model.Id },
+                success: function(data) {
+                    var counts = data.counts;
+                    var html = '';
+                    
+                    if (counts.like > 0) html += '<span title="Thích">👍 ' + counts.like + '</span>';
+                    if (counts.love > 0) html += '<span title="Yêu thích">❤️ ' + counts.love + '</span>';
+                    if (counts.haha > 0) html += '<span title="Haha">😆 ' + counts.haha + '</span>';
+                    if (counts.wow > 0) html += '<span title="Wow">😮 ' + counts.wow + '</span>';
+                    if (counts.angry > 0) html += '<span title="Giận dữ">😠 ' + counts.angry + '</span>';
+                    
+                    if (html === '') {
+                        html = '<span style="color: #999;">Chưa có phản ứng</span>';
+                    }
+                    
+                    $('#reactionCounts').html(html);
+                    
+                    // Update button text with user's reaction
+                    if (data.userReaction) {
+                        var emoji = {
+                            'like': '👍',
+                            'love': '❤️',
+                            'haha': '😆',
+                            'wow': '😮',
+                            'angry': '😠'
+                        }[data.userReaction];
+                        
+                        $('#reactionBtn').html('<i class="fas fa-heart"></i> ' + emoji + ' Phản Ứng');
+                    } else {
+                        $('#reactionBtn').html('<i class="fas fa-heart"></i> Phản Ứng');
+                    }
+                }
+            });
+        }
+
+        // Load reactions on page load
+        $(document).ready(function() {
+            updateReactionCounts();
+        });
+
+        function toggleLike(postId) {
+            if (!@(User.Identity.IsAuthenticated ? "true" : "false")) {
+                alert('Vui lòng đăng nhập để like');
+                window.location.href = '@Url.Action("Login", "Account", new { area = "" })';
+                return;
+            }
+
+            $.post('@Url.Action("Toggle", "Like", new { area = "Community" })', { postId: postId }, function (result) {
+                if (result.success) {
+                    $('[data-post-id="' + postId + '"] .like-count').text(result.likeCount);
+                    if (result.liked) {
+                        $('[data-post-id="' + postId + '"]').addClass('liked');
+                    } else {
+                        $('[data-post-id="' + postId + '"]').removeClass('liked');
+                    }
+                } else {
+                    alert(result.message);
+                }
+            });
+        }
+
+        function addComment(postId) {
+            var content = $('#commentInput').val();
+            if (!content.trim()) {
+                alert('Vui lòng nhập nội dung bình luận');
+                return;
+            }
+
+            $.post('@Url.Action("Add", "Comment", new { area = "Community" })', 
+                { postId: postId, content: content }, 
+                function (result) {
+                    if (result.success) {
+                        $('#commentInput').val('');
+                        location.reload();
+                    } else {
+                        alert(result.message);
+                    }
+                }
+            );
+        }
+
+        function deleteComment(commentId) {
+            if (confirm('Xóa bình luận này?')) {
+                $.post('@Url.Action("Delete", "Comment", new { area = "Community" })', 
+                    { commentId: commentId }, 
+                    function (result) {
+                        if (result.success) {
+                            $('[data-comment-id="' + commentId + '"]').fadeOut(300, function () {
+                                $(this).remove();
+                            });
+                        } else {
+                            alert(result.message);
+                        }
+                    }
+                );
+            }
+        }
+
+        function deletePost(postId) {
+            if (confirm('Xóa bài này? Hành động không thể hoàn tác.')) {
+                $.post('@Url.Action("Delete", "Post", new { area = "Community" })', { id: postId }, function (result) {
+                    if (result.success) {
+                        alert(result.message);
+                        window.location.href = '@Url.Action("Index", "Home", new { area = "Community" })';
+                    } else {
+                        alert(result.message);
+                    }
+                });
+            }
+        }
+    </script>
+}

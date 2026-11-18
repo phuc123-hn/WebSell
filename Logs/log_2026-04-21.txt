@@ -1,0 +1,47 @@
+[2026-04-21 14:18:52] [INFO] User 'admin123' logged in successfully
+[2026-04-21 14:20:13] [INFO] User logged out
+[2026-04-21 14:20:31] [INFO] User 'testuser' logged in successfully
+[2026-04-21 14:20:57] [INFO] User logged out
+[2026-04-21 14:21:08] [INFO] User 'admin123' logged in successfully
+[2026-04-21 19:58:44] [INFO] [RECORD] Attempt recorded: ::1 - Register
+[2026-04-21 19:59:16] [INFO] [RATE_LIMIT] Cooldown enforced for ::1
+[2026-04-21 19:59:16] [WARNING] [RATE_LIMIT] Request blocked: ::1 (Register) - Vui lòng ch? 28 giây tr??c khi th? l?i.
+[2026-04-21 20:03:23] [INFO] User 'admin123' logged in successfully
+[2026-04-21 20:03:31] [INFO] User logged out
+[2026-04-21 20:03:58] [INFO] [RECORD] Attempt recorded: ::1 - Register
+[2026-04-21 20:04:25] [INFO] [RATE_LIMIT] Cooldown enforced for ::1
+[2026-04-21 20:04:25] [WARNING] [RATE_LIMIT] Request blocked: ::1 (Register) - Vui lòng ch? 32 giây tr??c khi th? l?i.
+[2026-04-21 20:09:06] [INFO] [RECORD] Attempt recorded: ::1 - Register
+[2026-04-21 20:09:42] [INFO] [RATE_LIMIT] Cooldown enforced for ::1
+[2026-04-21 20:09:42] [WARNING] [RATE_LIMIT] Request blocked: ::1 (Register) - Vui lòng ch? 23 giây tr??c khi th? l?i.
+[2026-04-21 20:51:06] [INFO] User 'testuser' logged in successfully
+[2026-04-21 20:52:04] [INFO] [RECORD] Attempt recorded: 2 - Payment
+[2026-04-21 20:52:08] [ERROR] SMTP Error sending email to testuser@techworld.vn: The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+System.Net.Mail.SmtpException: The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+   at System.Net.Mail.MailCommand.CheckResponse(SmtpStatusCode statusCode, String response)
+   at System.Net.Mail.MailCommand.Send(SmtpConnection conn, Byte[] command, MailAddress from, Boolean allowUnicode)
+   at System.Net.Mail.SmtpTransport.SendMail(MailAddress sender, MailAddressCollection recipients, String deliveryNotify, Boolean allowUnicode, SmtpFailedRecipientException& exception)
+   at System.Net.Mail.SmtpClient.Send(MailMessage message)
+   at web1.Services.EmailService.SendGenericEmail(String toEmail, String subject, String htmlBody) in C:\Users\VivoBook\Documents\WebSell\web1\web1\Services\EmailService.cs:line 142
+[2026-04-21 20:52:08] [WARNING] Email not sent for OTP to 0987654321, but OTP saved in database
+[2026-04-21 20:52:08] [INFO] OTP saved and email sent to 0987654321 for Payment
+[2026-04-21 20:52:08] [INFO] OTP sent for payment - Order: 26, User: 2
+[2026-04-21 20:52:25] [INFO] User logged out
+[2026-04-21 20:52:34] [INFO] User 'admin123' logged in successfully
+[2026-04-21 20:52:58] [INFO] User logged out
+[2026-04-21 20:53:08] [INFO] User 'phucngo' logged in successfully
+[2026-04-21 20:54:04] [INFO] [RECORD] Attempt recorded: 4 - Payment
+[2026-04-21 20:54:12] [ERROR] SMTP Error sending email to phucngo2406@gmail.com: The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+System.Net.Mail.SmtpException: The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+   at System.Net.Mail.MailCommand.CheckResponse(SmtpStatusCode statusCode, String response)
+   at System.Net.Mail.MailCommand.Send(SmtpConnection conn, Byte[] command, MailAddress from, Boolean allowUnicode)
+   at System.Net.Mail.SmtpTransport.SendMail(MailAddress sender, MailAddressCollection recipients, String deliveryNotify, Boolean allowUnicode, SmtpFailedRecipientException& exception)
+   at System.Net.Mail.SmtpClient.Send(MailMessage message)
+   at web1.Services.EmailService.SendGenericEmail(String toEmail, String subject, String htmlBody) in C:\Users\VivoBook\Documents\WebSell\web1\web1\Services\EmailService.cs:line 142
+[2026-04-21 20:54:12] [WARNING] Email not sent for OTP to 0777268757, but OTP saved in database
+[2026-04-21 20:54:12] [INFO] OTP saved and email sent to 0777268757 for Payment
+[2026-04-21 20:54:12] [INFO] OTP sent for payment - Order: 27, User: 4
+[2026-04-21 20:54:32] [INFO] [RATE_LIMIT] Cooldown enforced for 4
+[2026-04-21 20:54:32] [WARNING] [RATE_LIMIT] Request blocked: 4 (Payment) - Vui lòng ch? 31 giây tr??c khi th? l?i.
+[2026-04-21 20:54:36] [INFO] [RATE_LIMIT] Cooldown enforced for 4
+[2026-04-21 20:54:36] [WARNING] [RATE_LIMIT] Request blocked: 4 (Payment) - Vui lòng ch? 27 giây tr??c khi th? l?i.

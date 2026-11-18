@@ -1,0 +1,108 @@
+@model dynamic
+
+@{
+    ViewBag.Title = "Test Email - Debug Only";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0"><i class="fas fa-envelope"></i> Test Email Send (DEBUG ONLY)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Debug Tool:</strong> Trang này chỉ dùng để test SMTP configuration. Hãy xóa sau khi hoàn tất debug.
+                    </div>
+
+                    <form id="testEmailForm">
+                        <div class="form-group mb-3">
+                            <label for="recipientEmail">Email người nhận:</label>
+                            <input type="email" class="form-control" id="recipientEmail" 
+                                   value="phucngo240726@gmail.com"
+                                   placeholder="test@example.com" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="testOtp">Mã OTP Test:</label>
+                            <input type="text" class="form-control" id="testOtp" 
+                                   value="123456" 
+                                   placeholder="Mặc định: 123456">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-paper-plane"></i> Gửi Email Test
+                        </button>
+                    </form>
+
+                    <hr />
+
+                    <div id="result" style="display:none;">
+                        <h5>Kết quả:</h5>
+                        <div id="resultMessage" class="alert"></div>
+                    </div>
+
+                    <hr />
+
+                    <h5>Hướng dẫn debug:</h5>
+                    <ol>
+                        <li>Nhập email nhận (mặc định: phucngo240726@gmail.com)</li>
+                        <li>Click "Gửi Email Test"</li>
+                        <li>Nếu thành công: Email sẽ được gửi trong vài giây</li>
+                        <li>Nếu thất bại: Kiểm tra chi tiết trong file log</li>
+                    </ol>
+
+                    <h5 style="margin-top: 20px;">Nơi xem log:</h5>
+                    <code>~/Logs/log_2026-04-22.txt</code> (hoặc ngày hiện tại)
+                    
+                    <p style="margin-top: 10px; font-size: 12px; color: #666;">
+                        <strong>Tìm dòng:</strong> <code>[EMAIL]</code> hoặc <code>[DEBUG]</code> để xem chi tiết quá trình gửi email
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#testEmailForm').on('submit', function(e) {
+        e.preventDefault();
+
+        var email = $('#recipientEmail').val();
+        var otp = $('#testOtp').val() || '123456';
+
+        $('button[type=submit]').prop('disabled', true)
+            .html('<i class="fas fa-spinner fa-spin"></i> Đang gửi...');
+
+        $.ajax({
+            url: '@Url.Action("TestEmailSend", "Account")',
+            type: 'POST',
+            data: {
+                recipientEmail: email,
+                testOtp: otp
+            },
+            success: function(response) {
+                $('#result').show();
+                if (response.success) {
+                    $('#resultMessage').removeClass('alert-danger').addClass('alert-success')
+                        .html('<i class="fas fa-check-circle"></i> ' + response.message.replace(/\n/g, '<br>'));
+                } else {
+                    $('#resultMessage').removeClass('alert-success').addClass('alert-danger')
+                        .html('<i class="fas fa-exclamation-circle"></i> ' + response.message.replace(/\n/g, '<br>'));
+                }
+            },
+            error: function() {
+                $('#result').show();
+                $('#resultMessage').removeClass('alert-success').addClass('alert-danger')
+                    .html('<i class="fas fa-times-circle"></i> Lỗi kết nối. Kiểm tra console và logs.');
+            },
+            complete: function() {
+                $('button[type=submit]').prop('disabled', false)
+                    .html('<i class="fas fa-paper-plane"></i> Gửi Email Test');
+            }
+        });
+    });
+});
+</script>

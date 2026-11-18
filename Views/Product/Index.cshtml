@@ -1,0 +1,282 @@
+﻿@model List<web1.Models.Product>
+
+@{
+    ViewBag.Title = "Sản phẩm - TechWorld";
+}
+
+<style>
+    /* Sửa nền: Ép màu nền của toàn bộ body thành màu tối */
+    body {
+        background: linear-gradient(135deg, #07091A 0%, #0F1628 100%);
+        color: var(--text);
+        font-family: 'Be Vietnam Pro', sans-serif;
+        overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, h5, p, span {
+        color: #e0e0e0;
+    }
+
+    .tech-card-container {
+        background-color: #1a1d1a;
+        padding: 20px 0;
+        min-height: 100vh;
+    }
+
+    .product-card {
+        background-color: #03050a;
+        border: 1.5px solid #a2f6a2;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 25px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(162, 246, 162, 0.4);
+        }
+
+    .product-image-wrapper {
+        width: 100%;
+        height: 250px;
+        overflow: hidden;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        position: relative;
+        background-color: #000;
+    }
+
+        .product-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+    .product-title {
+        color: #a2f6a2;
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+        line-height: 1.2;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 40px;
+    }
+
+    /* Style cho phần Rating Icon */
+    .product-rating {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .star-icon {
+        font-size: 0.9rem;
+        margin-right: 2px;
+        filter: drop-shadow(0 0 2px rgba(255, 193, 7, 0.5));
+    }
+
+    .star-filled {
+        color: #ffc107;
+    }
+    /* Màu vàng đặc trưng của sao */
+    .star-empty {
+        color: #444;
+    }
+
+    .product-price-tech {
+        color: #a2f6a2;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+    .btn-tech-detail, .btn-tech-cart {
+        background-color: #a2f6a2;
+        color: #121412 !important;
+        border: none;
+        font-weight: bold;
+        text-transform: uppercase;
+        border-radius: 6px;
+        padding: 10px;
+        width: 100%;
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        box-shadow: 0 0 5px rgba(162, 246, 162, 0.2);
+    }
+
+    .btn-tech-detail {
+        margin-bottom: 10px;
+        opacity: 0.9;
+    }
+
+    .btn-tech-detail:hover,
+    .btn-tech-cart:hover {
+        background-color: #ffffff;
+        box-shadow: 0 0 15px rgba(162, 246, 162, 0.6);
+        transform: translateY(-3px) scale(1.02);
+        text-decoration: none;
+        color: #121412 !important;
+    }
+
+    .btn-tech-detail:active,
+    .btn-tech-cart:active {
+        transform: translateY(-1px) scale(0.98);
+        text-decoration: none;
+    }
+
+    .sidebar-tech {
+        background: #121412;
+        border: 1px solid #a2f6a2;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+        .sidebar-tech .form-control, .sidebar-tech .form-select {
+            background: #1a1d1a;
+            border: 1px solid #333;
+            color: #fff;
+        }
+
+    .hot-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #ff4757;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        z-index: 10;
+        box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+    }
+</style>
+
+<div class="tech-card-container container-fluid">
+    <div class="row px-3">
+        @* SIDEBAR *@
+        <div class="col-md-3 mb-4">
+            <div class="sidebar-tech">
+                <h4 class="mb-4 text-uppercase" style="color: #a2f6a2; font-size: 1.2rem;">
+                    <i class="fas fa-filter"></i> Bộ lọc
+                </h4>
+                <form action="@Url.Action("Index", "Product")" method="get">
+                    <div class="mb-3">
+                        <label class="form-label" style="color:yellowgreen">Danh mục</label>
+                        <select name="categoryId" class="form-select">
+                            <option value="">-- Tất cả --</option>
+                            @if (ViewBag.Categories != null)
+                            {
+                                foreach (var cat in ViewBag.Categories)
+                                {
+                                    <option value="@cat.Id" @(ViewBag.SelectedCategory == cat.Id ? "selected" : "")>@cat.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="color:yellowgreen">Giá từ (VNĐ)</label>
+                        <input type="number" name="minPrice" class="form-control" value="@ViewBag.MinPrice" placeholder="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="color:yellowgreen">Đến</label>
+                        <input type="number" name="maxPrice" class="form-control" value="@ViewBag.MaxPrice" placeholder="999.999.999">
+                    </div>
+                    <button type="submit" class="btn btn-tech-cart mt-2">Áp dụng lọc</button>
+                </form>
+            </div>
+        </div>
+
+        @* DANH SÁCH SẢN PHẨM *@
+        <div class="col-md-9">
+            <h2 class="mb-4" style="color: #a2f6a2; text-transform: uppercase; letter-spacing: 2px;">
+                <i class="fas fa-microchip"></i> Kho sản phẩm công nghệ
+            </h2>
+
+            <div class="row">
+                @if (Model != null && Model.Count > 0)
+                {
+                    foreach (var product in Model)
+                    {
+                        <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                            <div class="product-card">
+                                @if (product.IsHot)
+                                {
+                                    <span class="hot-badge">HOT</span>
+                                }
+
+                                <div class="product-image-wrapper">
+                                    @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                    {
+                                        <img src="@Url.Content(product.ImageUrl)" alt="@product.Name" />
+                                    }
+                                    else
+                                    {
+                                        <div class="h-100 d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-laptop-code" style="font-size: 4rem; color: #222;"></i>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="product-title">@product.Name</div>
+
+                                @* PHẦN RATING ĐÃ ĐỔI SANG ICON *@
+                                <div class="product-rating">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= Math.Floor(product.Rating))
+                                        {
+                                            <i class="fas fa-star star-icon star-filled"></i>
+                                        }
+                                        else if (i == Math.Ceiling(product.Rating) && product.Rating % 1 != 0)
+                                        {
+                                            <i class="fas fa-star-half-alt star-icon star-filled"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="far fa-star star-icon star-empty"></i>
+                                        }
+                                    }
+                                    <span style="color: #888; margin-left: 8px; font-size: 0.85rem;">(@product.Rating.ToString("0.0"))</span>
+                                </div>
+
+                                <div class="product-price-tech">
+                                    @product.Price.ToString("N0") VNĐ
+                                </div>
+
+                                <div class="mt-auto">
+                                    <a href="@Url.Action("Details", "Product", new { id = product.Id })" class="btn btn-tech-detail">
+                                        <i class="fas fa-eye"></i> Chi tiết
+                                    </a>
+                                    <button type="button" class="btn btn-tech-cart" onclick="addToCart(@product.Id)">
+                                        <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12">
+                        <div class="alert alert-dark border-success text-success bg-transparent">
+                            <i class="fas fa-info-circle"></i> Không tìm thấy sản phẩm nào phù hợp với bộ lọc.
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

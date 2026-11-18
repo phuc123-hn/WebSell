@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - Community TechWorld</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="@Url.Content("~/Content/theme.css")" />
+    
+    <style>
+        html, body {
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            font-family: var(--font-family);
+        }
+
+        .community-header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            border-bottom: 1px solid var(--border-color-hover);
+            padding: 20px 0;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .community-header h1 {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .community-header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+        }
+
+        .community-header .username {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .community-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .community-nav a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .community-nav a:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .community-nav a:not(.active):hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .community-nav a.active {
+            background: var(--color-cyan);
+            color: var(--bg-primary);
+            box-shadow: var(--shadow-md);
+            font-weight: 600;
+        }
+
+        .back-to-shop {
+            background: rgba(255, 255, 255, 0.15) !important;
+            border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+            color: white !important;
+            margin-left: 15px;
+            padding: 10px 16px !important;
+            font-size: 13px;
+        }
+
+        .back-to-shop:hover {
+            background: rgba(255, 255, 255, 0.25) !important;
+            border-color: white !important;
+            transform: translateY(-2px);
+        }
+
+        .community-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow-lg);
+            min-height: 400px;
+            margin: 30px 15px 50px;
+        }
+
+        .post-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .post-card:hover {
+            box-shadow: var(--shadow-purple);
+            transform: translateY(-4px);
+            border-color: var(--color-primary);
+        }
+
+        .post-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .post-title:hover {
+            color: var(--color-cyan);
+        }
+
+        .btn-primary-community {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            box-shadow: var(--shadow-purple);
+        }
+
+        .btn-primary-community:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-glow);
+            color: white;
+        }
+
+        .btn-admin-community {
+            background: linear-gradient(135deg, var(--color-warning) 0%, #ff8c42 100%);
+        }
+
+        .btn-admin-community:hover {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+        }
+
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 25px;
+            font-size: 14px;
+            margin-top: 40px;
+        }
+
+        @@media (max-width: 768px) {
+            .community-header h1 {
+                font-size: 20px;
+            }
+
+            .community-nav {
+                gap: 8px;
+            }
+
+            .community-nav a {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            .back-to-shop {
+                margin-left: 0 !important;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="community-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-7">
+                    <h1 style="margin: 0;">
+                        <i class="fas fa-comments"></i> Cộng Đồng TechWorld
+                    </h1>
+                    <p style="margin: 3px 0 0 0;">
+                        Chia sẻ, đánh giá và trao đổi công nghệ
+                    </p>
+                </div>
+
+                <div class="col-md-5 d-flex justify-content-end align-items-center">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <span class="username">
+                            <i class="fas fa-user-circle"></i> @Session["Username"]
+                        </span>
+                        <a href="@Url.Action("Index", "Home", new { area = "" })" class="btn-primary-community back-to-shop">
+                            <i class="fas fa-arrow-left"></i> Shop
+                        </a>
+                    }
+                </div>
+            </div>
+
+            <div class="community-nav">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a href="@Url.Action("Index", "Home", new { area = "Community" })" class="@(ViewBag.CurrentTab == "all" ? "active" : "")">
+                        <i class="fas fa-list"></i> Tất Cả
+                    </a>
+                    <a href="@Url.Action("Reviews", "Home", new { area = "Community" })" class="@(ViewBag.CurrentTab == "reviews" ? "active" : "")">
+                        <i class="fas fa-star"></i> Đánh Giá
+                    </a>
+                    <a href="@Url.Action("Index", "Profile", new { area = "Community" })" class="@(ViewBag.CurrentTab == "profile" ? "active" : "")">
+                        <i class="fas fa-user"></i> Cá Nhân
+                    </a>
+                    <a href="@Url.Action("Create", "Post", new { area = "Community", type = 0 })" class="btn-primary-community" style="padding: 10px 16px; font-size: 14px;">
+                        <i class="fas fa-plus"></i> Đăng Bài
+                    </a>
+                    if (User.IsInRole("Admin"))
+                    {
+                        <a href="@Url.Action("Create", "Post", new { area = "Community", type = 1 })" class="btn-primary-community btn-admin-community" style="padding: 10px 16px; font-size: 14px;">
+                            <i class="fas fa-plus"></i> Cho Thuê
+                        </a>
+                        <a href="@Url.Action("Posts", "Admin", new { area = "Community" })" class="@(ViewBag.CurrentTab == "admin" ? "active" : "") btn-primary-community btn-admin-community" style="padding: 10px 16px; font-size: 14px;">
+                            <i class="fas fa-shield-alt"></i> Quản Lý
+                        </a>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="community-container">
+            @RenderBody()
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Community TechWorld - Nơi chia sẻ, trao đổi công nghệ</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

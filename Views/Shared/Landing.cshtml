@@ -1,0 +1,1215 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TechWorld – Điện Tử & Bán Dẫn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=Be+Vietnam+Pro:wght@300;400;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #050810;
+            --surface: #0c1120;
+            --card: #111827;
+            --border: #1e2d4a;
+            --accent: #00d4ff;
+            --accent2: #7c3aed;
+            --accent3: #f59e0b;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --glow: 0 0 40px rgba(0,212,255,0.18);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Be Vietnam Pro', sans-serif;
+            overflow-x: hidden;
+        }
+
+            /* ─── NOISE OVERLAY ─── */
+            body::before {
+                content: '';
+                position: fixed;
+                inset: 0;
+                background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+                pointer-events: none;
+                z-index: 0;
+                opacity: 0.5;
+            }
+
+        /* ─── CIRCUIT GRID BACKGROUND ─── */
+        .circuit-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+
+        /* ─── NAV ─── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 48px;
+            background: rgba(5,8,16,0.75);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.02em;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 12px var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.4);
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 36px;
+            list-style: none;
+        }
+
+            .nav-links a {
+                color: var(--muted);
+                text-decoration: none;
+                font-size: 0.88rem;
+                font-weight: 600;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+                transition: color .25s;
+            }
+
+                .nav-links a:hover {
+                    color: var(--accent);
+                }
+
+        .nav-cta {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background .25s, box-shadow .25s;
+        }
+
+            .nav-cta:hover {
+                background: rgba(0,212,255,0.1);
+                box-shadow: var(--glow);
+            }
+
+        /* ─── HERO ─── */
+        .hero {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 24px 80px;
+            overflow: hidden;
+        }
+
+        /* Glowing orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0,212,255,0.12), transparent 70%);
+            top: -100px;
+            left: -100px;
+            animation: float1 8s ease-in-out infinite;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(124,58,237,0.14), transparent 70%);
+            bottom: 0;
+            right: -80px;
+            animation: float2 10s ease-in-out infinite;
+        }
+
+        @@keyframes float1 {
+            0%, 100% {
+                transform: translate(0,0)
+            }
+
+            50% {
+                transform: translate(60px,40px)
+            }
+        }
+
+        @@keyframes float2 {
+            0%, 100% {
+                transform: translate(0,0)
+            }
+
+            50% {
+                transform: translate(-40px,-50px)
+            }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,212,255,0.07);
+            border: 1px solid rgba(0,212,255,0.25);
+            border-radius: 100px;
+            padding: 6px 18px;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+            animation: fadeUp .7s ease both;
+        }
+
+        .hero-badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        .hero-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.8rem, 7vw, 6rem);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+            animation: fadeUp .8s .1s ease both;
+        }
+
+            .hero-title .highlight {
+                background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+        .hero-sub {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: var(--muted);
+            max-width: 600px;
+            line-height: 1.7;
+            margin: 0 auto 48px;
+            font-weight: 300;
+            animation: fadeUp .8s .2s ease both;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeUp .8s .3s ease both;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #050810;
+            border: none;
+            padding: 16px 36px;
+            border-radius: 4px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: box-shadow .3s, transform .2s;
+        }
+
+            .btn-primary:hover {
+                box-shadow: 0 0 40px rgba(0,212,255,0.5);
+                transform: translateY(-2px);
+            }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 16px 36px;
+            border-radius: 4px;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: border-color .3s, color .3s;
+        }
+
+            .btn-outline:hover {
+                border-color: var(--accent);
+                color: var(--accent);
+            }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 0.75rem;
+            font-family: 'DM Mono', monospace;
+            letter-spacing: 0.1em;
+            animation: fadeUp .8s .6s ease both;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 48px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+            animation: scrollDown 1.8s ease-in-out infinite;
+        }
+
+        @@keyframes scrollDown {
+            0% {
+                transform: scaleY(0);
+                transform-origin: top;
+            }
+
+            50% {
+                transform: scaleY(1);
+                transform-origin: top;
+            }
+
+            51% {
+                transform: scaleY(1);
+                transform-origin: bottom;
+            }
+
+            100% {
+                transform: scaleY(0);
+                transform-origin: bottom;
+            }
+        }
+
+        /* ─── STATS ─── */
+        .stats-bar {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: rgba(12,17,32,0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-item {
+            flex: 1;
+            min-width: 160px;
+            padding: 32px 24px;
+            text-align: center;
+            border-right: 1px solid var(--border);
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity .6s ease, transform .6s ease;
+        }
+
+            .stat-item:last-child {
+                border-right: none;
+            }
+
+            .stat-item.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        .stat-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* ─── SECTIONS ─── */
+        section {
+            position: relative;
+            z-index: 1;
+            padding: 100px 48px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-tag {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+            .section-tag::before {
+                content: '';
+                display: block;
+                width: 32px;
+                height: 1px;
+                background: var(--accent);
+            }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .section-desc {
+            color: var(--muted);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            max-width: 520px;
+            font-weight: 300;
+        }
+
+        /* ─── FEATURES GRID ─── */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 64px;
+        }
+
+        .feature-card {
+            background: var(--card);
+            padding: 40px 36px;
+            position: relative;
+            overflow: hidden;
+            transition: background .3s;
+        }
+
+            .feature-card::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, rgba(0,212,255,0.04), transparent);
+                opacity: 0;
+                transition: opacity .3s;
+            }
+
+            .feature-card:hover {
+                background: #131e33;
+            }
+
+                .feature-card:hover::before {
+                    opacity: 1;
+                }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: rgba(0,212,255,0.1);
+            border: 1px solid rgba(0,212,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 24px;
+        }
+
+        .feature-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.65;
+        }
+
+        /* ─── CATEGORIES BENTO ─── */
+        .bento {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: auto;
+            gap: 16px;
+            margin-top: 64px;
+        }
+
+        .bento-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 36px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color .3s, transform .25s;
+            cursor: default;
+        }
+
+            .bento-card:hover {
+                border-color: var(--accent);
+                transform: translateY(-4px);
+            }
+
+            .bento-card::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: linear-gradient(90deg, var(--accent), var(--accent2));
+                transform: scaleX(0);
+                transform-origin: left;
+                transition: transform .4s ease;
+            }
+
+            .bento-card:hover::after {
+                transform: scaleX(1);
+            }
+
+        .bc-1 {
+            grid-column: span 7;
+        }
+
+        .bc-2 {
+            grid-column: span 5;
+        }
+
+        .bc-3 {
+            grid-column: span 4;
+        }
+
+        .bc-4 {
+            grid-column: span 4;
+        }
+
+        .bc-5 {
+            grid-column: span 4;
+        }
+
+        .bento-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .bento-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .bento-text {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.7;
+        }
+
+        .bento-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        /* ─── NEWS TICKER ─── */
+        .ticker-wrap {
+            position: relative;
+            z-index: 1;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            overflow: hidden;
+        }
+
+        .ticker-label {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: var(--accent);
+            color: #050810;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 2;
+            white-space: nowrap;
+        }
+
+        .ticker-track {
+            display: flex;
+            gap: 80px;
+            white-space: nowrap;
+            animation: ticker 28s linear infinite;
+            padding-left: 140px;
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: var(--muted);
+            font-size: 0.88rem;
+            font-family: 'DM Mono', monospace;
+        }
+
+            .ticker-item::before {
+                content: '◆';
+                color: var(--accent);
+                font-size: 0.5rem;
+            }
+
+        @@keyframes ticker {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* ─── WHY ─── */
+        .why-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+            margin-top: 64px;
+        }
+
+        .why-visual {
+            position: relative;
+            aspect-ratio: 1;
+            max-width: 420px;
+        }
+
+        .why-circuit {
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .why-circuit svg {
+                width: 70%;
+                height: 70%;
+                opacity: 0.6;
+            }
+
+        .why-glow {
+            position: absolute;
+            inset: -1px;
+            border-radius: 16px;
+            background: conic-gradient(from 0deg, transparent, var(--accent), transparent, var(--accent2), transparent);
+            z-index: -1;
+            animation: spin 6s linear infinite;
+        }
+
+        @@keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .why-glow-inner {
+            position: absolute;
+            inset: 2px;
+            border-radius: 14px;
+            background: var(--card);
+            z-index: 0;
+        }
+
+        .why-circuit-inner {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .why-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .why-item {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            padding: 24px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            transition: border-color .3s;
+        }
+
+            .why-item:hover {
+                border-color: rgba(0,212,255,0.35);
+            }
+
+        .why-check {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(0,212,255,0.12);
+            border: 1px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 0.75rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .why-item-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .why-item-text {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        /* ─── CTA FOOTER ─── */
+        .cta-section {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 120px 48px;
+            border-top: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+            .cta-section::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(ellipse at center bottom, rgba(0,212,255,0.06), transparent 70%);
+                pointer-events: none;
+            }
+
+        .cta-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 24px;
+        }
+
+        .cta-desc {
+            color: var(--muted);
+            font-size: 1.1rem;
+            max-width: 480px;
+            margin: 0 auto 48px;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .btn-enter {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, var(--accent), #0099cc);
+            color: #050810;
+            border: none;
+            padding: 20px 48px;
+            border-radius: 6px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.15rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform .2s, box-shadow .3s;
+            box-shadow: 0 0 40px rgba(0,212,255,0.3);
+        }
+
+            .btn-enter:hover {
+                transform: translateY(-3px) scale(1.02);
+                box-shadow: 0 0 70px rgba(0,212,255,0.5);
+            }
+
+            .btn-enter svg {
+                transition: transform .25s;
+            }
+
+            .btn-enter:hover svg {
+                transform: translateX(4px);
+            }
+
+        .footer-note {
+            margin-top: 40px;
+            color: var(--muted);
+            font-size: 0.8rem;
+            font-family: 'DM Mono', monospace;
+            letter-spacing: 0.05em;
+        }
+
+        /* ─── ANIMATIONS ─── */
+        @@keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity .7s ease, transform .7s ease;
+        }
+
+            .reveal.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        /* ─── RESPONSIVE ─── */
+        @@media (max-width: 900px) {
+            nav {
+                padding: 18px 24px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            section {
+                padding: 70px 24px;
+            }
+
+            .bento {
+                grid-template-columns: 1fr;
+            }
+
+            .bc-1, .bc-2, .bc-3, .bc-4, .bc-5 {
+                grid-column: span 1;
+            }
+
+            .why-grid {
+                grid-template-columns: 1fr;
+                gap: 48px;
+            }
+
+            .why-visual {
+                display: none;
+            }
+
+            .cta-section {
+                padding: 80px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="circuit-bg"></div>
+
+    <!-- NAV -->
+    <nav>
+        <div class="logo">
+            <div class="logo-dot"></div>
+            TechWorld
+        </div>
+        <ul class="nav-links">
+            <li><a href="#about">Giới thiệu</a></li>
+            <li><a href="#categories">Danh mục</a></li>
+            <li><a href="#why">Tại sao chọn</a></li>
+            <li><a href="#news">Tin tức</a></li>
+        </ul>
+        <button class="nav-cta" onclick="document.querySelector('.cta-section').scrollIntoView({behavior:'smooth'})">Vào trang →</button>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero" id="about">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+
+        <div class="hero-badge">
+            <div class="hero-badge-dot"></div>
+            Nền tảng công nghệ hàng đầu
+        </div>
+
+        <h1 class="hero-title">
+            Điện tử. Bán dẫn.<br />
+            <span class="highlight">Công nghệ tương lai.</span>
+        </h1>
+
+        <p class="hero-sub" style="font-size: 20px; text-align: center;">
+            Khởi nguồn từ những hạt lúa nảy mầm trên đôi bàn tay thô sơ, hành trình của chúng ta đã băng qua những cánh đồng nắng cháy để được tiếp nối bởi những thế hệ con người đã tạo nên một thời kỳ công nghệ phát triển thịnh vượng. Từ những nhịp đập thủ công đầu tiên, chúng ta bước vào kỷ nguyên của những dây chuyền kết nối vô tận—nơi công nghệ trở thành cánh tay nối dài dệt nên những giá trị tinh hoa, biến di sản của quá khứ thành nhịp đập hiện đại của một chuỗi sản xuất vươn tầm thế giới.
+        </p>
+
+        <div class="hero-btns">
+            <button class="btn-primary" onclick="document.getElementById('categories').scrollIntoView({behavior:'smooth'})">Khám phá ngay</button>
+            <button class="btn-outline" onclick="document.getElementById('why').scrollIntoView({behavior:'smooth'})">Tìm hiểu thêm</button>
+        </div>
+
+        <div class="scroll-indicator">
+            <div class="scroll-line"></div>
+            scroll
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-num" data-target="10000">0</div>
+            <div class="stat-label">Sản phẩm linh kiện</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num" data-target="500">0</div>
+            <div class="stat-label">Thương hiệu uy tín</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num" data-target="50000">0</div>
+            <div class="stat-label">Khách hàng tin dùng</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num" data-target="200">0</div>
+            <div class="stat-label">Bài tin tức / tháng</div>
+        </div>
+    </div>
+
+    <!-- NEWS TICKER -->
+    <div class="ticker-wrap">
+        <div class="ticker-label">LIVE TECH</div>
+        <div class="ticker-track">
+            <span class="ticker-item">NVIDIA ra mắt chip AI thế hệ mới</span>
+            <span class="ticker-item">TSMC đầu tư 40 tỷ USD vào nhà máy 2nm</span>
+            <span class="ticker-item">Intel Lunar Lake - hiệu năng vượt trội</span>
+            <span class="ticker-item">Samsung mở rộng sản xuất HBM4</span>
+            <span class="ticker-item">Qualcomm Snapdragon X Elite - laptop AI thế hệ mới</span>
+            <span class="ticker-item">AMD EPYC 4th Gen phá kỷ lục benchmark</span>
+            <span class="ticker-item">Apple M4 Ultra chính thức ra mắt</span>
+            <span class="ticker-item">Vi mạch RISC-V tăng trưởng mạnh tại châu Á</span>
+            <!-- duplicate for seamless loop -->
+            <span class="ticker-item">NVIDIA ra mắt chip AI thế hệ mới</span>
+            <span class="ticker-item">TSMC đầu tư 40 tỷ USD vào nhà máy 2nm</span>
+            <span class="ticker-item">Intel Lunar Lake - hiệu năng vượt trội</span>
+            <span class="ticker-item">Samsung mở rộng sản xuất HBM4</span>
+            <span class="ticker-item">Qualcomm Snapdragon X Elite - laptop AI thế hệ mới</span>
+            <span class="ticker-item">AMD EPYC 4th Gen phá kỷ lục benchmark</span>
+            <span class="ticker-item">Apple M4 Ultra chính thức ra mắt</span>
+            <span class="ticker-item">Vi mạch RISC-V tăng trưởng mạnh tại châu Á</span>
+        </div>
+    </div>
+
+    <!-- FEATURES -->
+    <section id="categories">
+        <div class="reveal">
+            <div class="section-tag">Nền tảng</div>
+            <h2 class="section-title">Mọi thứ bạn cần<br />về công nghệ</h2>
+            <p class="section-desc">Từ linh kiện điện tử nhỏ nhất đến xu hướng bán dẫn toàn cầu — tất cả trong một nền tảng duy nhất.</p>
+        </div>
+
+        <div class="features-grid reveal">
+            <div class="feature-card">
+                <div class="feature-icon">🔌</div>
+                <div class="feature-name">Linh kiện điện tử</div>
+                <div class="feature-desc">Tụ điện, điện trở, transistor, IC logic, module cảm biến và hàng nghìn linh kiện thụ động/tích cực từ các hãng hàng đầu thế giới.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💾</div>
+                <div class="feature-name">Vi xử lý & Bán dẫn</div>
+                <div class="feature-desc">Chip MCU, FPGA, SoC, bộ nhớ DRAM/NAND — tất cả chip bán dẫn từ Intel, AMD, ARM, TSMC và các foundry lớn toàn cầu.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📡</div>
+                <div class="feature-name">Thiết bị RF & Viễn thông</div>
+                <div class="feature-desc">Module 5G/6G, RF amplifier, anten, transceiver và các thiết bị truyền thông không dây thế hệ mới.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛠️</div>
+                <div class="feature-name">Dụng cụ & Bo mạch</div>
+                <div class="feature-desc">Arduino, Raspberry Pi, kit phát triển, oscilloscope, thiết bị đo lường và công cụ hỗ trợ cho kỹ sư và người đam mê.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📰</div>
+                <div class="feature-name">Tin tức công nghệ</div>
+                <div class="feature-desc">Cập nhật nhanh nhất về xu hướng bán dẫn, AI hardware, EV, IoT và các đột phá công nghệ từ khắp nơi trên thế giới.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔋</div>
+                <div class="feature-name">Nguồn điện & Năng lượng</div>
+                <div class="feature-desc">Pin sạc, BMS, solar controller, inverter, UPS và các giải pháp lưu trữ năng lượng cho ứng dụng công nghiệp và dân dụng.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BENTO CATEGORIES -->
+    <section id="news" style="padding-top: 0;">
+        <div class="reveal">
+            <div class="section-tag">Danh mục nổi bật</div>
+            <h2 class="section-title">Khám phá<br />hệ sinh thái</h2>
+        </div>
+
+        <div class="bento reveal">
+            <div class="bento-card bc-1">
+                <span class="bento-emoji">⚡</span>
+                <div class="bento-label">Xu hướng 2025</div>
+                <div class="bento-title">Chip AI & Edge Computing</div>
+                <div class="bento-text">Cuộc cách mạng silicon đang diễn ra với các chip AI chuyên dụng cho xe tự lái, robot, và thiết bị edge. Cập nhật phân tích chuyên sâu mỗi ngày từ đội ngũ chuyên gia của chúng tôi.</div>
+            </div>
+            <div class="bento-card bc-2">
+                <span class="bento-emoji">🌐</span>
+                <div class="bento-label">Thị trường</div>
+                <div class="bento-title">Chuỗi cung ứng toàn cầu</div>
+                <div class="bento-text">Theo dõi biến động giá chip, tình trạng thiếu hụt linh kiện và cơ hội đầu tư trong ngành bán dẫn.</div>
+            </div>
+            <div class="bento-card bc-3">
+                <span class="bento-emoji">🤖</span>
+                <div class="bento-label">Công nghệ</div>
+                <div class="bento-title">AI & Machine Learning</div>
+                <div class="bento-text">Phần cứng cho AI — GPU, TPU, NPU và các accelerator mới nhất.</div>
+            </div>
+            <div class="bento-card bc-4">
+                <span class="bento-emoji">🚗</span>
+                <div class="bento-label">Ngành dọc</div>
+                <div class="bento-title">Automotive Electronics</div>
+                <div class="bento-text">Linh kiện cho xe điện, ADAS và hệ thống infotainment thế hệ mới.</div>
+            </div>
+            <div class="bento-card bc-5">
+                <span class="bento-emoji">📲</span>
+                <div class="bento-label">Consumer</div>
+                <div class="bento-title">IoT & Smart Home</div>
+                <div class="bento-text">Module kết nối WiFi/BT, Zigbee, Z-Wave và giải pháp nhà thông minh.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WHY -->
+    <section id="why">
+        <div class="reveal">
+            <div class="section-tag">Lý do chọn chúng tôi</div>
+            <h2 class="section-title">Tại sao TechWorld<br />khác biệt?</h2>
+        </div>
+
+        <div class="why-grid reveal">
+            <ul class="why-list">
+                <li class="why-item">
+                    <div class="why-check">✓</div>
+                    <div>
+                        <div class="why-item-title">Chuyên sâu & Uy tín</div>
+                        <div class="why-item-text">Nội dung được kiểm duyệt bởi kỹ sư điện tử và chuyên gia bán dẫn với hơn 10 năm kinh nghiệm trong ngành.</div>
+                    </div>
+                </li>
+                <li class="why-item">
+                    <div class="why-check">✓</div>
+                    <div>
+                        <div class="why-item-title">Cập nhật theo thời gian thực</div>
+                        <div class="why-item-text">Tin tức công nghệ được tổng hợp 24/7 từ hơn 500 nguồn uy tín toàn cầu, luôn nhanh hơn thị trường.</div>
+                    </div>
+                </li>
+                <li class="why-item">
+                    <div class="why-check">✓</div>
+                    <div>
+                        <div class="why-item-title">Datasheet & Tài liệu kỹ thuật</div>
+                        <div class="why-item-text">Truy cập hàng triệu datasheet, application note và reference design miễn phí ngay trên nền tảng.</div>
+                    </div>
+                </li>
+                <li class="why-item">
+                    <div class="why-check">✓</div>
+                    <div>
+                        <div class="why-item-title">Cộng đồng kỹ thuật viên</div>
+                        <div class="why-item-text">Kết nối với hàng chục nghìn kỹ sư, sinh viên và nhà sản xuất Việt Nam trong cộng đồng công nghệ sôi động.</div>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="why-visual">
+                <div class="why-circuit" style="position:relative;">
+                    <div class="why-glow"></div>
+                    <div class="why-glow-inner"></div>
+                    <div class="why-circuit-inner">
+                        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="70" y="70" width="60" height="60" rx="4" stroke="#00d4ff" stroke-width="1.5" />
+                            <line x1="100" y1="70" x2="100" y2="20" stroke="#00d4ff" stroke-width="1" stroke-dasharray="4 3" />
+                            <line x1="100" y1="130" x2="100" y2="180" stroke="#00d4ff" stroke-width="1" stroke-dasharray="4 3" />
+                            <line x1="70" y1="100" x2="20" y2="100" stroke="#00d4ff" stroke-width="1" stroke-dasharray="4 3" />
+                            <line x1="130" y1="100" x2="180" y2="100" stroke="#00d4ff" stroke-width="1" stroke-dasharray="4 3" />
+                            <circle cx="100" cy="100" r="16" fill="rgba(0,212,255,0.15)" stroke="#00d4ff" stroke-width="1.5" />
+                            <circle cx="100" cy="100" r="6" fill="#00d4ff" />
+                            <circle cx="100" cy="20" r="5" fill="rgba(0,212,255,0.3)" stroke="#00d4ff" stroke-width="1" />
+                            <circle cx="100" cy="180" r="5" fill="rgba(0,212,255,0.3)" stroke="#00d4ff" stroke-width="1" />
+                            <circle cx="20" cy="100" r="5" fill="rgba(0,212,255,0.3)" stroke="#00d4ff" stroke-width="1" />
+                            <circle cx="180" cy="100" r="5" fill="rgba(0,212,255,0.3)" stroke="#00d4ff" stroke-width="1" />
+                            <line x1="70" y1="80" x2="40" y2="50" stroke="#7c3aed" stroke-width="1" stroke-dasharray="3 3" opacity="0.6" />
+                            <line x1="130" y1="80" x2="160" y2="50" stroke="#7c3aed" stroke-width="1" stroke-dasharray="3 3" opacity="0.6" />
+                            <line x1="70" y1="120" x2="40" y2="150" stroke="#7c3aed" stroke-width="1" stroke-dasharray="3 3" opacity="0.6" />
+                            <line x1="130" y1="120" x2="160" y2="150" stroke="#7c3aed" stroke-width="1" stroke-dasharray="3 3" opacity="0.6" />
+                            <circle cx="40" cy="50" r="4" fill="rgba(124,58,237,0.3)" stroke="#7c3aed" stroke-width="1" />
+                            <circle cx="160" cy="50" r="4" fill="rgba(124,58,237,0.3)" stroke="#7c3aed" stroke-width="1" />
+                            <circle cx="40" cy="150" r="4" fill="rgba(124,58,237,0.3)" stroke="#7c3aed" stroke-width="1" />
+                            <circle cx="160" cy="150" r="4" fill="rgba(124,58,237,0.3)" stroke="#7c3aed" stroke-width="1" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA FOOTER -->
+    <div class="cta-section">
+        <div class="reveal">
+            <div class="section-tag" style="justify-content:center; margin-bottom: 20px;">
+                Sẵn sàng chưa?
+            </div>
+            <h2 class="cta-title">Bước vào thế giới<br /><span style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">công nghệ không giới hạn</span></h2>
+            <p class="cta-desc">Khám phá hàng chục nghìn sản phẩm điện tử, bán dẫn và tin tức công nghệ cập nhật mỗi ngày.</p>
+
+            <button class="nav-cta" onclick="window.location.href='/Home/HomePage'">Vào trang chủ</button>
+
+            <p class="footer-note">© 2025 TechWorld — Điện tử · Bán dẫn · Công nghệ</p>
+        </div>
+    </div>
+
+    <script>
+        // ─── SCROLL REVEAL ───
+        const reveals = document.querySelectorAll('.reveal');
+        const statsItems = document.querySelectorAll('.stat-item');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => entry.target.classList.add('visible'), i * 80);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        reveals.forEach(el => observer.observe(el));
+
+        // ─── STATS COUNTER ───
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, idx) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    const num = entry.target.querySelector('.stat-num');
+                    const target = parseInt(num.dataset.target);
+                    let current = 0;
+                    const step = target / 60;
+                    const timer = setInterval(() => {
+                        current = Math.min(current + step, target);
+                        num.textContent = Math.floor(current).toLocaleString('vi-VN') + '+';
+                        if (current >= target) clearInterval(timer);
+                    }, 20);
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.3 });
+
+        statsItems.forEach(el => statsObserver.observe(el));
+    </script>
+</body>
+</html>

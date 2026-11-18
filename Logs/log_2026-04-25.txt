@@ -1,0 +1,185 @@
+[2026-04-25 07:25:23] [INFO] User 'daotruc' logged in successfully
+[2026-04-25 07:34:43] [INFO] User 'daotruc' logged in successfully
+[2026-04-25 07:41:40] [INFO] User 'daotruc' logged in successfully
+[2026-04-25 07:42:08] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 07:42:08] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 07:42:08] [INFO] [EMAIL] Starting to send email to: phucngo2406@gmail.com, Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 07:42:08] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-25 07:42:08] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-25 07:42:08] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: phucngo2406@gmail.com
+[2026-04-25 07:42:08] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-25 07:42:14] [INFO] ✅ [EMAIL] Email sent successfully to phucngo2406@gmail.com - Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 07:42:14] [INFO] OTP email sent successfully to phucngo2406@gmail.com for Payment
+[2026-04-25 07:42:14] [INFO] OTP saved and email sent to phucngo2406@gmail.com for Payment
+[2026-04-25 07:42:27] [INFO] OTP verified successfully for phucngo2406@gmail.com
+[2026-04-25 07:42:28] [INFO] SpinCount += 1 for user 4, total: 1
+[2026-04-25 07:44:17] [INFO] User logged out
+[2026-04-25 07:44:34] [INFO] User 'admin123' logged in successfully
+[2026-04-25 07:46:25] [INFO] User 'daotruc' logged in successfully
+[2026-04-25 07:48:30] [INFO] User 'admin123' logged in successfully
+[2026-04-25 08:39:25] [INFO] User logged out
+[2026-04-25 08:40:32] [INFO] User 'daotruc' logged in successfully
+[2026-04-25 08:41:06] [INFO] User logged out
+[2026-04-25 08:42:26] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 08:42:26] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 08:42:26] [INFO] [EMAIL] Starting to send email to: phucngo240726@gmail.com, Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 08:42:26] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-25 08:42:26] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-25 08:42:26] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: phucngo240726@gmail.com
+[2026-04-25 08:42:26] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-25 08:42:32] [INFO] ✅ [EMAIL] Email sent successfully to phucngo240726@gmail.com - Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 08:42:33] [INFO] OTP email sent successfully to phucngo240726@gmail.com for Register
+[2026-04-25 08:42:33] [INFO] OTP saved and email sent to phucngo240726@gmail.com for Register
+[2026-04-25 08:42:33] [INFO] OTP sent for registration: phucngo240726@gmail.com
+[2026-04-25 08:42:52] [INFO] [RECORD] Attempt recorded: ::1 - Register
+[2026-04-25 08:42:52] [INFO] VerifyOtpRegister called with email='phucngo240726@gmail.com', otp='635173'
+[2026-04-25 08:42:53] [INFO] OTP verified successfully for phucngo240726@gmail.com
+[2026-04-25 08:42:53] [INFO] New user registered and verified: phucngo
+[2026-04-25 08:42:53] [INFO] [CLEAR] Records cleared: ::1 - Register
+[2026-04-25 08:43:11] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 08:43:11] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 08:43:11] [INFO] [EMAIL] Starting to send email to: phucngo240726@gmail.com, Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 08:43:11] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-25 08:43:11] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-25 08:43:11] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: phucngo240726@gmail.com
+[2026-04-25 08:43:11] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-25 08:43:17] [INFO] ✅ [EMAIL] Email sent successfully to phucngo240726@gmail.com - Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 08:43:17] [INFO] OTP email sent successfully to phucngo240726@gmail.com for Payment
+[2026-04-25 08:43:17] [INFO] OTP saved and email sent to phucngo240726@gmail.com for Payment
+[2026-04-25 08:43:28] [INFO] OTP verified successfully for phucngo240726@gmail.com
+[2026-04-25 08:43:28] [INFO] SpinCount += 1 for user 5, total: 1
+[2026-04-25 18:49:11] [INFO] User 'phucngo' logged in successfully
+[2026-04-25 18:49:44] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:49:44] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:49:44] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:49:44] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:49:44] [INFO] [EMAIL] Starting to send email to: phucngo240726@gmail.com, Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 18:49:44] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-25 18:49:44] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-25 18:49:44] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: phucngo240726@gmail.com
+[2026-04-25 18:49:44] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-25 18:49:50] [INFO] ✅ [EMAIL] Email sent successfully to phucngo240726@gmail.com - Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 18:49:50] [INFO] OTP email sent successfully to phucngo240726@gmail.com for Payment
+[2026-04-25 18:49:50] [INFO] OTP saved and email sent to phucngo240726@gmail.com for Payment
+[2026-04-25 18:50:05] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:50:05] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:50:05] [INFO] OTP verified successfully for phucngo240726@gmail.com
+[2026-04-25 18:50:06] [INFO] SpinCount += 1 for user 5, total: 2
+[2026-04-25 18:50:06] [INFO] [EMAIL] Starting to send email to: phucngo240726@gmail.com, Subject: 📦 Xác nhận đơn hàng #4
+[2026-04-25 18:50:06] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-25 18:50:06] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-25 18:50:06] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: phucngo240726@gmail.com
+[2026-04-25 18:50:06] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-25 18:50:11] [INFO] ✅ [EMAIL] Email sent successfully to phucngo240726@gmail.com - Subject: 📦 Xác nhận đơn hàng #4
+[2026-04-25 18:50:12] [INFO] ✅ Order confirmation email sent to phucngo240726@gmail.com for order #4
+[2026-04-25 18:53:18] [INFO] User 'phucngo' logged in successfully
+[2026-04-25 18:53:37] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:53:37] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:53:37] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:53:37] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:53:37] [INFO] [EMAIL] Starting to send email to: phucngo240726@gmail.com, Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 18:53:37] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-25 18:53:37] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-25 18:53:37] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: phucngo240726@gmail.com
+[2026-04-25 18:53:37] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-25 18:53:42] [INFO] ✅ [EMAIL] Email sent successfully to phucngo240726@gmail.com - Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 18:53:43] [INFO] OTP email sent successfully to phucngo240726@gmail.com for Payment
+[2026-04-25 18:53:43] [INFO] OTP saved and email sent to phucngo240726@gmail.com for Payment
+[2026-04-25 18:54:07] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:54:07] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:54:07] [WARNING] OTP verification failed for phucngo240726@gmail.com - incorrect code
+[2026-04-25 18:54:10] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:54:10] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:54:10] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:54:10] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:54:10] [INFO] [EMAIL] Starting to send email to: phucngo240726@gmail.com, Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 18:54:10] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-25 18:54:10] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-25 18:54:10] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: phucngo240726@gmail.com
+[2026-04-25 18:54:10] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-25 18:54:15] [INFO] ✅ [EMAIL] Email sent successfully to phucngo240726@gmail.com - Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 18:54:16] [INFO] OTP email sent successfully to phucngo240726@gmail.com for Payment
+[2026-04-25 18:54:16] [INFO] OTP saved and email sent to phucngo240726@gmail.com for Payment
+[2026-04-25 18:54:16] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:54:16] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:54:16] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:54:16] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:54:16] [INFO] [EMAIL] Starting to send email to: phucngo240726@gmail.com, Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 18:54:16] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-25 18:54:16] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-25 18:54:16] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: phucngo240726@gmail.com
+[2026-04-25 18:54:16] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-25 18:54:21] [INFO] ✅ [EMAIL] Email sent successfully to phucngo240726@gmail.com - Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 18:54:22] [INFO] OTP email sent successfully to phucngo240726@gmail.com for Payment
+[2026-04-25 18:54:22] [INFO] OTP saved and email sent to phucngo240726@gmail.com for Payment
+[2026-04-25 18:54:30] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:54:30] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:54:31] [WARNING] OTP verification failed for phucngo240726@gmail.com - incorrect code
+[2026-04-25 18:54:35] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:54:35] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:54:35] [WARNING] OTP verification failed for phucngo240726@gmail.com - incorrect code
+[2026-04-25 18:55:10] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:55:10] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:55:10] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:55:10] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:55:10] [INFO] [EMAIL] Starting to send email to: phucngo240726@gmail.com, Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 18:55:10] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-25 18:55:10] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-25 18:55:10] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: phucngo240726@gmail.com
+[2026-04-25 18:55:10] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-25 18:55:15] [INFO] ✅ [EMAIL] Email sent successfully to phucngo240726@gmail.com - Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 18:55:15] [INFO] OTP email sent successfully to phucngo240726@gmail.com for Payment
+[2026-04-25 18:55:15] [INFO] OTP saved and email sent to phucngo240726@gmail.com for Payment
+[2026-04-25 18:55:27] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:55:27] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:55:27] [WARNING] OTP verification failed for phucngo240726@gmail.com - incorrect code
+[2026-04-25 18:55:29] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:55:29] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:55:29] [WARNING] OTP verification failed for phucngo240726@gmail.com - incorrect code
+[2026-04-25 18:56:12] [INFO] User 'daotruc' logged in successfully
+[2026-04-25 18:56:37] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:56:37] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:56:37] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:56:37] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:56:37] [INFO] [EMAIL] Starting to send email to: phucngo2406@gmail.com, Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 18:56:37] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-25 18:56:37] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-25 18:56:37] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: phucngo2406@gmail.com
+[2026-04-25 18:56:37] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-25 18:56:43] [INFO] ✅ [EMAIL] Email sent successfully to phucngo2406@gmail.com - Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 18:56:43] [INFO] OTP email sent successfully to phucngo2406@gmail.com for Payment
+[2026-04-25 18:56:43] [INFO] OTP saved and email sent to phucngo2406@gmail.com for Payment
+[2026-04-25 18:56:52] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:56:52] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:56:52] [INFO] OTP verified successfully for phucngo2406@gmail.com
+[2026-04-25 18:56:53] [INFO] SpinCount += 1 for user 4, total: 2
+[2026-04-25 18:56:53] [INFO] [EMAIL] Starting to send email to: phucngo2406@gmail.com, Subject: 📦 Xác nhận đơn hàng #5
+[2026-04-25 18:56:53] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-25 18:56:53] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-25 18:56:53] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: phucngo2406@gmail.com
+[2026-04-25 18:56:53] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-25 18:56:58] [INFO] ✅ [EMAIL] Email sent successfully to phucngo2406@gmail.com - Subject: 📦 Xác nhận đơn hàng #5
+[2026-04-25 18:56:58] [INFO] ✅ Order confirmation email sent to phucngo2406@gmail.com for order #5
+[2026-04-25 18:57:11] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:57:11] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:57:11] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:57:11] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:57:11] [INFO] [EMAIL] Starting to send email to: phucngo2406@gmail.com, Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 18:57:11] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-25 18:57:11] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-25 18:57:11] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: phucngo2406@gmail.com
+[2026-04-25 18:57:11] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-25 18:57:16] [INFO] ✅ [EMAIL] Email sent successfully to phucngo2406@gmail.com - Subject: 🔐 Mã xác thực TechWorld - OTP
+[2026-04-25 18:57:16] [INFO] OTP email sent successfully to phucngo2406@gmail.com for Payment
+[2026-04-25 18:57:16] [INFO] OTP saved and email sent to phucngo2406@gmail.com for Payment
+[2026-04-25 18:57:32] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=thanhtrucdao123321446@gmail.com, sender=phucngo240726@gmail.com, passwordSet=True
+[2026-04-25 18:57:32] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-25 18:57:32] [INFO] OTP verified successfully for phucngo2406@gmail.com
+[2026-04-25 18:57:32] [INFO] SpinCount += 1 for user 4, total: 3
+[2026-04-25 18:57:32] [INFO] [EMAIL] Starting to send email to: phucngo2406@gmail.com, Subject: 📦 Xác nhận đơn hàng #6
+[2026-04-25 18:57:32] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=thanhtrucdao123321446@gmail.com, SSL=enabled
+[2026-04-25 18:57:32] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-25 18:57:32] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: phucngo2406@gmail.com
+[2026-04-25 18:57:32] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-25 18:57:37] [INFO] ✅ [EMAIL] Email sent successfully to phucngo2406@gmail.com - Subject: 📦 Xác nhận đơn hàng #6
+[2026-04-25 18:57:37] [INFO] ✅ Order confirmation email sent to phucngo2406@gmail.com for order #6

@@ -1,0 +1,73 @@
+﻿@model web1.Models.User
+
+@{
+    ViewBag.Title = "Xóa người dùng - Admin";
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2>Xóa người dùng</h2>
+    </div>
+</div>
+
+<div class="alert alert-danger" role="alert">
+    <strong>Cảnh báo!</strong> Bạn sắp xóa người dùng này. Hành động này không thể hoàn tác.
+</div>
+
+<div class="card border-danger">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">Thông tin người dùng</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-borderless">
+            <tr>
+                <td><strong>ID:</strong></td>
+                <td>@Model.Id</td>
+            </tr>
+            <tr>
+                <td><strong>Tên đăng nhập:</strong></td>
+                <td>@Model.Username</td>
+            </tr>
+            <tr>
+                <td><strong>Họ và tên:</strong></td>
+                <td>@Model.FullName</td>
+            </tr>
+            <tr>
+                <td><strong>Email:</strong></td>
+                <td>@Model.Email</td>
+            </tr>
+            <tr>
+                <td><strong>Số điện thoại:</strong></td>
+                <td>@Model.Phone</td>
+            </tr>
+            <tr>
+                <td><strong>Vai trò:</strong></td>
+                <td>
+                    @if (Model.Role == "Admin")
+                    {
+                        <span class="badge bg-danger">Admin</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-info">Customer</span>
+                    }
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="mt-4">
+    @using (Html.BeginForm("Delete", "User", new { area = "Admin" }, FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.Id)
+
+        <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Xác nhận xóa
+        </button>
+        <a href="@Url.Action("Index", "User", new { area = "Admin" })" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Hủy
+        </a>
+    }
+</div>

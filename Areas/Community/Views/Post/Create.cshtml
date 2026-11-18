@@ -1,0 +1,159 @@
+﻿@model web1.Models.Post
+
+@{
+    ViewBag.Title = ViewBag.PostType == 1 ? "Đăng Bài Thuê Đồ" : "Đăng Bài Đánh Giá";
+    Layout = "~/Areas/Community/Views/Shared/_CommunityLayout.cshtml";
+}
+
+<div class="row justify-content-center m-0">
+    <div class="col-lg-8 col-md-10">
+
+        <h2 style="color: #667eea; margin-bottom: 30px; text-align: center;">
+            <i class="fas fa-@(ViewBag.PostType == 1 ? "tools" : "star")"></i>
+            @ViewBag.Title
+        </h2>
+
+        @if (ViewBag.PostType == 1)
+        {
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>Lưu ý:</strong> Bạn có thể đăng bài thuê đồ và bình luận - trao đổi.
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>Lưu ý:</strong> Hãy chia sẻ đánh giá trung thực về sản phẩm. Bài vi phạm sẽ bị xóa.
+            </div>
+        }
+
+        @using (Html.BeginForm("Create", "Post", new { area = "Community" }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label for="Title" style="font-weight: 600; color: #333;">Tiêu Đề</label>
+                @Html.TextBoxFor(m => m.Title, new { @class = "form-control", placeholder = "Nhập tiêu đề bài đăng", maxlength = 255 })
+                @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <label for="Content" style="font-weight: 600; color: #333;">Nội Dung</label>
+                @Html.TextAreaFor(m => m.Content, new { @class = "form-control", placeholder = "Nhập nội dung bài đăng...", rows = 8, maxlength = 5000 })
+                @Html.ValidationMessageFor(m => m.Content, "", new { @class = "text-danger" })
+                <small class="form-text text-muted">Tối đa 5000 ký tự</small>
+            </div>
+
+            <div class="form-group">
+                <label for="ImageUrl" style="font-weight: 600; color: #333;">
+                    <i class="fas fa-image"></i> Hình Ảnh Sản Phẩm (Tuỳ Chọn)
+                </label>
+                <div class="input-group">
+                    @Html.TextBoxFor(m => m.ImageUrl, new { @class = "form-control", placeholder = "Nhập URL ảnh hoặc tải lên", id = "imageUrlInput" })
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-primary" type="button" onclick="document.getElementById('imageFileInput').click()">
+                            <i class="fas fa-upload"></i> Tải Lên
+                        </button>
+                    </div>
+                </div>
+                <input type="file" id="imageFileInput" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+                <small class="form-text text-muted">JPG, PNG, GIF | Tối đa 5MB</small>
+            </div>
+
+            <div class="form-group mt-3" id="imagePreviewContainer" style="display:none; text-align: center;">
+                <label class="d-block" style="font-weight: 600; color: #333; margin-bottom: 10px;">
+                    <i class="fas fa-eye"></i> Xem Trước Ảnh
+                </label>
+                <div style="border: 2px dashed #667eea; padding: 10px; border-radius: 12px; display: inline-block; background: #f8f9fa;">
+                    <img id="imagePreview" src="#" alt="Xem trước"
+                         style="max-width: 100%; height: auto; max-height: 350px; border-radius: 8px; object-fit: contain;">
+                </div>
+            </div>
+
+            if (ViewBag.PostType == 0)
+            {
+                <div class="form-group">
+                    <label for="Rating" style="font-weight: 600; color: #333;">Đánh Giá (Sao)</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        @{
+                            for (int i = 1; i <= 5; i++)
+                            {
+                                <label style="margin: 0; cursor: pointer;">
+                                    <input type="radio" name="Rating" value="@i" style="margin-right: 5px;" />
+                                    <i class="fas fa-star" style="color: #ffc107; font-size: 20px;"></i>
+                                </label>
+                            }
+                        }
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Rating, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @Html.HiddenFor(m => m.Type, new { Value = ViewBag.PostType })
+
+            <div style="display: flex; gap: 10px; justify-content: space-between; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                <a href="@Url.Action("Index", "Home", new { area = "Community" })" class="btn btn-secondary" style="padding: 10px 25px; border-radius: 25px;">
+                    <i class="fas fa-arrow-left"></i> Quay Lại
+                </a>
+                <button type="submit" class="btn-primary-community" style="padding: 10px 25px; border: none; cursor: pointer;">
+                    <i class="fas fa-paper-plane"></i> Đăng Bài
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        function handleImageUpload(event) {
+            var file = event.target.files[0];
+
+            if (!file) return;
+
+            // Kiểm tra loại file
+            if (!file.type.match('image.*')) {
+                alert('❌ Vui lòng chọn file ảnh!');
+                return;
+            }
+
+            // Kiểm tra kích thước (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('❌ Kích thước ảnh phải nhỏ hơn 5MB!');
+                return;
+            }
+
+            // Tạo preview
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('imageUrlInput').value = e.target.result;
+                document.getElementById('imagePreview').src = e.target.result;
+                document.getElementById('imagePreviewContainer').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Hiển thị preview khi page load nếu có URL
+        document.addEventListener('DOMContentLoaded', function () {
+            var imageUrl = document.getElementById('imageUrlInput').value;
+            if (imageUrl) {
+                document.getElementById('imagePreview').src = imageUrl;
+                document.getElementById('imagePreviewContainer').style.display = 'block';
+            }
+        });
+
+        // Cập nhật preview khi user thay đổi URL
+        document.getElementById('imageUrlInput').addEventListener('change', function () {
+            var url = this.value.trim();
+            if (url) {
+                document.getElementById('imagePreview').src = url;
+                document.getElementById('imagePreviewContainer').style.display = 'block';
+                document.getElementById('imagePreview').onerror = function () {
+                    document.getElementById('imagePreviewContainer').style.display = 'none';
+                };
+            } else {
+                document.getElementById('imagePreviewContainer').style.display = 'none';
+            }
+        });
+    </script>
+}

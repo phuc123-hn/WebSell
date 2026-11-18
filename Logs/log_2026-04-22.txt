@@ -1,0 +1,91 @@
+[2026-04-22 08:02:10] [INFO] [RECORD] Attempt recorded: ::1 - Register
+[2026-04-22 08:02:37] [INFO] [RATE_LIMIT] Cooldown enforced for ::1
+[2026-04-22 08:02:37] [WARNING] [RATE_LIMIT] Request blocked: ::1 (Register) - Vui lòng ch? 33 giây tr??c khi th? l?i.
+[2026-04-22 08:13:08] [INFO] [RECORD] Attempt recorded: ::1 - Register
+[2026-04-22 08:13:29] [INFO] [RATE_LIMIT] Cooldown enforced for ::1
+[2026-04-22 08:13:29] [WARNING] [RATE_LIMIT] Request blocked: ::1 (Register) - Vui l�ng ch? 37 gi�y tr??c khi th? l?i.
+[2026-04-22 08:25:00] [INFO] [RECORD] Attempt recorded: ::1 - Register
+[2026-04-22 08:25:06] [ERROR] SMTP Error sending email to phucngo240726@gmail.com: The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+System.Net.Mail.SmtpException: The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+   at System.Net.Mail.MailCommand.CheckResponse(SmtpStatusCode statusCode, String response)
+   at System.Net.Mail.MailCommand.Send(SmtpConnection conn, Byte[] command, MailAddress from, Boolean allowUnicode)
+   at System.Net.Mail.SmtpTransport.SendMail(MailAddress sender, MailAddressCollection recipients, String deliveryNotify, Boolean allowUnicode, SmtpFailedRecipientException& exception)
+   at System.Net.Mail.SmtpClient.Send(MailMessage message)
+   at web1.Services.EmailService.SendGenericEmail(String toEmail, String subject, String htmlBody) in C:\Users\VivoBook\Documents\WebSell\web1\web1\Services\EmailService.cs:line 142
+[2026-04-22 08:25:06] [WARNING] Email not sent for OTP to phucngo240726@gmail.com, but OTP saved in database
+[2026-04-22 08:25:06] [INFO] OTP saved and email sent to phucngo240726@gmail.com for Register
+[2026-04-22 08:25:06] [INFO] OTP sent for registration: phucngo240726@gmail.com
+[2026-04-22 08:25:20] [WARNING] OTP resend blocked by cooldown for email: phucngo240726@gmail.com, cooldown remaining: 14s
+[2026-04-22 08:25:59] [ERROR] SMTP Error sending email to phucngo240726@gmail.com: The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+System.Net.Mail.SmtpException: The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+   at System.Net.Mail.MailCommand.CheckResponse(SmtpStatusCode statusCode, String response)
+   at System.Net.Mail.MailCommand.Send(SmtpConnection conn, Byte[] command, MailAddress from, Boolean allowUnicode)
+   at System.Net.Mail.SmtpTransport.SendMail(MailAddress sender, MailAddressCollection recipients, String deliveryNotify, Boolean allowUnicode, SmtpFailedRecipientException& exception)
+   at System.Net.Mail.SmtpClient.Send(MailMessage message)
+   at web1.Services.EmailService.SendGenericEmail(String toEmail, String subject, String htmlBody) in C:\Users\VivoBook\Documents\WebSell\web1\web1\Services\EmailService.cs:line 142
+[2026-04-22 08:25:59] [WARNING] Email not sent for OTP to phucngo240726@gmail.com, but OTP saved in database
+[2026-04-22 08:25:59] [INFO] OTP saved and email sent to phucngo240726@gmail.com for Register
+[2026-04-22 08:25:59] [INFO] OTP resent successfully for registration: phucngo240726@gmail.com
+[2026-04-22 08:26:03] [INFO] [RECORD] Attempt recorded: ::1 - Register
+[2026-04-22 08:26:03] [INFO] VerifyOtpRegister called with email='phucngo240726@gmail.com', otp='111111'
+[2026-04-22 08:26:03] [WARNING] OTP verification failed for phucngo240726@gmail.com - incorrect code
+[2026-04-22 18:45:47] [INFO] [RECORD] Attempt recorded: ::1 - Register
+[2026-04-22 18:45:48] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=phucngo240726@gmail.com, sender=phucngo240726@gmail.com, passEmpty=False
+[2026-04-22 18:45:48] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-22 18:45:52] [ERROR] SMTP Error sending email to phucngo240726@gmail.com: The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+System.Net.Mail.SmtpException: The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+   at System.Net.Mail.MailCommand.CheckResponse(SmtpStatusCode statusCode, String response)
+   at System.Net.Mail.MailCommand.Send(SmtpConnection conn, Byte[] command, MailAddress from, Boolean allowUnicode)
+   at System.Net.Mail.SmtpTransport.SendMail(MailAddress sender, MailAddressCollection recipients, String deliveryNotify, Boolean allowUnicode, SmtpFailedRecipientException& exception)
+   at System.Net.Mail.SmtpClient.Send(MailMessage message)
+   at web1.Services.EmailService.SendGenericEmail(String toEmail, String subject, String htmlBody) in C:\Users\VivoBook\Documents\WebSell\web1\web1\Services\EmailService.cs:line 154
+[2026-04-22 18:45:52] [WARNING] Email not sent for OTP to phucngo240726@gmail.com, but OTP saved in database
+[2026-04-22 18:45:52] [INFO] OTP saved and email sent to phucngo240726@gmail.com for Register
+[2026-04-22 18:45:52] [INFO] OTP sent for registration: phucngo240726@gmail.com
+[2026-04-22 18:46:41] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=phucngo240726@gmail.com, sender=phucngo240726@gmail.com, passEmpty=False
+[2026-04-22 18:46:41] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-22 18:46:46] [ERROR] SMTP Error sending email to phucngo240726@gmail.com: The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+System.Net.Mail.SmtpException: The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+   at System.Net.Mail.MailCommand.CheckResponse(SmtpStatusCode statusCode, String response)
+   at System.Net.Mail.MailCommand.Send(SmtpConnection conn, Byte[] command, MailAddress from, Boolean allowUnicode)
+   at System.Net.Mail.SmtpTransport.SendMail(MailAddress sender, MailAddressCollection recipients, String deliveryNotify, Boolean allowUnicode, SmtpFailedRecipientException& exception)
+   at System.Net.Mail.SmtpClient.Send(MailMessage message)
+   at web1.Services.EmailService.SendGenericEmail(String toEmail, String subject, String htmlBody) in C:\Users\VivoBook\Documents\WebSell\web1\web1\Services\EmailService.cs:line 154
+[2026-04-22 18:46:46] [WARNING] Email not sent for OTP to phucngo240726@gmail.com, but OTP saved in database
+[2026-04-22 18:46:46] [INFO] OTP saved and email sent to phucngo240726@gmail.com for Register
+[2026-04-22 18:46:46] [INFO] OTP resent successfully for registration: phucngo240726@gmail.com
+[2026-04-22 18:46:47] [WARNING] OTP resend blocked by cooldown for email: phucngo240726@gmail.com, cooldown remaining: 28s
+[2026-04-22 18:51:26] [INFO] [RECORD] Attempt recorded: ::1 - Register
+[2026-04-22 18:51:26] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=phucngo240726@gmail.com, sender=phucngo240726@gmail.com, passEmpty=False
+[2026-04-22 18:51:26] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-22 18:51:26] [INFO] [EMAIL] Starting to send email to: phucngo240726@gmail.com, Subject: M� x�c th?c TechWorld
+[2026-04-22 18:51:26] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=phucngo240726@gmail.com, SSL=enabled
+[2026-04-22 18:51:26] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-22 18:51:26] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: phucngo240726@gmail.com
+[2026-04-22 18:51:26] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-22 18:51:31] [ERROR] ❌ [EMAIL] SMTP Error sending email to phucngo240726@gmail.com
+[2026-04-22 18:51:31] [ERROR]    Exception Type: SmtpException
+[2026-04-22 18:51:31] [ERROR]    Status Code: MustIssueStartTlsFirst
+[2026-04-22 18:51:31] [ERROR]    Message: The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+[2026-04-22 18:51:31] [ERROR]    Inner Exception: 
+[2026-04-22 18:51:31] [WARNING] Email not sent for OTP to phucngo240726@gmail.com, but OTP saved in database
+[2026-04-22 18:51:31] [INFO] OTP saved and email sent to phucngo240726@gmail.com for Register
+[2026-04-22 18:51:31] [INFO] OTP sent for registration: phucngo240726@gmail.com
+[2026-04-22 19:21:11] [INFO] [RECORD] Attempt recorded: ::1 - Register
+[2026-04-22 19:21:11] [INFO] SMTP Config: server=smtp.gmail.com, port=587, user=phucngo240726@gmail.com, sender=phucngo240726@gmail.com, passEmpty=False
+[2026-04-22 19:21:11] [INFO] ✅ SMTP configuration is COMPLETE and ready to use.
+[2026-04-22 19:21:11] [INFO] [EMAIL] Starting to send email to: phucngo240726@gmail.com, Subject: M� x�c th?c TechWorld
+[2026-04-22 19:21:11] [INFO] [EMAIL] SMTP Config: Server=smtp.gmail.com:587, User=phucngo240726@gmail.com, SSL=enabled
+[2026-04-22 19:21:11] [INFO] [EMAIL] SMTP client created and configured
+[2026-04-22 19:21:11] [INFO] [EMAIL] Email message created - From: "TechWorld" <phucngo240726@gmail.com>, To: phucngo240726@gmail.com
+[2026-04-22 19:21:11] [INFO] [EMAIL] Attempting to send email via SMTP...
+[2026-04-22 19:21:18] [INFO] ✅ [EMAIL] Email sent successfully to phucngo240726@gmail.com - Subject: M� x�c th?c TechWorld
+[2026-04-22 19:21:19] [INFO] OTP email sent successfully to phucngo240726@gmail.com for Register
+[2026-04-22 19:21:19] [INFO] OTP saved and email sent to phucngo240726@gmail.com for Register
+[2026-04-22 19:21:19] [INFO] OTP sent for registration: phucngo240726@gmail.com
+[2026-04-22 19:21:47] [INFO] [RATE_LIMIT] Cooldown enforced for ::1
+[2026-04-22 19:21:47] [WARNING] [RATE_LIMIT] Request blocked: ::1 (Register) - Vui l�ng ch? 22 gi�y tr??c khi th? l?i.
+[2026-04-22 20:28:13] [INFO] User 'phucngo' logged in successfully
+[2026-04-22 20:28:17] [INFO] User logged out
+[2026-04-22 20:28:27] [INFO] User 'admin123' logged in successfully
+[2026-04-22 20:33:45] [INFO] User logged out

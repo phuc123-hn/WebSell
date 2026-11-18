@@ -1,0 +1,119 @@
+﻿@{
+    ViewBag.Title = "Liên hệ - TechWorld";
+}
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="fas fa-envelope"></i> Liên hệ TechWorld</h3>
+            </div>
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
+                {
+                    <div class="alert alert-success">@ViewBag.SuccessMessage</div>
+                }
+                @if (!string.IsNullOrEmpty(ViewBag.Error))
+                {
+                    <div class="alert alert-danger">@ViewBag.Error</div>
+                }
+
+                @if (!User.Identity.IsAuthenticated)
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Vui lòng <a href="@Url.Action("Login", "Account")">đăng nhập</a> để gửi tin nhắn</strong>
+                    </div>
+                }
+                else
+                {
+                    <form id="contactForm" method="post" action="@Url.Action("SendMessage", "Home")">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label class="form-label">Tên của bạn</label>
+                            <input type="text" class="form-control" value="@Session["FullName"]" disabled>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" value="@Session["Email"]" disabled>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Nội dung tin nhắn</label>
+                            <textarea name="content" class="form-control" rows="5" placeholder="Nhập nội dung tin nhắn..." required maxlength="5000"></textarea>
+                            <small class="form-text text-muted">Tối đa 5000 ký tự. Tin nhắn của bạn sẽ được gửi đến admin thông qua hệ thống nội bộ.</small>
+                        </div>
+
+                        <div class="alert alert-warning" style="font-size: 12px;">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Lưu ý:</strong> Tin nhắn của bạn sẽ được lưu trong hệ thống trong 15 ngày và tự động xóa sau đó.
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-paper-plane"></i> Gửi Tin Nhắn
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h3 class="mb-0"><i class="fas fa-info-circle"></i> Thông tin liên hệ</h3>
+            </div>
+            <div class="card-body">
+                <div style="margin-bottom: 30px;">
+                    <h5><i class="fas fa-map-marker-alt" style="color: #667eea;"></i> Địa chỉ</h5>
+                    <p>123 Nguyễn Huệ, Hoàn Kiếm, Hà Nội, Việt Nam</p>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h5><i class="fas fa-phone" style="color: #667eea;"></i> Hotline</h5>
+                    <p><a href="tel:1900-1234" style="text-decoration: none; color: #333;">1900-1234</a></p>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h5><i class="fas fa-envelope" style="color: #667eea;"></i> Email</h5>
+                    <p><a href="mailto:support@techworld.vn" style="text-decoration: none; color: #333;">support@techworld.vn</a></p>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h5><i class="fas fa-clock" style="color: #667eea;"></i> Giờ mở cửa</h5>
+                    <p>
+                        Thứ 2 - Thứ 6: 08:00 - 18:00<br>
+                        Thứ 7 - Chủ nhật: 09:00 - 17:00
+                    </p>
+                </div>
+
+                <div>
+                    <h5><i class="fas fa-share-alt" style="color: #667eea;"></i> Kết nối với chúng tôi</h5>
+                    <p>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#" style="margin-left: 15px;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" style="margin-left: 15px;"><i class="fab fa-youtube"></i></a>
+                        <a href="#" style="margin-left: 15px;"><i class="fab fa-instagram"></i></a>
+                    </p>
+                </div>
+
+                @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                {
+                    <hr />
+                    <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                        <h5 style="color: #ff6b6b;">
+                            <i class="fas fa-inbox"></i> Admin Inbox
+                        </h5>
+                        <p>
+                            <a href="@Url.Action("Messages", "Admin", new { area = "Admin" })" class="btn btn-warning btn-sm">
+                                <i class="fas fa-envelope"></i> Xem Tin Nhắn
+                            </a>
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

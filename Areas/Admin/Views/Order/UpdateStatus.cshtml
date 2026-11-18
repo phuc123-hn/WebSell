@@ -1,0 +1,137 @@
+﻿@model web1.Models.Order
+
+@{
+    ViewBag.Title = "Cập nhật trạng thái đơn hàng - Admin";
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2>Cập nhật trạng thái đơn hàng #@Model.Id</h2>
+    </div>
+    <div class="col-md-6 text-right">
+        <a href="@Url.Action("Details", "Order", new { area = "Admin", id = Model.Id })" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-edit"></i> Thay đổi trạng thái</h5>
+            </div>
+            <div class="card-body" style="color:yellow">
+                <div class="mb-4">
+                    <h6>Thông tin hiện tại:</h6>
+                    <p>
+                        <strong>Mã đơn hàng:</strong> #@Model.Id<br />
+                        <strong>Khách hàng:</strong> @Model.User.FullName (@Model.User.Username)<br />
+                        <strong>Ngày đặt:</strong> @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")
+                    </p>
+                </div>
+
+                <form method="post" action="@Url.Action("UpdateStatus", "Order", new { area = "Admin" })">
+                    @Html.AntiForgeryToken()
+                    
+                    <input type="hidden" name="id" value="@Model.Id" />
+
+                    <div class="mb-4">
+                        <label class="form-label"><strong>Trạng thái hiện tại:</strong></label>
+                        <div class="mb-3">
+                            @{
+                                string currentStatusText = "";
+                                switch (Model.Status)
+                                {
+                                    case "Pending":
+                                        currentStatusText = "Chờ xử lý";
+                                        break;
+                                    case "Processing":
+                                        currentStatusText = "Đang xử lý";
+                                        break;
+                                    case "Shipped":
+                                        currentStatusText = "Đã gửi";
+                                        break;
+                                    case "Delivered":
+                                        currentStatusText = "Đã giao";
+                                        break;
+                                    case "Cancelled":
+                                        currentStatusText = "Đã hủy";
+                                        break;
+                                }
+                            }
+                            <span class="badge bg-info" style="font-size: 1rem; padding: 10px 15px;">@currentStatusText</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label"><strong>Chọn trạng thái mới:</strong></label>
+                        <select name="status" class="form-select" required>
+                            <option value="">-- Chọn trạng thái --</option>
+                            @if (ViewBag.StatusList != null)
+                            {
+                                foreach (var item in ViewBag.StatusList)
+                                {
+                                    <option value="@item.Value" @(item.Value == Model.Status ? "selected" : "")>
+                                        @item.Text
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong><i class="fas fa-info-circle"></i> Lưu ý:</strong>
+                        <ul class="mb-0">
+                            <li>Chờ xử lý → Đang xử lý → Đã gửi → Đã giao</li>
+                            <li>Bạn có thể hủy đơn hàng bất kỳ lúc nào (trước khi giao)</li>
+                            <li>Thay đổi trạng thái sẽ không thể hoàn tác</li>
+                        </ul>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i> Lưu thay đổi
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-list"></i> Quy trình xử lý</h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item" style="color: @(Model.Status == "Pending" ? "#ffc107" : "#28a745");">
+                        <strong><i class="fas fa-circle"></i> Chờ xử lý</strong>
+                    </div>
+                    <div class="timeline-item" style="color: @(Model.Status == "Processing" ? "#ffc107" : (Model.Status != "Pending" ? "#28a745" : "#ccc"));">
+                        <strong><i class="fas fa-circle"></i> Đang xử lý</strong>
+                    </div>
+                    <div class="timeline-item" style="color: @(Model.Status == "Shipped" ? "#ffc107" : (Model.Status == "Delivered" ? "#28a745" : "#ccc"));">
+                        <strong><i class="fas fa-circle"></i> Đã gửi</strong>
+                    </div>
+                    <div class="timeline-item" style="color: @(Model.Status == "Delivered" ? "#28a745" : "#ccc");">
+                        <strong><i class="fas fa-circle"></i> Đã giao</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding: 10px 0;
+    }
+
+    .timeline-item {
+        padding: 10px 0;
+        border-left: 3px solid currentColor;
+        padding-left: 15px;
+        margin-bottom: 10px;
+    }
+</style>

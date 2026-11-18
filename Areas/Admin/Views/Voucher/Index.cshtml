@@ -1,0 +1,376 @@
+﻿@{
+    ViewBag.Title = "Quản lý voucher - Admin";
+    var eventVouchers = (List<web1.Models.Voucher>)ViewBag.EventVouchers ?? new List<web1.Models.Voucher>();
+    var publicVouchers = (List<web1.Models.Voucher>)ViewBag.PublicVouchers ?? new List<web1.Models.Voucher>();
+    var sprintVouchers = (List<web1.Models.Voucher>)ViewBag.SprintVouchers ?? new List<web1.Models.Voucher>();
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2 style="color: #FFD700;">Quản lý voucher</h2>
+    </div>
+    <div class="col-md-6 text-right">
+        <a href="@Url.Action("Create", "Voucher", new { area = "Admin" })" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Thêm voucher
+        </a>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+<!-- Tabs Navigation -->
+<ul class="nav nav-tabs mb-4" role="tablist" style="border-bottom: 2px solid #FFD700;">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="event-tab" data-bs-toggle="tab" data-bs-target="#event-content" type="button" role="tab" aria-controls="event-content" aria-selected="true" style="color: #FFD700; font-weight: bold;">
+            <i class="fas fa-calendar"></i> Voucher Sự Kiện
+            <span class="badge bg-primary ms-2">@eventVouchers.Count</span>
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="public-tab" data-bs-toggle="tab" data-bs-target="#public-content" type="button" role="tab" aria-controls="public-content" aria-selected="false" style="color: #FFD700; font-weight: bold;">
+            <i class="fas fa-globe"></i> Voucher Chung
+            <span class="badge bg-success ms-2">@publicVouchers.Count</span>
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="sprint-tab" data-bs-toggle="tab" data-bs-target="#sprint-content" type="button" role="tab" aria-controls="sprint-content" aria-selected="false" style="color: #FFD700; font-weight: bold;">
+            <i class="fas fa-users"></i> Voucher Sprint
+            <span class="badge bg-warning text-dark ms-2">@sprintVouchers.Count</span>
+        </button>
+    </li>
+</ul>
+
+<!-- Tabs Content -->
+<div class="tab-content">
+    <!-- TAB 1: Voucher Sự Kiện -->
+    <div class="tab-pane fade show active" id="event-content" role="tabpanel" aria-labelledby="event-tab">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 8%; color: #FFD700;">ID</th>
+                        <th style="width: 12%; color: #FFD700;">Mã voucher</th>
+                        <th style="width: 15%; color: #FFD700;">Tên</th>
+                        <th style="width: 10%; color: #FFD700;">Giảm</th>
+                        <th style="width: 10%; color: #FFD700;">Còn lại</th>
+                        <th style="width: 12%; color: #FFD700;">Hạn</th>
+                        <th style="width: 15%; color: #FFD700;">Sự kiện</th>
+                        <th style="width: 18%; color: #FFD700;">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (eventVouchers.Count > 0)
+                    {
+                        foreach (var voucher in eventVouchers)
+                        {
+                            var remaining = voucher.Quantity > 0 ? (voucher.Quantity - voucher.UsedQuantity).ToString() : "∞";
+                            var isExpired = voucher.EndDate < DateTime.Now;
+                            var daysLeft = (voucher.EndDate - DateTime.Now).Days;
+
+                            <tr @(isExpired ? "class='table-danger'" : "") style="color: #FFD700;">
+                                <td>@voucher.Id</td>
+                                <td><code>@voucher.Code</code></td>
+                                <td>@voucher.Name</td>
+                                <td>
+                                    @if (voucher.DiscountPercent > 0)
+                                    {
+                                        <strong>-@voucher.DiscountPercent%</strong>
+                                    }
+                                    else if (voucher.DiscountAmount > 0)
+                                    {
+                                        <strong>-@voucher.DiscountAmount.ToString("N0") đ</strong>
+                                    }
+                                </td>
+                                <td>
+                                    @if (voucher.Quantity > 0)
+                                    {
+                                        <strong>@remaining/@voucher.Quantity</strong>
+                                    }
+                                    else
+                                    {
+                                        <strong>∞</strong>
+                                    }
+                                </td>
+                                <td>
+                                    @if (isExpired)
+                                    {
+                                        <span class="badge bg-danger">Hết hạn</span>
+                                    }
+                                    else if (daysLeft <= 3)
+                                    {
+                                        <span class="badge bg-warning text-dark">@daysLeft ngày</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">@voucher.EndDate.ToString("dd/MM/yyyy")</span>
+                                    }
+                                </td>
+                                <td>
+                                    <small><strong>@(voucher.Event != null ? voucher.Event.Name : "N/A")</strong></small>
+                                </td>
+                                <td>
+                                    <a href="@Url.Action("Details", "Voucher", new { area = "Admin", id = voucher.Id })" class="btn btn-sm btn-info" title="Chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="@Url.Action("Edit", "Voucher", new { area = "Admin", id = voucher.Id })" class="btn btn-sm btn-warning" title="Sửa">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="@Url.Action("Delete", "Voucher", new { area = "Admin", id = voucher.Id })" class="btn btn-sm btn-danger" title="Xóa">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center" style="color: #FFD700;">
+                                <i class="fas fa-inbox"></i> Không có voucher sự kiện nào
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TAB 2: Voucher Chung -->
+    <div class="tab-pane fade" id="public-content" role="tabpanel" aria-labelledby="public-tab">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 8%; color: #FFD700;">ID</th>
+                        <th style="width: 12%; color: #FFD700;">Mã voucher</th>
+                        <th style="width: 15%; color: #FFD700;">Tên</th>
+                        <th style="width: 10%; color: #FFD700;">Giảm</th>
+                        <th style="width: 10%; color: #FFD700;">Còn lại</th>
+                        <th style="width: 12%; color: #FFD700;">Hạn</th>
+                        <th style="width: 15%; color: #FFD700;">Loại</th>
+                        <th style="width: 18%; color: #FFD700;">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (publicVouchers.Count > 0)
+                    {
+                        foreach (var voucher in publicVouchers)
+                        {
+                            var remaining = voucher.Quantity > 0 ? (voucher.Quantity - voucher.UsedQuantity).ToString() : "∞";
+                            var isExpired = voucher.EndDate < DateTime.Now;
+                            var daysLeft = (voucher.EndDate - DateTime.Now).Days;
+
+                            <tr @(isExpired ? "class='table-danger'" : "") style="color: #FFD700;">
+                                <td>@voucher.Id</td>
+                                <td><code>@voucher.Code</code></td>
+                                <td>@voucher.Name</td>
+                                <td>
+                                    @if (voucher.DiscountPercent > 0)
+                                    {
+                                        <strong>-@voucher.DiscountPercent%</strong>
+                                    }
+                                    else if (voucher.DiscountAmount > 0)
+                                    {
+                                        <strong>-@voucher.DiscountAmount.ToString("N0") đ</strong>
+                                    }
+                                </td>
+                                <td>
+                                    @if (voucher.Quantity > 0)
+                                    {
+                                        <strong>@remaining/@voucher.Quantity</strong>
+                                    }
+                                    else
+                                    {
+                                        <strong>∞</strong>
+                                    }
+                                </td>
+                                <td>
+                                    @if (isExpired)
+                                    {
+                                        <span class="badge bg-danger">Hết hạn</span>
+                                    }
+                                    else if (daysLeft <= 3)
+                                    {
+                                        <span class="badge bg-warning text-dark">@daysLeft ngày</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">@voucher.EndDate.ToString("dd/MM/yyyy")</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (voucher.IsLuckySpinVoucher)
+                                    {
+                                        <span class="badge bg-primary">Lucky Spin</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Public</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a href="@Url.Action("Details", "Voucher", new { area = "Admin", id = voucher.Id })" class="btn btn-sm btn-info" title="Chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="@Url.Action("Edit", "Voucher", new { area = "Admin", id = voucher.Id })" class="btn btn-sm btn-warning" title="Sửa">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="@Url.Action("Delete", "Voucher", new { area = "Admin", id = voucher.Id })" class="btn btn-sm btn-danger" title="Xóa">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center" style="color: #FFD700;">
+                                <i class="fas fa-inbox"></i> Không có voucher chung nào
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TAB 3: Voucher Sprint (Private) -->
+    <div class="tab-pane fade" id="sprint-content" role="tabpanel" aria-labelledby="sprint-tab">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 8%; color: #FFD700;">ID</th>
+                        <th style="width: 10%; color: #FFD700;">Mã voucher</th>
+                        <th style="width: 12%; color: #FFD700;">Tên</th>
+                        <th style="width: 10%; color: #FFD700;">Giảm</th>
+                        <th style="width: 12%; color: #FFD700;">User Sở Hữu</th>
+                        <th style="width: 12%; color: #FFD700;">Hạn</th>
+                        <th style="width: 12%; color: #FFD700;">Loại</th>
+                        <th style="width: 14%; color: #FFD700;">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (sprintVouchers.Count > 0)
+                    {
+                        foreach (var voucher in sprintVouchers)
+                        {
+                            var isExpired = voucher.EndDate < DateTime.Now;
+                            var daysLeft = (voucher.EndDate - DateTime.Now).Days;
+                            var ownerName = voucher.OwnerUser != null ? voucher.OwnerUser.FullName : "N/A";
+
+                            <tr @(isExpired ? "class='table-danger'" : "") style="color: #FFD700;">
+                                <td>@voucher.Id</td>
+                                <td><code>@voucher.Code</code></td>
+                                <td>@voucher.Name</td>
+                                <td>
+                                    @if (voucher.DiscountPercent > 0)
+                                    {
+                                        <strong>-@voucher.DiscountPercent%</strong>
+                                    }
+                                    else if (voucher.DiscountAmount > 0)
+                                    {
+                                        <strong>-@voucher.DiscountAmount.ToString("N0") đ</strong>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        <i class="fas fa-user"></i> @ownerName
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (isExpired)
+                                    {
+                                        <span class="badge bg-danger">Hết hạn</span>
+                                    }
+                                    else if (daysLeft <= 3)
+                                    {
+                                        <span class="badge bg-warning text-dark">@daysLeft ngày</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">@voucher.EndDate.ToString("dd/MM/yyyy")</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (voucher.IsLuckySpinVoucher)
+                                    {
+                                        <span class="badge bg-primary">Lucky Spin</span>
+                                    }
+                                    else if (voucher.Code.StartsWith("EVENT_"))
+                                    {
+                                        <span class="badge bg-warning">Event</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Private</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a href="@Url.Action("Details", "Voucher", new { area = "Admin", id = voucher.Id })" class="btn btn-sm btn-info" title="Chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="@Url.Action("Delete", "Voucher", new { area = "Admin", id = voucher.Id })" class="btn btn-sm btn-danger" title="Xóa">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center" style="color: #FFD700;">
+                                <i class="fas fa-inbox"></i> Không có voucher sprint nào
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    code {
+        background-color: #f5f5f5;
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-weight: bold;
+        color: #667eea;
+    }
+
+    .nav-tabs {
+        border-bottom: 2px solid #FFD700 !important;
+    }
+
+    .nav-tabs .nav-link {
+        border: none;
+        color: #6c757d;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .nav-tabs .nav-link:hover {
+        border-bottom-color: #FFD700;
+        color: #FFD700;
+    }
+
+    .nav-tabs .nav-link.active {
+        background-color: transparent;
+        border-bottom-color: #FFD700;
+        color: #FFD700;
+        font-weight: bold;
+    }
+
+    .badge {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+</style>

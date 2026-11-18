@@ -1,0 +1,629 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|c:\\users\\vivobook\\documents\\websell\\web1\\web1\\migrations\\202604231235412_fixspincountandorderidnullable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:migrations\\202604231235412_fixspincountandorderidnullable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|c:\\users\\vivobook\\documents\\websell\\web1\\web1\\migrations\\202604231209068_addspincount.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:migrations\\202604231209068_addspincount.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|c:\\users\\vivobook\\documents\\websell\\web1\\web1\\migrations\\202603301352175_addnewcommunitymodels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:migrations\\202603301352175_addnewcommunitymodels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|c:\\users\\vivobook\\documents\\websell\\web1\\web1\\views\\voucher\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:views\\voucher\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\views\\voucher\\eventdetail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:views\\voucher\\eventdetail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\views\\news\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:views\\news\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\views\\showcase\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:views\\showcase\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\views\\product\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:views\\product\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\content\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:content\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\content\\effects.css||{8B382828-6202-11D1-8870-0000F87579D2}|",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:content\\effects.css||{8B382828-6202-11D1-8870-0000F87579D2}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\css.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}|",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:css.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\app_start\\bundleconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:app_start\\bundleconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\areas\\community\\views\\shared\\_communitylayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:areas\\community\\views\\shared\\_communitylayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\areas\\admin\\views\\shared\\_adminlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:areas\\admin\\views\\shared\\_adminlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\content\\theme.css||{8B382828-6202-11D1-8870-0000F87579D2}|",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:content\\theme.css||{8B382828-6202-11D1-8870-0000F87579D2}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\infrastructure\\security\\authenticationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:infrastructure\\security\\authenticationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\infrastructure\\security\\secureauthenticationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:infrastructure\\security\\secureauthenticationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\views\\payment\\verifyotp.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:views\\payment\\verifyotp.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\t\u00E0i kho\u1EA3n.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:t\u00E0i kho\u1EA3n.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\code m\u1EABu.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}|",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:code m\u1EABu.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\backend_sec.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}|",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:backend_sec.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\backend_feature.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}|",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:backend_feature.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\ch\u1EE9c_n\u0103ng.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:ch\u1EE9c_n\u0103ng.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\t\u00F3m t\u1EAFt lu\u1ED3ng.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}|",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:t\u00F3m t\u1EAFt lu\u1ED3ng.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\infrastructure\\security\\passwordhasherservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:infrastructure\\security\\passwordhasherservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\sql_scripts\\view_database_schema.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:sql_scripts\\view_database_schema.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\web1\\database\\webselldatabase_complete.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:web1\\database\\webselldatabase_complete.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\services\\emailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:services\\emailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\controllers\\paymentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:controllers\\paymentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\services\\emailqueueservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:services\\emailqueueservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\services\\luckyspinservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:services\\luckyspinservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\controllers\\luckyspincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:controllers\\luckyspincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\areas\\admin\\controllers\\productcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:areas\\admin\\controllers\\productcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\areas\\admin\\views\\product\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:areas\\admin\\views\\product\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\content\\site.css||{8B382828-6202-11D1-8870-0000F87579D2}|",
+      "RelativeMoniker": "D:0:0:{EC876942-65C9-4992-A27A-9FB9EDB68E8A}|web1.csproj|solutionrelative:content\\site.css||{8B382828-6202-11D1-8870-0000F87579D2}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "202604231235412_FixSpinCountAndOrderIdNullable.cs",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Migrations\\202604231235412_FixSpinCountAndOrderIdNullable.cs",
+              "RelativeDocumentMoniker": "Migrations\\202604231235412_FixSpinCountAndOrderIdNullable.cs",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Migrations\\202604231235412_FixSpinCountAndOrderIdNullable.cs",
+              "RelativeToolTip": "Migrations\\202604231235412_FixSpinCountAndOrderIdNullable.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-29T06:16:53.406Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "202604231209068_AddSpinCount.cs",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Migrations\\202604231209068_AddSpinCount.cs",
+              "RelativeDocumentMoniker": "Migrations\\202604231209068_AddSpinCount.cs",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Migrations\\202604231209068_AddSpinCount.cs",
+              "RelativeToolTip": "Migrations\\202604231209068_AddSpinCount.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-29T06:15:52.688Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "202603301352175_AddNewCommunityModels.cs",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Migrations\\202603301352175_AddNewCommunityModels.cs",
+              "RelativeDocumentMoniker": "Migrations\\202603301352175_AddNewCommunityModels.cs",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Migrations\\202603301352175_AddNewCommunityModels.cs",
+              "RelativeToolTip": "Migrations\\202603301352175_AddNewCommunityModels.cs",
+              "ViewState": "AgIAACgAAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-29T06:15:31.614Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\Voucher\\Index.cshtml",
+              "RelativeDocumentMoniker": "Views\\Voucher\\Index.cshtml",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\Voucher\\Index.cshtml",
+              "RelativeToolTip": "Views\\Voucher\\Index.cshtml",
+              "ViewState": "AgIAAIQAAAAAAAAAAAAgwI0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-29T02:19:25.428Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "EventDetail.cshtml",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\Voucher\\EventDetail.cshtml",
+              "RelativeDocumentMoniker": "Views\\Voucher\\EventDetail.cshtml",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\Voucher\\EventDetail.cshtml",
+              "RelativeToolTip": "Views\\Voucher\\EventDetail.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-29T02:19:19.018Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "_ViewStart.cshtml",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\_ViewStart.cshtml",
+              "RelativeDocumentMoniker": "Views\\_ViewStart.cshtml",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\_ViewStart.cshtml",
+              "RelativeToolTip": "Views\\_ViewStart.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-29T02:18:55.432Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\News\\Index.cshtml",
+              "RelativeDocumentMoniker": "Views\\News\\Index.cshtml",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\News\\Index.cshtml",
+              "RelativeToolTip": "Views\\News\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-29T02:17:30.194Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\Showcase\\Index.cshtml",
+              "RelativeDocumentMoniker": "Views\\Showcase\\Index.cshtml",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\Showcase\\Index.cshtml",
+              "RelativeToolTip": "Views\\Showcase\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAABGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-29T02:17:02.122Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\Product\\Index.cshtml",
+              "RelativeDocumentMoniker": "Views\\Product\\Index.cshtml",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\Product\\Index.cshtml",
+              "RelativeToolTip": "Views\\Product\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-29T02:16:26.597Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Css.md",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Css.md",
+              "RelativeDocumentMoniker": "Css.md",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Css.md",
+              "RelativeToolTip": "Css.md",
+              "ViewState": "AgIAABgAAAAAAAAAAAAAACIAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2026-04-28T11:28:49.075Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "effects.css",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Content\\effects.css",
+              "RelativeDocumentMoniker": "Content\\effects.css",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Content\\effects.css",
+              "RelativeToolTip": "Content\\effects.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAI0BAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-04-28T11:27:51.017Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAAcBAAAAAAAAAAAgwEQBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-28T11:25:10.874Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Site.css",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Content\\Site.css",
+              "RelativeDocumentMoniker": "Content\\Site.css",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Content\\Site.css",
+              "RelativeToolTip": "Content\\Site.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-04-28T11:26:26.037Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "BundleConfig.cs",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\App_Start\\BundleConfig.cs",
+              "RelativeDocumentMoniker": "App_Start\\BundleConfig.cs",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\App_Start\\BundleConfig.cs",
+              "RelativeToolTip": "App_Start\\BundleConfig.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAewAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-28T11:28:05.565Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "Views\\Home\\Index.cshtml",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "Views\\Home\\Index.cshtml",
+              "ViewState": "AgIAAM8BAAAAAAAAAAAswN4BAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-28T11:31:51.415Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "_CommunityLayout.cshtml",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Areas\\Community\\Views\\Shared\\_CommunityLayout.cshtml",
+              "RelativeDocumentMoniker": "Areas\\Community\\Views\\Shared\\_CommunityLayout.cshtml",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Areas\\Community\\Views\\Shared\\_CommunityLayout.cshtml",
+              "RelativeToolTip": "Areas\\Community\\Views\\Shared\\_CommunityLayout.cshtml",
+              "ViewState": "AgIAABUAAAAAAAAAAAAAAKwAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-28T11:26:17.952Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 37,
+              "Title": "Site.css",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Content\\Site.css",
+              "RelativeDocumentMoniker": "Content\\Site.css",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Content\\Site.css",
+              "RelativeToolTip": "Content\\Site.css",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-04-28T11:26:26.754Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "_AdminLayout.cshtml",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Areas\\Admin\\Views\\Shared\\_AdminLayout.cshtml",
+              "RelativeDocumentMoniker": "Areas\\Admin\\Views\\Shared\\_AdminLayout.cshtml",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Areas\\Admin\\Views\\Shared\\_AdminLayout.cshtml",
+              "RelativeToolTip": "Areas\\Admin\\Views\\Shared\\_AdminLayout.cshtml",
+              "ViewState": "AgIAAIgAAAAAAAAAAAApwJYAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-28T11:25:37.645Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "theme.css",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Content\\theme.css",
+              "RelativeDocumentMoniker": "Content\\theme.css",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Content\\theme.css",
+              "RelativeToolTip": "Content\\theme.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAOQCAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-04-28T11:24:48.371Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "ProductController.cs",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Areas\\Admin\\Controllers\\ProductController.cs",
+              "RelativeDocumentMoniker": "Areas\\Admin\\Controllers\\ProductController.cs",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Areas\\Admin\\Controllers\\ProductController.cs",
+              "RelativeToolTip": "Areas\\Admin\\Controllers\\ProductController.cs",
+              "ViewState": "AgIAAJoAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-28T06:23:50.791Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "AuthenticationService.cs",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Infrastructure\\Security\\AuthenticationService.cs",
+              "RelativeDocumentMoniker": "Infrastructure\\Security\\AuthenticationService.cs",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Infrastructure\\Security\\AuthenticationService.cs",
+              "RelativeToolTip": "Infrastructure\\Security\\AuthenticationService.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAAAYwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-28T04:39:15.119Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Areas\\Admin\\Views\\Product\\Create.cshtml",
+              "RelativeDocumentMoniker": "Areas\\Admin\\Views\\Product\\Create.cshtml",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Areas\\Admin\\Views\\Product\\Create.cshtml",
+              "RelativeToolTip": "Areas\\Admin\\Views\\Product\\Create.cshtml",
+              "ViewState": "AgIAAF0AAAAAAAAAAABhwGQAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-28T06:24:13.659Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "VerifyOtp.cshtml",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\Payment\\VerifyOtp.cshtml",
+              "RelativeDocumentMoniker": "Views\\Payment\\VerifyOtp.cshtml",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Views\\Payment\\VerifyOtp.cshtml",
+              "RelativeToolTip": "Views\\Payment\\VerifyOtp.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-28T04:39:04.731Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "T\u00E0i kho\u1EA3n.md",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\T\u00E0i kho\u1EA3n.md",
+              "RelativeDocumentMoniker": "T\u00E0i kho\u1EA3n.md",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\T\u00E0i kho\u1EA3n.md",
+              "RelativeToolTip": "T\u00E0i kho\u1EA3n.md",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2026-04-28T04:37:39.353Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "SecureAuthenticationService.cs",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Infrastructure\\Security\\SecureAuthenticationService.cs",
+              "RelativeDocumentMoniker": "Infrastructure\\Security\\SecureAuthenticationService.cs",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Infrastructure\\Security\\SecureAuthenticationService.cs",
+              "RelativeToolTip": "Infrastructure\\Security\\SecureAuthenticationService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-27T15:26:06.365Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "Backend_Sec.md",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Backend_Sec.md",
+              "RelativeDocumentMoniker": "Backend_Sec.md",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Backend_Sec.md",
+              "RelativeToolTip": "Backend_Sec.md",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHgEAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2026-04-28T04:35:17.531Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "Ch\u1EE9c_n\u0103ng.md",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Ch\u1EE9c_n\u0103ng.md",
+              "RelativeDocumentMoniker": "Ch\u1EE9c_n\u0103ng.md",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Ch\u1EE9c_n\u0103ng.md",
+              "RelativeToolTip": "Ch\u1EE9c_n\u0103ng.md",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2026-04-28T04:36:46.349Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "Backend_Feature.md",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Backend_Feature.md",
+              "RelativeDocumentMoniker": "Backend_Feature.md",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Backend_Feature.md",
+              "RelativeToolTip": "Backend_Feature.md",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAL4EAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2026-04-28T04:27:31.797Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "Code m\u1EABu.md",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Code m\u1EABu.md",
+              "RelativeDocumentMoniker": "Code m\u1EABu.md",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Code m\u1EABu.md",
+              "RelativeToolTip": "Code m\u1EABu.md",
+              "ViewState": "AgIAAIMBAAAAAAAAAAAAAL4DAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2026-04-28T04:29:28.292Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "T\u00F3m t\u1EAFt lu\u1ED3ng.md",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\T\u00F3m t\u1EAFt lu\u1ED3ng.md",
+              "RelativeDocumentMoniker": "T\u00F3m t\u1EAFt lu\u1ED3ng.md",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\T\u00F3m t\u1EAFt lu\u1ED3ng.md",
+              "RelativeToolTip": "T\u00F3m t\u1EAFt lu\u1ED3ng.md",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAOgBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2026-04-28T04:28:07.021Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "PasswordHasherService.cs",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Infrastructure\\Security\\PasswordHasherService.cs",
+              "RelativeDocumentMoniker": "Infrastructure\\Security\\PasswordHasherService.cs",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Infrastructure\\Security\\PasswordHasherService.cs",
+              "RelativeToolTip": "Infrastructure\\Security\\PasswordHasherService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-27T15:26:09.553Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "View_Database_Schema.sql ",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\SQL_Scripts\\View_Database_Schema.sql",
+              "RelativeDocumentMoniker": "SQL_Scripts\\View_Database_Schema.sql",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\SQL_Scripts\\View_Database_Schema.sql",
+              "RelativeToolTip": "SQL_Scripts\\View_Database_Schema.sql",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2026-04-26T14:59:35.141Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "WebSellDatabase_Complete.sql ",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\web1\\Database\\WebSellDatabase_Complete.sql",
+              "RelativeDocumentMoniker": "web1\\Database\\WebSellDatabase_Complete.sql",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\web1\\Database\\WebSellDatabase_Complete.sql",
+              "RelativeToolTip": "web1\\Database\\WebSellDatabase_Complete.sql",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2026-04-26T14:55:48.652Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "PaymentController.cs",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Controllers\\PaymentController.cs",
+              "RelativeDocumentMoniker": "Controllers\\PaymentController.cs",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Controllers\\PaymentController.cs",
+              "RelativeToolTip": "Controllers\\PaymentController.cs",
+              "ViewState": "AgIAAJsAAAAAAAAAAAAAAFwBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-25T01:45:43.476Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "EmailService.cs",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Services\\EmailService.cs",
+              "RelativeDocumentMoniker": "Services\\EmailService.cs",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Services\\EmailService.cs",
+              "RelativeToolTip": "Services\\EmailService.cs",
+              "ViewState": "AgIAAGwBAAAAAAAAAAAgwAUAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-25T01:45:02.446Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "EmailQueueService.cs",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Services\\EmailQueueService.cs",
+              "RelativeDocumentMoniker": "Services\\EmailQueueService.cs",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Services\\EmailQueueService.cs",
+              "RelativeToolTip": "Services\\EmailQueueService.cs",
+              "ViewState": "AgIAAIgAAAAAAAAAAAAcwEIAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-25T01:47:23.001Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "LuckySpinService.cs",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Services\\LuckySpinService.cs",
+              "RelativeDocumentMoniker": "Services\\LuckySpinService.cs",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Services\\LuckySpinService.cs",
+              "RelativeToolTip": "Services\\LuckySpinService.cs",
+              "ViewState": "AgIAABsAAAAAAAAAAAASwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-25T00:33:39.425Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "LuckySpinController.cs",
+              "DocumentMoniker": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Controllers\\LuckySpinController.cs",
+              "RelativeDocumentMoniker": "Controllers\\LuckySpinController.cs",
+              "ToolTip": "C:\\Users\\VivoBook\\Documents\\WebSell\\web1\\web1\\Controllers\\LuckySpinController.cs",
+              "RelativeToolTip": "Controllers\\LuckySpinController.cs",
+              "ViewState": "AgIAAF4AAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-25T00:33:40.482Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

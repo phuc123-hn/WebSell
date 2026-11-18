@@ -1,0 +1,170 @@
+﻿@{
+    ViewBag.Title = "Sự kiện - TechWorld";
+    var ongoingEvents = (List<web1.Models.Event>)ViewBag.OngoingEvents;
+    var upcomingEvents = (List<web1.Models.Event>)ViewBag.UpcomingEvents;
+    var pastEvents = (List<web1.Models.Event>)ViewBag.PastEvents;
+}
+
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-calendar-alt"></i> Sự Kiện Giảm Giá</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="@Url.Action("Index", "Voucher")" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại Voucher
+            </a>
+        </div>
+    </div>
+
+    <!-- Sự kiện đang diễn ra -->
+    @if (ongoingEvents != null && ongoingEvents.Count > 0)
+    {
+        <div class="mb-5">
+            <h3 class="mb-4">
+                <span class="badge bg-success" style="font-size: 1rem; padding: 10px 15px;">
+                    <i class="fas fa-play-circle"></i> Đang Diễn Ra (@ongoingEvents.Count)
+                </span>
+            </h3>
+            <div class="row">
+                @foreach (var evt in ongoingEvents)
+                {
+                    var voucherCount = evt.Vouchers != null ? evt.Vouchers.Count : 0;
+                    <div class="col-md-6 mb-4">
+                        <a href="@Url.Action("EventDetail", "Voucher", new { id = evt.Id })" style="text-decoration: none; color: inherit;">
+                            <div class="card h-100 border-success border-3" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                                @if (!string.IsNullOrEmpty(evt.ImageUrl))
+                                {
+                                    <img src="@evt.ImageUrl" class="card-img-top" alt="@evt.Name" style="height: 200px; object-fit: cover;">
+                                }
+                                <div class="card-body">
+                                    <h5 class="card-title">@evt.Name</h5>
+                                    <p class="card-text text-muted">@evt.Description</p>
+                                    <p class="mb-2">
+                                        <i class="fas fa-calendar"></i>
+                                        @evt.StartDate.ToString("dd/MM/yyyy") - @evt.EndDate.ToString("dd/MM/yyyy")
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>@voucherCount voucher</strong> có sẵn trong sự kiện này
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Sự kiện sắp tới -->
+    @if (upcomingEvents != null && upcomingEvents.Count > 0)
+    {
+        <div class="mb-5">
+            <h3 class="mb-4">
+                <span class="badge bg-info" style="font-size: 1rem; padding: 10px 15px;">
+                    <i class="fas fa-hourglass-start"></i> Sắp Tới (@upcomingEvents.Count)
+                </span>
+            </h3>
+            <div class="row">
+                @foreach (var evt in upcomingEvents)
+                {
+                    var voucherCount = evt.Vouchers != null ? evt.Vouchers.Count : 0;
+                    var daysUntil = (evt.StartDate - DateTime.Now).Days;
+                    <div class="col-md-6 mb-4">
+                        <a href="@Url.Action("EventDetail", "Voucher", new { id = evt.Id })" style="text-decoration: none; color: inherit;">
+                            <div class="card h-100 border-info border-3" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                                @if (!string.IsNullOrEmpty(evt.ImageUrl))
+                                {
+                                    <img src="@evt.ImageUrl" class="card-img-top" alt="@evt.Name" style="height: 200px; object-fit: cover;">
+                                }
+                                <div class="card-body">
+                                    <h5 class="card-title">@evt.Name</h5>
+                                    <p class="card-text text-muted">@evt.Description</p>
+                                    <p class="mb-2">
+                                        <i class="fas fa-calendar"></i>
+                                        @evt.StartDate.ToString("dd/MM/yyyy") - @evt.EndDate.ToString("dd/MM/yyyy")
+                                    </p>
+                                    <p class="mb-2">
+                                        <span class="badge bg-warning text-dark">Bắt đầu trong @daysUntil ngày</span>
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>@voucherCount voucher</strong> sẽ có trong sự kiện này
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Sự kiện đã qua -->
+    @if (pastEvents != null && pastEvents.Count > 0)
+    {
+        <div class="mb-5">
+            <h3 class="mb-4">
+                <span class="badge bg-secondary" style="font-size: 1rem; padding: 10px 15px;">
+                    <i class="fas fa-history"></i> Đã Qua (@pastEvents.Count)
+                </span>
+            </h3>
+            <div class="row">
+                @foreach (var evt in pastEvents)
+                {
+                    var voucherCount = evt.Vouchers != null ? evt.Vouchers.Count : 0;
+                    <div class="col-md-6 mb-4">
+                        <a href="@Url.Action("EventDetail", "Voucher", new { id = evt.Id })" style="text-decoration: none; color: inherit;">
+                            <div class="card h-100 border-secondary border-3 opacity-75" style="transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                                @if (!string.IsNullOrEmpty(evt.ImageUrl))
+                                {
+                                    <img src="@evt.ImageUrl" class="card-img-top" alt="@evt.Name" style="height: 200px; object-fit: cover; opacity: 0.7;">
+                                }
+                                <div class="card-body">
+                                    <h5 class="card-title text-muted">@evt.Name</h5>
+                                    <p class="card-text text-muted">@evt.Description</p>
+                                    <p class="mb-2 text-muted">
+                                        <i class="fas fa-calendar"></i>
+                                        @evt.StartDate.ToString("dd/MM/yyyy") - @evt.EndDate.ToString("dd/MM/yyyy")
+                                    </p>
+                                    <p class="mb-0 text-muted">
+                                        <strong>@voucherCount voucher</strong> đã có trong sự kiện này
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    @if ((ongoingEvents == null || ongoingEvents.Count == 0) &&
+         (upcomingEvents == null || upcomingEvents.Count == 0) &&
+         (pastEvents == null || pastEvents.Count == 0))
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <strong>Không có sự kiện nào!</strong>
+        </div>
+    }
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+
+    .badge {
+        padding: 8px 12px;
+    }
+
+    .opacity-75 {
+        opacity: 0.75;
+    }
+
+    .alert {
+        border-radius: 8px;
+        border: none;
+    }
+</style>

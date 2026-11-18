@@ -1,0 +1,102 @@
+﻿@model List<web1.Models.Event>
+
+@{
+    ViewBag.Title = "Quản lý sự kiện - Admin";
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2 style="color: #FFD700;">Quản lý sự kiện</h2>
+    </div>
+    <div class="col-md-6 text-right">
+        <a href="@Url.Action("Create", "Event", new { area = "Admin" })" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Thêm sự kiện
+        </a>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th style="width: 5%; color: #FFD700;">ID</th>
+                <th style="width: 20%; color: #FFD700;">Tên sự kiện</th>
+                <th style="width: 15%; color: #FFD700;">Ngày bắt đầu</th>
+                <th style="width: 15%; color: #FFD700;">Ngày kết thúc</th>
+                <th style="width: 10%; color: #FFD700;">Trạng thái</th>
+                <th style="width: 10%; color: #FFD700;">Voucher</th>
+                <th style="width: 25%; color: #FFD700;">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                foreach (var evt in Model)
+                {
+                    var now = DateTime.Now;
+                    string statusClass = "";
+                    string statusText = "";
+
+                    if (evt.StartDate <= now && evt.EndDate >= now)
+                    {
+                        statusClass = "success";
+                        statusText = "Đang diễn ra";
+                    }
+                    else if (evt.StartDate > now)
+                    {
+                        statusClass = "warning";
+                        statusText = "Sắp tới";
+                    }
+                    else
+                    {
+                        statusClass = "secondary";
+                        statusText = "Đã qua";
+                    }
+
+                    var voucherCount = evt.Vouchers != null ? evt.Vouchers.Count : 0;
+
+                    <tr style="color: #FFD700;">
+                        <td>@evt.Id</td>
+                        <td>
+                            <a href="@Url.Action("Detail", "Event", new { area = "Admin", id = evt.Id })" style="color: #FFD700; text-decoration: none;">
+                                <strong style="color:black">@evt.Name</strong>
+                            </a>
+                        </td>
+                        <td>@evt.StartDate.ToString("dd/MM/yyyy")</td>
+                        <td>@evt.EndDate.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <span class="badge bg-@statusClass">@statusText</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">@voucherCount</span>
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Index", "EventQuestion", new { area = "Admin", eventId = evt.Id })" class="btn btn-sm btn-info" title="Quản lý câu hỏi quiz">
+                                <i class="fas fa-questions"></i> Quiz
+                            </a>
+                            <a href="@Url.Action("Edit", "Event", new { area = "Admin", id = evt.Id })" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> Sửa
+                            </a>
+                            <a href="@Url.Action("Delete", "Event", new { area = "Admin", id = evt.Id })" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i> Xóa
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center">Không có sự kiện nào</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

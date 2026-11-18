@@ -1,0 +1,679 @@
+﻿@model IEnumerable<web1.Models.Product>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Trưng Bày Sản Phẩm";
+}
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background: linear-gradient(135deg, #07091A 0%, #0F1628 100%);
+        color: var(--text);
+        font-family: 'Be Vietnam Pro', sans-serif;
+        overflow-x: hidden;
+    }
+
+    .sc-wrap {
+        min-height: 100vh;
+        background: #1a1d1a;
+        padding-top: 32px;
+        padding-bottom: 80px;
+    }
+
+    .sc-header {
+        text-align: center;
+        padding: 40px 40px 20px;
+    }
+
+    .sc-eyebrow {
+        font-size: 11px;
+        letter-spacing: .22em;
+        color: rgba(100,150,255,.65);
+        text-transform: uppercase;
+        margin-bottom: 14px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .sc-title {
+        font-size: 42px;
+        font-weight: 500;
+        color: #fff;
+        letter-spacing: -.01em;
+        margin-bottom: 10px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .sc-sub {
+        font-size: 14px;
+        color: rgba(255,255,255,.32);
+        letter-spacing: .04em;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .sc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 32px 40px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* ── CARD ── */
+    .sc-card {
+        background: rgba(255,255,255,.03);
+        border: .5px solid rgba(255,255,255,.08);
+        border-radius: 20px;
+        overflow: hidden;
+        transition: border-color .25s, transform .3s cubic-bezier(.23,1,.32,1);
+        cursor: pointer;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+        .sc-card:hover {
+            border-color: rgba(255,255,255,.18);
+            transform: translateY(-4px);
+        }
+
+    /* ── DEVICE PREVIEW AREA ── */
+    .sc-preview {
+        height: 240px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Phone shape */
+    .dev-phone {
+        width: 96px;
+        height: 192px;
+        border-radius: 20px;
+        background: linear-gradient(165deg, #2a2d38, #12141a);
+        border: 1.5px solid rgba(255,255,255,.12);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 24px 64px rgba(0,0,0,.7), 0 0 0 .5px rgba(255,255,255,.06);
+        transform: perspective(600px) rotateX(6deg) rotateY(-12deg);
+        transition: transform .4s cubic-bezier(.23,1,.32,1);
+    }
+
+    .sc-card:hover .dev-phone {
+        transform: perspective(600px) rotateX(2deg) rotateY(-6deg) translateY(-6px);
+    }
+
+    .dev-phone::before {
+        content: '';
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 34px;
+        height: 4px;
+        background: #08090e;
+        border-radius: 2px;
+    }
+
+    .dev-phone-screen {
+        width: 80px;
+        height: 160px;
+        border-radius: 14px;
+        background: linear-gradient(160deg, #040d2e, #08052a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .dev-phone-label {
+        font-size: 10px;
+        font-weight: 500;
+        color: rgba(255,255,255,.75);
+        letter-spacing: .04em;
+        text-align: center;
+        line-height: 1.4;
+    }
+
+    .dev-phone-sub {
+        font-size: 7px;
+        color: rgba(100,160,255,.6);
+        letter-spacing: .14em;
+        text-transform: uppercase;
+    }
+
+    /* iPad shape */
+    .dev-ipad {
+        width: 140px;
+        height: 185px;
+        border-radius: 16px;
+        background: linear-gradient(165deg, #2a2d38, #12141a);
+        border: 1.5px solid rgba(255,255,255,.12);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 24px 64px rgba(0,0,0,.7), 0 0 0 .5px rgba(255,255,255,.06);
+        transform: perspective(700px) rotateX(8deg) rotateY(-10deg);
+        transition: transform .4s cubic-bezier(.23,1,.32,1);
+    }
+
+    .sc-card:hover .dev-ipad {
+        transform: perspective(700px) rotateX(3deg) rotateY(-5deg) translateY(-6px);
+    }
+
+    .dev-ipad::before {
+        content: '';
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        border: 1.5px solid rgba(255,255,255,.1);
+    }
+
+    .dev-ipad-screen {
+        width: 120px;
+        height: 156px;
+        border-radius: 10px;
+        background: linear-gradient(160deg, #040d2e, #08052a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .dev-ipad-label {
+        font-size: 11px;
+        font-weight: 500;
+        color: rgba(255,255,255,.75);
+        letter-spacing: .03em;
+        text-align: center;
+    }
+
+    .dev-ipad-sub {
+        font-size: 7px;
+        color: rgba(100,160,255,.6);
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    /* MacBook shape */
+    .dev-macbook {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transform: perspective(800px) rotateX(10deg) rotateY(-8deg);
+        transition: transform .4s cubic-bezier(.23,1,.32,1);
+    }
+
+    .sc-card:hover .dev-macbook {
+        transform: perspective(800px) rotateX(4deg) rotateY(-3deg) translateY(-6px);
+    }
+
+    .dev-mb-lid {
+        width: 210px;
+        height: 130px;
+        border-radius: 10px 10px 2px 2px;
+        background: linear-gradient(165deg, #2a2d38, #12141a);
+        border: 1.5px solid rgba(255,255,255,.12);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 -4px 20px rgba(0,0,0,.5);
+    }
+
+    .dev-mb-screen {
+        width: 192px;
+        height: 114px;
+        border-radius: 6px;
+        background: linear-gradient(160deg, #040d2e, #08052a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .dev-mb-label {
+        font-size: 11px;
+        font-weight: 500;
+        color: rgba(255,255,255,.75);
+        letter-spacing: .03em;
+    }
+
+    .dev-mb-sub {
+        font-size: 7px;
+        color: rgba(100,160,255,.6);
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .dev-mb-base {
+        width: 224px;
+        height: 12px;
+        background: linear-gradient(180deg, #1e2028, #14151c);
+        border-radius: 0 0 8px 8px;
+        border: 1.5px solid rgba(255,255,255,.08);
+        border-top: none;
+        position: relative;
+    }
+
+        .dev-mb-base::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 5px;
+            background: #0f1015;
+            border-radius: 0 0 4px 4px;
+            border: 1px solid rgba(255,255,255,.06);
+            border-top: none;
+        }
+
+    /* Laptop shape */
+    .dev-laptop {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transform: perspective(800px) rotateX(10deg) rotateY(-8deg);
+        transition: transform .4s cubic-bezier(.23,1,.32,1);
+    }
+
+    .sc-card:hover .dev-laptop {
+        transform: perspective(800px) rotateX(4deg) rotateY(-3deg) translateY(-6px);
+    }
+
+    .dev-lt-lid {
+        width: 200px;
+        height: 126px;
+        border-radius: 8px 8px 2px 2px;
+        background: linear-gradient(165deg, #252830, #0f1015);
+        border: 1.5px solid rgba(255,255,255,.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 -4px 20px rgba(0,0,0,.5);
+    }
+
+    .dev-lt-screen {
+        width: 184px;
+        height: 112px;
+        border-radius: 4px;
+        background: linear-gradient(160deg, #040d2e, #08052a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .dev-lt-label {
+        font-size: 11px;
+        font-weight: 500;
+        color: rgba(255,255,255,.75);
+        letter-spacing: .03em;
+    }
+
+    .dev-lt-sub {
+        font-size: 7px;
+        color: rgba(100,160,255,.6);
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .dev-lt-base {
+        width: 216px;
+        height: 14px;
+        background: linear-gradient(180deg, #1a1c22, #0f1015);
+        border-radius: 0 0 6px 6px;
+        border: 1.5px solid rgba(255,255,255,.07);
+        border-top: none;
+        position: relative;
+    }
+
+        .dev-lt-base::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 72px;
+            height: 6px;
+            background: #0a0b0f;
+            border-radius: 0 0 6px 6px;
+            border: 1px solid rgba(255,255,255,.05);
+            border-top: none;
+        }
+
+    /* Badge */
+    .sc-badge {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    /* Glow behind device */
+    .sc-glow {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+    }
+
+    /* Card info */
+    .sc-info {
+        padding: 20px 22px 22px;
+        border-top: .5px solid rgba(255,255,255,.06);
+    }
+
+    .sc-brand {
+        font-size: 10px;
+        color: rgba(255,255,255,.28);
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+
+    .sc-name {
+        font-size: 17px;
+        font-weight: 500;
+        color: #fff;
+        margin-bottom: 6px;
+        line-height: 1.3;
+    }
+
+    .sc-desc {
+        font-size: 12px;
+        color: rgba(255,255,255,.35);
+        line-height: 1.65;
+        margin-bottom: 16px;
+    }
+
+    .sc-price {
+        font-size: 19px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 16px;
+    }
+
+        .sc-price span {
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255,255,255,.3);
+            margin-left: 4px;
+        }
+
+    .sc-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .sc-btn {
+        flex: 1;
+        padding: 10px 0;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: .05em;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        border: .5px solid;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sc-btn-view {
+        background: rgba(80, 130, 255, .14);
+        border-color: rgba(100, 160, 255, .28);
+        color: rgba(140, 190, 255, .9);
+    }
+
+    .sc-btn-view:hover {
+        background: rgba(80, 130, 255, .26);
+        border-color: rgba(100, 160, 255, .5);
+        color: #fff;
+        text-decoration: none;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(100, 160, 255, 0.3);
+    }
+
+    .sc-btn-view:active {
+        transform: translateY(-1px);
+    }
+
+    .sc-btn-cart {
+        background: rgba(255, 255, 255, .05);
+        border-color: rgba(255, 255, 255, .1);
+        color: rgba(255, 255, 255, .55);
+    }
+
+    .sc-btn-cart:hover {
+        background: rgba(255, 255, 255, .1);
+        color: rgba(255, 255, 255, .85);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(255, 255, 255, 0.15);
+        text-decoration: none;
+    }
+
+    .sc-btn-cart:active {
+        transform: translateY(-1px);
+    }
+
+    /* Component count pill */
+    .sc-comp-count {
+        position: absolute;
+        bottom: 12px;
+        left: 14px;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 9px;
+        color: rgba(255,255,255,.3);
+        background: rgba(255,255,255,.04);
+        border: .5px solid rgba(255,255,255,.08);
+        letter-spacing: .06em;
+    }
+
+    /* Background glow per category */
+    .glow-phone {
+        background: radial-gradient(circle at 50% 60%, rgba(80,120,255,.08) 0%, transparent 65%);
+    }
+
+    .glow-ipad {
+        background: radial-gradient(circle at 50% 60%, rgba(80,200,220,.07) 0%, transparent 65%);
+    }
+
+    .glow-mac {
+        background: radial-gradient(circle at 50% 60%, rgba(200,200,220,.06) 0%, transparent 65%);
+    }
+
+    .glow-laptop {
+        background: radial-gradient(circle at 50% 60%, rgba(100,200,120,.06) 0%, transparent 65%);
+    }
+</style>
+
+<div class="sc-wrap">
+    <div class="sc-header">
+        <div class="sc-eyebrow">Bộ sưu tập · Công nghệ cao cấp</div>
+        <h1 class="sc-title">Trưng Bày Sản Phẩm</h1>
+        <p class="sc-sub">Khám phá chi tiết kỹ thuật từng thiết bị — Camera · Chip · Pin · Màn hình</p>
+    </div>
+
+    <div class="sc-grid">
+        @foreach (var product in Model)
+        {
+            string nameLower = product.Name.ToLower();
+            string deviceType = "phone";
+            string glowClass = "glow-phone";
+            string badgeBg = "rgba(100,150,255,.12)";
+            string badgeColor = "rgba(140,190,255,.9)";
+            string badgeText = "Điện thoại";
+            string compCount = "7 linh kiện";
+
+            if (nameLower.Contains("macbook") || nameLower.Contains("mac book"))
+            {
+                deviceType = "macbook";
+                glowClass = "glow-mac";
+                badgeBg = "rgba(200,200,220,.08)";
+                badgeColor = "rgba(200,210,230,.85)";
+                badgeText = "MacBook";
+                compCount = "5 linh kiện";
+            }
+            else if (nameLower.Contains("ipad"))
+            {
+                deviceType = "ipad";
+                glowClass = "glow-ipad";
+                badgeBg = "rgba(80,200,220,.1)";
+                badgeColor = "rgba(80,210,230,.9)";
+                badgeText = "iPad";
+                compCount = "5 linh kiện";
+            }
+            else if (nameLower.Contains("laptop"))
+            {
+                deviceType = "laptop";
+                glowClass = "glow-laptop";
+                badgeBg = "rgba(100,200,120,.1)";
+                badgeColor = "rgba(100,210,130,.9)";
+                badgeText = "Laptop";
+                compCount = "5 linh kiện";
+            }
+            else if (nameLower.Contains("samsung") || nameLower.Contains("galaxy") || nameLower.Contains("s24") || nameLower.Contains("s25"))
+            {
+                badgeBg = "rgba(255,195,70,.12)";
+                badgeColor = "rgba(255,200,80,.9)";
+                badgeText = "Samsung";
+                compCount = "7 linh kiện";
+            }
+            else if (nameLower.Contains("iphone"))
+            {
+                badgeBg = "rgba(200,200,200,.08)";
+                badgeColor = "rgba(200,210,220,.9)";
+                badgeText = "iPhone";
+                compCount = "6 linh kiện";
+            }
+            else if (nameLower.Contains("huawei") || nameLower.Contains("mate"))
+            {
+                badgeBg = "rgba(255,80,80,.1)";
+                badgeColor = "rgba(255,120,100,.9)";
+                badgeText = "Huawei";
+                compCount = "6 linh kiện";
+            }
+
+            // short name for screen label
+            string[] nameParts = product.Name.Split(' ');
+            string screenLine1 = nameParts.Length > 0 ? nameParts[0] : product.Name;
+            string screenLine2 = nameParts.Length > 1 ? string.Join(" ", nameParts.Skip(1).Take(2)) : "";
+
+            <div class="sc-card">
+                <div class="sc-preview">
+                    <div class="sc-glow @glowClass"></div>
+
+                    @if (deviceType == "macbook")
+                    {
+                        <div class="dev-macbook">
+                            <div class="dev-mb-lid">
+                                <div class="dev-mb-screen">
+                                    <div class="dev-mb-label">@screenLine1</div>
+                                    @if (!string.IsNullOrEmpty(screenLine2))
+                                    {
+                                        <div class="dev-mb-sub">@screenLine2</div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="dev-mb-base"></div>
+                        </div>
+                    }
+                    else if (deviceType == "ipad")
+                    {
+                        <div class="dev-ipad">
+                            <div class="dev-ipad-screen">
+                                <div class="dev-ipad-label">@screenLine1</div>
+                                @if (!string.IsNullOrEmpty(screenLine2))
+                                {
+                                    <div class="dev-ipad-sub">@screenLine2</div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else if (deviceType == "laptop")
+                    {
+                        <div class="dev-laptop">
+                            <div class="dev-lt-lid">
+                                <div class="dev-lt-screen">
+                                    <div class="dev-lt-label">@screenLine1</div>
+                                    @if (!string.IsNullOrEmpty(screenLine2))
+                                    {
+                                        <div class="dev-lt-sub">@screenLine2</div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="dev-lt-base"></div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="dev-phone">
+                            <div class="dev-phone-screen">
+                                <div class="dev-phone-label">@screenLine1<br>@screenLine2</div>
+                                <div class="dev-phone-sub">@(product.Category?.Name ?? "Mobile")</div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="sc-badge" style="background:@badgeBg; color:@badgeColor">@badgeText</div>
+                    <div class="sc-comp-count">@compCount</div>
+                </div>
+
+                <div class="sc-info">
+                    <div class="sc-brand">@(product.Category?.Name ?? "Apple")</div>
+                    <div class="sc-name">@product.Name</div>
+                    <div class="sc-desc">
+                        @if (nameLower.Contains("s24 ultra"))
+                        {<text>Camera 200MP · Snapdragon 8 Gen 3 · S Pen · Pin 5000mAh · 45W</text> }
+                    else if (nameLower.Contains("iphone 17 pro"))
+                    { <text>Chip A19 Pro · 3× 48MP · RAM 12GB · OLED 120Hz · USB-C</text> }
+                else if (nameLower.Contains("mate x"))
+                { <text>Kirin 9030 Pro · Màn hình gập 8" · XMAGE 50MP · 5600mAh</text> }
+            else if (nameLower.Contains("macbook"))
+            { <text>Apple Silicon · Màn hình Liquid Retina · Pin bền bỉ · macOS</text> }
+        else if (nameLower.Contains("ipad"))
+        { <text>Chip Apple · Màn hình Liquid Retina · Apple Pencil · iPadOS</text> }
+    else if (nameLower.Contains("laptop"))
+    { <text>Chip hiệu suất cao · Màn hình sắc nét · Pin bền · Đa nhiệm</text> }
+else
+{ <text>Chip mạnh mẽ · Camera cao cấp · Pin dung lượng lớn · 5G</text>}
+                    </div>
+                    <div class="sc-price">
+                        @(product.Price > 0 ? product.Price.ToString("N0") + " ₫" : "Liên hệ")
+                    </div>
+                    <div class="sc-actions">
+                        <a href="@Url.Action("Detail", "Showcase", new { id = product.Id })" class="sc-btn sc-btn-view">
+                            Xem Trưng Bày 3D
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

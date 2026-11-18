@@ -1,0 +1,117 @@
+﻿@model List<web1.Models.Order>
+
+@{
+    ViewBag.Title = "Quản lý đơn hàng - Admin";
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2>Quản lý đơn hàng</h2>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th style="width: 5%;">ID</th>
+                <th style="width: 12%;">Khách hàng</th>
+                <th style="width: 10%;">Ngày đặt</th>
+                <th style="width: 12%;">Tổng tiền</th>
+                <th style="width: 10%;">Trạng thái</th>
+                <th style="width: 10%;">Thanh toán</th>
+                <th style="width: 10%;">Phương thức</th>
+                <th style="width: 21%;">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                foreach (var order in Model)
+                {
+                    string statusClass = "";
+                    string statusText = "";
+
+                    switch (order.Status)
+                    {
+                        case "Pending":
+                            statusClass = "warning";
+                            statusText = "Chờ xử lý";
+                            break;
+                        case "Processing":
+                            statusClass = "info";
+                            statusText = "Đang xử lý";
+                            break;
+                        case "Shipped":
+                            statusClass = "primary";
+                            statusText = "Đã gửi";
+                            break;
+                        case "Delivered":
+                            statusClass = "success";
+                            statusText = "Đã giao";
+                            break;
+                        case "Cancelled":
+                            statusClass = "danger";
+                            statusText = "Đã hủy";
+                            break;
+                    }
+
+                    <tr>
+                        <td>@order.Id</td>
+                        <td>@order.User.Username (@order.User.FullName)</td>
+                        <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td><strong>@order.TotalAmount.ToString("N0") đ</strong></td>
+                        <td>
+                            <span class="badge bg-@statusClass">@statusText</span>
+                        </td>
+                        <td>
+                            @if (order.IsPaid)
+                            {
+                                <span class="badge bg-success"><i class="fas fa-check"></i> Đã thanh toán</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning"><i class="fas fa-clock"></i> Chưa thanh toán</span>
+                            }
+                        </td>
+                        <td>@order.PaymentMethod</td>
+                        <td>
+                            <a href="@Url.Action("Details", "Order", new { area = "Admin", id = order.Id })" class="btn btn-sm btn-info" title="Xem chi tiết">
+                                <i class="fas fa-eye"></i> Xem
+                            </a>
+                            @if (order.Status != "Cancelled" && order.Status != "Delivered")
+                            {
+                                <a href="@Url.Action("UpdateStatus", "Order", new { area = "Admin", id = order.Id })" class="btn btn-sm btn-warning" title="Cập nhật trạng thái">
+                                    <i class="fas fa-edit"></i> Cập nhật
+                                </a>
+                                <a href="@Url.Action("Cancel", "Order", new { area = "Admin", id = order.Id })" class="btn btn-sm btn-danger" title="Hủy đơn hàng">
+                                    <i class="fas fa-times"></i> Hủy
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8" class="text-center">Không có đơn hàng nào</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

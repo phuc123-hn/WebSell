@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Admin Panel - TechWorld</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <style>
+
+        body {
+            background: #0f172a;
+            color: white;
+        }
+
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            background: #020617;
+            padding-top: 20px;
+        }
+
+            .sidebar a {
+                display: block;
+                color: #94a3b8;
+                padding: 12px 20px;
+                text-decoration: none;
+            }
+
+                .sidebar a:hover {
+                    background: #1e293b;
+                    color: white;
+                }
+
+        .content {
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .topbar {
+            background: #020617;
+            padding: 10px 20px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .card {
+            background: #1e293b;
+            border: none;
+        }
+
+        /* Admin form labels - Greenyellow color */
+        .form-label {
+            color: #adff2f !important;
+            font-weight: 500;
+        }
+
+        .form-check-label {
+            color: #adff2f !important;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="sidebar">
+
+        <h4 class="text-center mb-4">ADMIN</h4>
+
+        <a href="@Url.Action("Index","Home")">
+            <i class="fas fa-chart-line"></i> Dashboard
+        </a>
+
+        <a href="@Url.Action("Index","Product")">
+            <i class="fas fa-box"></i> Quản lý sản phẩm
+        </a>
+
+        <a href="@Url.Action("Index","News")">
+            <i class="fas fa-newspaper"></i> Quản lý tin tức
+        </a>
+
+        <a href="@Url.Action("Index","Order")">
+            <i class="fas fa-shopping-cart"></i> Đơn hàng
+        </a>
+
+        <a href="@Url.Action("Index","User")">
+            <i class="fas fa-users"></i> Người dùng
+        </a>
+
+        <a href="@Url.Action("Index","Voucher")">
+            <i class="fas fa-ticket-alt"></i> Voucher
+        </a>
+
+        <a href="@Url.Action("Index","Event")">
+            <i class="fas fa-calendar"></i> Sự kiện
+        </a>
+
+        <a href="@Url.Action("Index","LuckySpinPrize")">
+            <i class="fas fa-gift"></i> Vòng quay may mắn
+        </a>
+
+        <a href="@Url.Action("Logout","Account", new { area="" })">
+            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+        </a>
+
+    </div>
+
+
+    <div class="content">
+
+        <div class="topbar mb-4">
+            <h5>Admin Dashboard</h5>
+        </div>
+
+        @RenderBody()
+
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    @RenderSection("scripts", required: false)
+
+</body>
+</html>

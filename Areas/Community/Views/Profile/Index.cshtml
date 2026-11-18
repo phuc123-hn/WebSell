@@ -1,0 +1,186 @@
+﻿@model List<web1.Models.Post>
+
+@{
+    ViewBag.Title = "Trang Cá Nhân";
+    ViewBag.CurrentTab = "profile";
+    Layout = "~/Areas/Community/Views/Shared/_CommunityLayout.cshtml";
+    var user = ViewBag.User as web1.Models.User;
+}
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;">
+                <i class="fas fa-user"></i>
+            </div>
+            <h4 style="color: #333; margin-bottom: 5px;">@user.FullName</h4>
+            <p style="color: #999; margin: 0 0 10px 0;">@user.Username</p>
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                <i class="fas fa-envelope"></i> @user.Email
+            </p>
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                <i class="fas fa-phone"></i> @user.Phone
+            </p>
+            <p style="color: #999; font-size: 12px;">
+                <i class="fas fa-calendar"></i> Tham gia: @user.CreatedAt.ToString("dd/MM/yyyy")
+            </p>
+
+            @if (User.Identity.IsAuthenticated && (int)(Session["UserId"] ?? 0) == user.Id)
+            {
+                <a href="@Url.Action("MyAccount", "AccountProfile", new { area = "" })" class="btn-primary-community" style="margin-top: 15px; display: inline-block;">
+                    <i class="fas fa-cog"></i> Chỉnh Sửa Hồ Sơ
+                </a>
+            }
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <h3 style="margin-bottom: 20px; color: #333;">
+            <i class="fas fa-list"></i> Các Bài Đăng (@(Model != null ? Model.Count : 0))
+        </h3>
+
+        @if (Model != null && Model.Count > 0)
+        {
+            foreach (var post in Model.OrderByDescending(p => p.CreatedAt))
+            {
+                var typeText = post.Type == 0 ? "Đánh Giá" : "Thuê Đồ";
+                var typeClass = post.Type == 0 ? "post-type-review" : "post-type-rent";
+                var likeCount = post.Likes != null ? post.Likes.Count : 0;
+                var commentCount = post.Comments != null ? post.Comments.Where(c => !c.IsDeleted).Count() : 0;
+
+                <div class="post-card">
+                    <div class="post-header">
+                        <div>
+                            <span class="post-type-badge @typeClass">
+                                @if (post.Type == 0)
+                                {
+                                    <i class="fas fa-star"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-tools"></i>
+                                }
+                                @typeText
+                            </span>
+                        </div>
+                        @if (User.Identity.IsAuthenticated && ((int)(Session["UserId"] ?? 0) == user.Id || User.IsInRole("Admin")))
+                        {
+                            <div>
+                                <a href="@Url.Action("Edit", "Post", new { area = "Community", id = post.Id })" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+                                <button onclick="deletePost(@post.Id)" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </button>
+                            </div>
+                        }
+                    </div>
+
+                    <div style="margin-bottom: 10px;">
+                        <span class="post-date">
+                            <i class="fas fa-calendar"></i> @post.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                        </span>
+                    </div>
+
+                    @if (post.Type == 0 && post.Rating.HasValue)
+                    {
+                        <div class="post-rating">
+                            <span class="stars">
+                                @for (int i = 0; i < post.Rating.Value; i++)
+                                {
+                                    <i class="fas fa-star"></i>
+                                }
+                                @for (int i = post.Rating.Value; i < 5; i++)
+                                {
+                                    <i class="far fa-star"></i>
+                                }
+                            </span>
+                            <span style="margin-left: 10px; color: #666;">(@post.Rating/5)</span>
+                        </div>
+                    }
+
+                    <a href="@Url.Action("Detail", "Post", new { area = "Community", id = post.Id })" class="post-title">
+                        @post.Title
+                    </a>
+
+                    @if (!string.IsNullOrEmpty(post.ImageUrl))
+                    {
+                        <div style="margin-bottom: 15px;">
+                            <img src="@post.ImageUrl" style="max-width: 100%; max-height: 250px; border-radius: 8px; border: 1px solid #e0e0e0; object-fit: cover;">
+                        </div>
+                    }
+
+                    <div class="post-content">
+                        @{
+                            var preview = post.Content.Length > 200 ? post.Content.Substring(0, 200) + "..." : post.Content;
+                        }
+                        @Html.Encode(preview)
+                    </div>
+
+                    <div class="post-actions">
+                        <button class="action-btn like-btn" data-post-id="@post.Id" onclick="toggleLike(@post.Id)">
+                            <i class="fas fa-heart"></i>
+                            <span class="like-count">@likeCount</span>
+                        </button>
+
+                        <a href="@Url.Action("Detail", "Post", new { area = "Community", id = post.Id })" class="action-btn">
+                            <i class="fas fa-comment"></i>
+                            <span>@commentCount</span>
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>Chưa có bài đăng</h3>
+                @if (User.Identity.IsAuthenticated && (int)(Session["UserId"] ?? 0) == user.Id)
+                {
+                    <p>Hãy là người đầu tiên đăng bài chia sẻ!</p>
+                    <a href="@Url.Action("Create", "Post", new { area = "Community", type = 0 })" class="btn-primary-community" style="margin-top: 20px;">
+                        <i class="fas fa-plus"></i> Đăng bài đánh giá
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        function toggleLike(postId) {
+            if (!@(User.Identity.IsAuthenticated ? "true" : "false")) {
+                alert('Vui lòng đăng nhập để like');
+                window.location.href = '@Url.Action("Login", "Account", new { area = "" })';
+                return;
+            }
+
+            $.post('@Url.Action("Toggle", "Like", new { area = "Community" })', { postId: postId }, function (result) {
+                if (result.success) {
+                    var btn = $('[data-post-id="' + postId + '"]');
+                    btn.find('.like-count').text(result.likeCount);
+                    if (result.liked) {
+                        btn.addClass('liked');
+                    } else {
+                        btn.removeClass('liked');
+                    }
+                }
+            });
+        }
+
+        function deletePost(postId) {
+            if (confirm('Bạn chắc chắn muốn xóa bài này?')) {
+                $.post('@Url.Action("Delete", "Post", new { area = "Community" })', { id: postId }, function (result) {
+                    if (result.success) {
+                        alert(result.message);
+                        location.reload();
+                    } else {
+                        alert(result.message);
+                    }
+                });
+            }
+        }
+    </script>
+}

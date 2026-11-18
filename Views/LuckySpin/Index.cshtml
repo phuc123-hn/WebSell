@@ -1,0 +1,455 @@
+﻿@{
+    ViewBag.Title = "Vòng Quay May Mắn";
+}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+
+    .luck-spin-header {
+        text-align: center;
+        color: white;
+        margin-bottom: 40px;
+        margin-top: 20px;
+    }
+
+    .luck-spin-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .luck-spin-header p {
+        font-size: 1.2rem;
+        opacity: 0.95;
+    }
+
+    .spin-container {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        max-width: 700px;
+        margin: 0 auto 50px;
+    }
+
+    #spinWheelContainer {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 30px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e7ee 100%);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1) inset;
+    }
+
+    #spinWheelContainer::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 20px solid transparent;
+        border-right: 20px solid transparent;
+        border-top: 40px solid #FF6B6B;
+        z-index: 20;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+
+    #wheelCanvas {
+        display: block;
+        width: 100%;
+        max-width: 480px;
+        height: auto;
+        filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
+        transition: transform 5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    #wheelCanvas.spinning {
+        animation: none;
+    }
+
+    #spinButton {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 4px solid white;
+        background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+        color: white;
+        font-size: 18px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        letter-spacing: 1px;
+    }
+
+    #spinButton:hover:not(:disabled) {
+        transform: translate(-50%, -50%) scale(1.2);
+        box-shadow: 0 8px 28px rgba(255, 107, 107, 0.8);
+    }
+
+    #spinButton:active:not(:disabled) {
+        transform: translate(-50%, -50%) scale(1.15);
+    }
+
+    #spinButton:disabled {
+        background: linear-gradient(135deg, #ccc 0%, #bbb 100%);
+        cursor: not-allowed;
+        opacity: 0.6;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    #resultArea {
+        text-align: center;
+        padding: 30px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e7ee 100%);
+        border-radius: 15px;
+        margin-top: 30px;
+    }
+
+    #prizeTitle {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #FF6B6B;
+        margin-bottom: 15px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    #prizeDescription {
+        font-size: 1.1rem;
+        color: #666;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    #claimButton {
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        border: none;
+        color: white;
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+        margin: 15px 10px;
+    }
+
+    #claimButton:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(39, 174, 96, 0.6);
+    }
+
+    #claimButton:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        border: none;
+        color: white;
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+        text-decoration: none;
+        color: white;
+    }
+
+    .alert {
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 15px;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 2px solid #27ae60;
+    }
+</style>
+
+<div class="luck-spin-header">
+    <h1><i class="fas fa-star"></i> Vòng Quay May Mắn</h1>
+    <p>Quay ngay để nhận voucher hot nhất!</p>
+</div>
+
+<div class="spin-container">
+    <!-- Thêm vào đầu spin-container -->
+    <div class="text-center mb-3">
+        <span class="badge" style="background: #FF6B6B; font-size: 1.1rem; padding: 10px 20px;">
+            <i class="fas fa-dharmachakra"></i> 
+            Lượt quay còn lại: <strong id="spinCountDisplay">@ViewBag.SpinCount</strong>
+        </span>
+    </div>
+
+    <div id="spinWheelContainer">
+        <canvas id="wheelCanvas" width="480" height="480"></canvas>
+        <button id="spinButton">QUAY</button>
+    </div>
+
+    <div id="resultArea" style="display: none;">
+        <h4 id="prizeTitle"></h4>
+        <p id="prizeDescription"></p>
+        <div id="claimArea" style="display: none;">
+            <button id="claimButton" onclick="claimVoucher()">
+                <i class="fas fa-gift"></i> <span id="claimButtonText">Nhận Voucher</span>
+            </button>
+        </div>
+        <button onclick="location.href='/'" class="btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay Lại Trang Chủ
+        </button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    var isSpinning = false;
+    var spinHistoryId = 0;
+    var currentPrize = null;
+    var currentRotation = 0;
+
+    var prizes = [
+        { name: "Chúc bạn may mắn lần sau", color: "#FFD700", rate: 54.3 },
+        { name: "Voucher 5%", color: "#FF6B6B", rate: 12.7 },
+        { name: "Voucher 10%", color: "#4ECDC4", rate: 23 },
+        { name: "Voucher 20%", color: "#95E1D3", rate: 9.99998 },
+        { name: "Quà tặng đặc biệt", color: "#C7CEEA", rate: 0.00002 }
+    ];
+
+    function drawWheel() {
+        var canvas = document.getElementById('wheelCanvas');
+        if (!canvas) return;
+
+        var ctx = canvas.getContext('2d');
+        var centerX = canvas.width / 2;
+        var centerY = canvas.height / 2;
+        var radius = Math.min(centerX, centerY) - 5;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        var currentAngle = 0;
+        var currentAngleDeg = 0;
+        var totalRate = prizes.reduce((sum, p) => sum + p.rate, 0);
+
+        prizes.forEach((prize) => {
+            var sliceAngle = (prize.rate / totalRate) * 2 * Math.PI;
+            var sliceAngleDeg = (prize.rate / totalRate) * 360;
+
+            prize.startAngle = currentAngleDeg;
+            prize.endAngle = currentAngleDeg + sliceAngleDeg;
+
+            ctx.fillStyle = prize.color;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+            ctx.lineTo(centerX, centerY);
+            ctx.fill();
+
+            ctx.strokeStyle = "#fff";
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.fillStyle = "#333";
+            ctx.font = "bold 14px Arial";
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(currentAngle + sliceAngle / 2);
+            ctx.textAlign = "right";
+            ctx.fillText(prize.name, radius - 25, 5);
+            ctx.restore();
+
+            currentAngle += sliceAngle;
+            currentAngleDeg += sliceAngleDeg;
+        });
+
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 40, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.strokeStyle = "#FF6B6B";
+        ctx.lineWidth = 4;
+        ctx.stroke();
+    }
+
+    function animateWheel(finalRotation, duration) {
+        var canvas = document.getElementById('wheelCanvas');
+        var startTime = Date.now();
+        var startRotation = currentRotation;
+
+        function easeOutQuad(t) {
+            return t * (2 - t);
+        }
+
+        function animate() {
+            var elapsed = Date.now() - startTime;
+            var progress = Math.min(elapsed / duration, 1);
+            var easeProgress = easeOutQuad(progress);
+            
+            var rotation = startRotation + (finalRotation - startRotation) * easeProgress;
+            canvas.style.transform = 'rotate(' + rotation + 'deg)';
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                currentRotation = finalRotation;
+                isSpinning = false;
+                showResult(currentPrize);
+            }
+        }
+
+        animate();
+    }
+
+    function spinWheel() {
+        if (isSpinning) {
+            alert('Vui lòng chờ quay hoàn tất');
+            return;
+        }
+
+        if (@ViewBag.SpinCount <= 0) {
+            alert('Bạn không có lượt quay nào. Hãy mua hàng để nhận lượt quay!');
+            return;
+        }
+
+        isSpinning = true;
+        document.getElementById('spinButton').disabled = true;
+        document.getElementById('resultArea').style.display = 'none';
+
+        $.ajax({
+            url: '@Url.Action("Spin", "LuckySpin")',
+            method: 'POST',
+            data: {},
+            success: function (data) {
+                if (data.success) {
+                    spinHistoryId = data.spinHistoryId;
+                    currentPrize = data;
+
+                    var prizeIndex = prizes.findIndex(p => p.name === data.prizeName);
+                    if (prizeIndex === -1) prizeIndex = 0;
+
+                    var wonPrize = prizes[prizeIndex];
+                    var sliceCenter = wonPrize.startAngle + (wonPrize.endAngle - wonPrize.startAngle) / 2;
+
+                    var targetAngle = 270 - sliceCenter;
+                    var spins = 360 * 5;
+
+                    var currentMod = currentRotation % 360;
+                    var targetMod = targetAngle % 360;
+                    if (targetMod < 0) targetMod += 360;
+
+                    var rotationDiff = targetMod - currentMod;
+                    if (rotationDiff < 0) rotationDiff += 360;
+
+                    var finalRotation = currentRotation + spins + rotationDiff;
+
+                    animateWheel(finalRotation, 5000);
+                } else {
+                    alert('Lỗi: ' + data.message);
+                    isSpinning = false;
+                    document.getElementById('spinButton').disabled = false;
+                }
+            },
+            error: function () {
+                alert('Lỗi khi quay');
+                isSpinning = false;
+                document.getElementById('spinButton').disabled = false;
+            }
+        });
+    }
+
+    function showResult(data) {
+        document.getElementById('resultArea').style.display = 'block';
+        document.getElementById('prizeTitle').innerText = data.prizeName;
+        document.getElementById('prizeDescription').innerText = data.message;
+
+        $('#spinCountDisplay').text(data.spinCountLeft);
+        $('#spinCountBadge').text(data.spinCountLeft);
+        
+        if (data.spinCountLeft <= 0) {
+            document.getElementById('spinButton').disabled = true;
+        }
+
+        if (data.prizeType === 'Voucher' && data.wonVoucherCode) {
+            document.getElementById('claimArea').style.display = 'block';
+            document.getElementById('claimButtonText').innerText = 'Nhận ' + data.prizeName;
+            
+            setTimeout(function() {
+                document.getElementById('claimButton').disabled = true;
+                document.getElementById('claimButton').innerHTML = '<i class="fas fa-check-circle"></i> Voucher đã được thêm vào tài khoản';
+                
+                var msg = document.createElement('div');
+                msg.className = 'alert alert-success';
+                msg.innerHTML = '<i class="fas fa-check-circle"></i> Voucher: <strong>' + data.wonVoucherCode + '</strong> đã được thêm vào tài khoản của bạn!';
+                document.getElementById('claimArea').appendChild(msg);
+            }, 1000);
+        } else {
+            document.getElementById('claimArea').style.display = 'none';
+        }
+    }
+
+    function claimVoucher() {
+        if (!spinHistoryId) {
+            alert('Lỗi: Không tìm thấy dữ liệu quay');
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("ClaimVoucher", "LuckySpin")',
+            method: 'POST',
+            data: { spinHistoryId: spinHistoryId },
+            success: function (data) {
+                if (data.success) {
+                    document.getElementById('claimButton').disabled = true;
+                    document.getElementById('claimButton').innerHTML = '<i class="fas fa-check-circle"></i> Voucher đã được thêm vào tài khoản';
+                    
+                    var msg = document.createElement('div');
+                    msg.className = 'alert alert-success';
+                    msg.innerHTML = '<i class="fas fa-check-circle"></i> ' + data.message;
+                    document.getElementById('claimArea').appendChild(msg);
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            },
+            error: function () {
+                alert('Lỗi kết nối');
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        drawWheel();
+        document.getElementById('spinButton').addEventListener('click', spinWheel);
+    });
+</script>

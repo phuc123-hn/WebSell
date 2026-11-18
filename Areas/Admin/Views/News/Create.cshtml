@@ -1,0 +1,65 @@
+@model web1.Models.News
+
+@{
+    ViewBag.Title = "Thêm tin t?c - Admin";
+}
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h2>Thêm tin t?c m?i</h2>
+
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <div class="card">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Tiêu ??</label>
+                        @Html.TextBoxFor(m => m.Title, new { @class = "form-control", placeholder = "Nh?p tiêu ?? tin t?c" })
+                        @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Danh m?c</label>
+                        @Html.DropDownListFor(m => m.Category, 
+                            ViewBag.Categories as List<string> != null 
+                                ? new SelectList(ViewBag.Categories as List<string>, "")
+                                : new SelectList(new[] { "Technology", "Defense" }, ""),
+                            "-- Ch?n danh m?c --",
+                            new { @class = "form-select" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tóm t?t</label>
+                        @Html.TextBoxFor(m => m.Summary, new { @class = "form-control", placeholder = "Nh?p tóm t?t ng?n" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">N?i dung</label>
+                        @Html.TextAreaFor(m => m.Content, new { @class = "form-control", rows = 10, placeholder = "Nh?p n?i dung tin t?c" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Link ?nh</label>
+                        @Html.TextBoxFor(m => m.ImageUrl, new { @class = "form-control", placeholder = "~/Content/Images/news.jpg" })
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-check-input" })
+                            <label class="form-check-label" for="IsActive">Kích ho?t (hi?n th? trên trang ch?)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> L?u
+                    </button>
+                    <a href="@Url.Action("Index", "News", new { area = "Admin" })" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> H?y
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

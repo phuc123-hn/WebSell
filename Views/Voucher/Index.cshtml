@@ -1,0 +1,205 @@
+﻿@model List<web1.Models.Voucher>
+
+@{
+    ViewBag.Title = "Săn vé giảm giá - TechWorld";
+}
+
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-ticket-alt"></i> Vé Giảm Giá</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="@Url.Action("Events", "Voucher")" class="btn btn-info">
+                <i class="fas fa-calendar"></i> Xem Sự Kiện
+            </a>
+        </div>
+    </div>
+
+    <!-- Kiểm tra mã giảm giá -->
+    <div class="card card-enhanced mb-4">
+        <div class="card-header card-header-primary">
+            <h5 class="mb-0"><i class="fas fa-search"></i> Kiểm Tra Mã Giảm Giá</h5>
+        </div>
+        <div class="card-body">
+            <div class="input-group input-group-lg">
+                <input type="text" id="voucherCode" class="form-control" placeholder="Nhập mã giảm giá..." maxlength="50">
+                <button class="btn btn-primary" type="button" onclick="validateVoucher()">
+                    <i class="fas fa-check-circle"></i> Kiểm Tra
+                </button>
+            </div>
+            <div id="voucherResult" class="mt-3"></div>
+        </div>
+    </div>
+
+    <!-- Danh sách voucher -->
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="row">
+            @foreach (var voucher in Model)
+            {
+                var remainingQuantity = voucher.Quantity > 0 ? (voucher.Quantity - voucher.UsedQuantity) : -1;
+                var percentUsed = voucher.Quantity > 0 ? Math.Round((double)voucher.UsedQuantity / voucher.Quantity * 100) : 0;
+                var daysLeft = (voucher.EndDate - DateTime.Now).Days;
+                var isLimited = remainingQuantity == -1 ? "Không giới hạn" : remainingQuantity + " vé";
+
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-2 @(daysLeft <= 3 ? "border-danger" : "border-success")" style="transition: transform 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h5 class="card-title mb-1">@voucher.Name</h5>
+                                    <code class="text-primary" style="font-size: 1.2rem; font-weight: bold;">@voucher.Code</code>
+                                </div>
+                                @if (voucher.DiscountPercent > 0)
+                                {
+                                    <span class="badge bg-danger" style="font-size: 1rem;">-@voucher.DiscountPercent%</span>
+                                }
+                                else if (voucher.DiscountAmount > 0)
+                                {
+                                    <span class="badge bg-danger" style="font-size: 1rem;">-@voucher.DiscountAmount.ToString("N0") đ</span>
+                                }
+                            </div>
+
+                            <p class="card-text text-muted">@voucher.Description</p>
+
+                            @if (voucher.MinOrderAmount > 0)
+                            {
+                                <p class="text-sm mb-2">
+                                    <i class="fas fa-info-circle"></i> Đơn tối thiểu: <strong>@voucher.MinOrderAmount.ToString("N0") đ</strong>
+                                </p>
+                            }
+
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <small class="text-muted">Còn lại: <strong>@isLimited</strong></small>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <small class="text-muted">
+                                        @if (daysLeft > 0)
+                                        {
+                                            <span>Còn @daysLeft ngày</span>
+                                        }
+                                        else if (daysLeft == 0)
+                                        {
+                                            <span class="text-danger">Hôm nay hết hạn</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger">Đã hết hạn</span>
+                                        }
+                                    </small>
+                                </div>
+                            </div>
+
+                            @if (voucher.Quantity > 0)
+                            {
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar @(percentUsed > 80 ? "bg-danger" : "bg-success")" role="progressbar" style="width: @(percentUsed + "%")"></div>
+                                </div>
+                                <small class="text-muted">@voucher.UsedQuantity / @voucher.Quantity đã sử dụng</small>
+                            }
+
+                            @if (voucher.EventId.HasValue && voucher.Event != null)
+                            {
+                                <p class="mt-2 mb-0">
+                                    <small class="badge bg-info">Sự kiện: @voucher.Event.Name</small>
+                                </p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <strong>Không có voucher nào đang hoạt động!</strong>
+            <p class="mt-2">Hãy <a href="@Url.Action("Events", "Voucher")">xem sự kiện</a> để biết về các voucher sắp tới.</p>
+        </div>
+    }
+</div>
+
+<style>
+    /* Loại bỏ màu nền trắng của code và thay bằng style Tech */
+    code {
+        background-color: var(--bg-tertiary);
+        color: var(--color-cyan) !important;
+        padding: 4px 10px;
+        border-radius: 4px;
+        border: 1px solid var(--border-color);
+        display: inline-block;
+    }
+
+    /* Sửa ô input để không bị trắng xóa */
+    #voucherCode {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+    }
+
+    /* Hiệu ứng hover cho card voucher */
+    .card.h-100 {
+        background: var(--bg-card);
+        border-width: 1px !important; /* Giảm độ dày border cho tinh tế */
+    }
+
+    /* Sửa màu text cho label nhỏ */
+    .text-sm strong {
+        color: var(--color-cyan);
+    }
+
+    /* Progress bar nền tối */
+    .progress {
+        background-color: var(--bg-tertiary);
+        overflow: hidden;
+    }
+</style>
+
+<script>
+    function validateVoucher() {
+        var code = document.getElementById('voucherCode').value;
+        var resultDiv = document.getElementById('voucherResult');
+
+        if (!code) {
+            resultDiv.innerHTML = '<div class="alert alert-warning">Vui lòng nhập mã giảm giá!</div>';
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("ValidateCode", "Voucher")',
+            method: 'POST',
+            data: { code: code },
+            success: function (response) {
+                if (response.success) {
+                    var html = '<div class="alert alert-success"><strong><i class="fas fa-check-circle"></i> Mã hợp lệ!</strong><br>';
+                    html += 'Tên: ' + response.voucher.name + '<br>';
+                    if (response.voucher.discountPercent > 0) {
+                        html += 'Giảm: <strong>' + response.voucher.discountPercent + '%</strong><br>';
+                    } else {
+                        html += 'Giảm: <strong>' + response.voucher.discountAmount.toLocaleString('vi-VN') + ' đ</strong><br>';
+                    }
+                    if (response.voucher.minOrderAmount > 0) {
+                        html += 'Đơn tối thiểu: ' + response.voucher.minOrderAmount.toLocaleString('vi-VN') + ' đ<br>';
+                    }
+                    html += '</div>';
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = '<div class="alert alert-danger"><strong><i class="fas fa-times-circle"></i> Lỗi!</strong><br>' + response.message + '</div>';
+                }
+            },
+            error: function () {
+                resultDiv.innerHTML = '<div class="alert alert-danger">Lỗi kết nối!</div>';
+            }
+        });
+    }
+
+    // Cho phép Enter để kiểm tra
+    document.getElementById('voucherCode').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            validateVoucher();
+        }
+    });
+</script>

@@ -1,0 +1,221 @@
+﻿@{
+    ViewBag.Title = "Xác Minh OTP - Đăng Ký";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-mobile-alt" style="font-size: 48px; color: #007bff;"></i>
+                        <h2 class="mt-3">Xác Minh OTP</h2>
+                        <p class="text-muted">Nhập mã OTP đã gửi đến email của bạn</p>
+                    </div>
+
+                    @if (TempData["RateLimitError"] != null)
+                    {
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            <i class="fas fa-clock"></i> @TempData["RateLimitError"]
+                            @if (TempData["RateLimitRetryAfter"] != null)
+                            {
+                                <span> Tự động cho phép sau <strong id="rateLimitCountdown">@TempData["RateLimitRetryAfter"]</strong>s</span>
+                            }
+                            <button type="button" class="close" data-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(ViewBag.Error))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle"></i> @ViewBag.Error
+                            <button type="button" class="close" data-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(ViewBag.Message))
+                    {
+                        <div class="alert alert-info alert-dismissible fade show" role="alert">
+                            <i class="fas fa-info-circle"></i> @ViewBag.Message
+                            <button type="button" class="close" data-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="alert alert-light border" style="text-align: center;">
+                        <strong>Email:</strong>
+                        <p class="mb-0" id="emailDisplay" style="font-size: 18px; color: #007bff;">
+                            @(ViewBag.Email ?? "")
+                        </p>
+                    </div>
+
+                    <form method="post" action="@Url.Action("VerifyOtpRegister", "Account")" id="otpForm">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" name="email" value="@ViewBag.Email" />
+
+                        <div class="form-group mb-4">
+                            <label for="otpCode">
+                                <i class="fas fa-key"></i> Mã OTP (6 chữ số)
+                            </label>
+                            <input type="text"
+                                   class="form-control form-control-lg text-center"
+                                   id="otpCode"
+                                   name="otp"
+                                   maxlength="6"
+                                   inputmode="numeric"
+                                   placeholder="000000"
+                                   autocomplete="one-time-code"
+                                   required
+                                   style="font-size: 24px; letter-spacing: 8px;" />
+                            <small class="form-text text-muted">
+                                Chỉ nhập các chữ số, không có khoảng trắng
+                            </small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block btn-lg" id="verifyBtn">
+                            <i class="fas fa-check-circle"></i> Xác Minh OTP
+                        </button>
+                    </form>
+
+                    <hr />
+
+                    <div class="text-center">
+                        <p class="mb-2">Chưa nhận được mã?</p>
+                        <button type="button" class="btn btn-outline-secondary" id="resendBtn" onclick="resendOtp()">
+                            <i class="fas fa-redo"></i> Gửi Lại Mã OTP
+                        </button>
+                        <div id="cooldownTimer" style="margin-top: 10px; display: none;">
+                            <p class="text-muted">
+                                Vui lòng chờ <strong id="countdown">60</strong>s trước khi gửi lại
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; text-align: center;">
+                        <a href="@Url.Action("Register", "Account")" class="text-muted">
+                            <i class="fas fa-arrow-left"></i> Quay lại đăng ký
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-3">
+                <i class="fas fa-shield-alt"></i>
+                <strong>Bảo Mật:</strong>
+                <ul class="mb-0 mt-2">
+                    <li>Mã OTP có hiệu lực trong 5 phút</li>
+                    <li>Tối đa 3 lần nhập sai, sau đó phải yêu cầu mã mới</li>
+                    <li>Không bao giờ chia sẻ mã OTP với ai</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+var resendCooldown = 60;
+var resendTimer = null;
+
+$(document).ready(function() {
+    // Auto-focus OTP input
+    $('#otpCode').focus();
+
+    // Only allow numbers
+    $('#otpCode').on('keypress', function(e) {
+        if (!/[0-9]/.test(e.key)) {
+            e.preventDefault();
+        }
+    });
+
+    // Form submission
+    $('#otpForm').on('submit', function() {
+        $('#verifyBtn').prop('disabled', true)
+            .html('<i class="fas fa-spinner fa-spin"></i> Đang xác minh...');
+    });
+
+    // Handle RateLimit countdown
+    var el = document.getElementById('rateLimitCountdown');
+    if (el) {
+        var s = parseInt(el.textContent);
+        var t = setInterval(function () {
+            s--;
+            el.textContent = s;
+            if (s <= 0) {
+                clearInterval(t);
+                document.querySelector('button[type=submit]').disabled = false;
+                el.closest('.alert').innerHTML = '<i class="fas fa-check"></i> Bạn có thể thử lại.';
+            }
+        }, 1000);
+        document.querySelector('button[type=submit]').disabled = true;
+    }
+});
+
+function resendOtp() {
+    var email = '@ViewBag.Email';
+
+    $.ajax({
+        url: '@Url.Action("SendOtpRegister", "Account")',
+        type: 'POST',
+        data: {
+            email: email,
+            __RequestVerificationToken: $('[name=__RequestVerificationToken]').val()
+        },
+        success: function(response) {
+            if (response.success) {
+                var alert = $('<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                    '<i class="fas fa-check-circle"></i> Mã OTP mới đã được gửi!' +
+                    '<button type="button" class="close" data-dismiss="alert"></button>' +
+                    '</div>');
+                $('form').before(alert);
+                startCooldown(60);
+                $('#otpCode').val('').focus();
+            } else {
+                if (response.retryAfter && response.retryAfter > 0) {
+                    startCooldown(response.retryAfter);
+                    var alert = $('<div class="alert alert-warning alert-dismissible fade show" role="alert">' +
+                        '<i class="fas fa-clock"></i> ' + response.message +
+                        '<button type="button" class="close" data-dismiss="alert"></button>' +
+                        '</div>');
+                    $('form').before(alert);
+                } else {
+                    var alert = $('<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                        '<i class="fas fa-exclamation-circle"></i> ' + (response.message || 'Lỗi gửi OTP') +
+                        '<button type="button" class="close" data-dismiss="alert"></button>' +
+                        '</div>');
+                    $('form').before(alert);
+                }
+            }
+        },
+        error: function() {
+            var alert = $('<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                '<i class="fas fa-exclamation-circle"></i> Lỗi kết nối, vui lòng thử lại' +
+                '<button type="button" class="close" data-dismiss="alert"></button>' +
+                '</div>');
+            $('form').before(alert);
+        }
+    });
+}
+
+function startCooldown(seconds) {
+    resendCooldown = seconds;
+    $('#resendBtn').prop('disabled', true);
+    $('#resendBtn').html('<i class="fas fa-clock"></i> Gửi lại sau ' + resendCooldown + 's');
+    $('#cooldownTimer').show();
+
+    clearInterval(resendTimer);
+    resendTimer = setInterval(function() {
+        resendCooldown--;
+        $('#countdown').text(resendCooldown);
+        $('#resendBtn').html('<i class="fas fa-clock"></i> Gửi lại sau ' + resendCooldown + 's');
+
+        if (resendCooldown <= 0) {
+            clearInterval(resendTimer);
+            $('#resendBtn').prop('disabled', false);
+            $('#resendBtn').html('<i class="fas fa-redo"></i> Gửi Lại Mã OTP');
+            $('#cooldownTimer').hide();
+        }
+    }, 1000);
+}
+    </script>
+}

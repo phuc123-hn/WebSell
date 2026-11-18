@@ -1,0 +1,134 @@
+﻿@model web1.Models.Post
+
+@{
+    ViewBag.Title = "Chỉnh Sửa Bài Đăng";
+    Layout = "~/Areas/Community/Views/Shared/_CommunityLayout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <h2 style="color: #667eea; margin-bottom: 30px;">
+                <i class="fas fa-edit"></i> @ViewBag.Title
+            </h2>
+
+            @using (Html.BeginForm("Edit", "Post", new { area = "Community" }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.Id)
+                @Html.HiddenFor(m => m.Type)
+                @Html.HiddenFor(m => m.UserId)
+                @Html.HiddenFor(m => m.CreatedAt)
+
+                <div class="form-group">
+                    <label for="Title" style="font-weight: 600; color: #333;">Tiêu Đề</label>
+                    @Html.TextBoxFor(m => m.Title, new { @class = "form-control", placeholder = "Nhập tiêu đề bài đăng", maxlength = 255 })
+                    @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    <label for="Content" style="font-weight: 600; color: #333;">Nội Dung</label>
+                    @Html.TextAreaFor(m => m.Content, new { @class = "form-control", placeholder = "Nhập nội dung bài đăng...", rows = 8, maxlength = 5000 })
+                    @Html.ValidationMessageFor(m => m.Content, "", new { @class = "text-danger" })
+                    <small class="form-text text-muted">Tối đa 5000 ký tự</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="ImageUrl" style="font-weight: 600; color: #333;">
+                        <i class="fas fa-image"></i> Hình Ảnh Sản Phẩm
+                    </label>
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.ImageUrl, new { @class = "form-control", placeholder = "Nhập URL ảnh hoặc tải lên", id = "imageUrlInput" })
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-primary" type="button" onclick="document.getElementById('imageFileInput').click()">
+                                <i class="fas fa-upload"></i> Tải Lên
+                            </button>
+                        </div>
+                    </div>
+                    <input type="file" id="imageFileInput" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+                    <small class="form-text text-muted">JPG, PNG, GIF | Tối đa 5MB</small>
+                </div>
+
+                <div class="form-group" id="imagePreviewContainer">
+                    <label style="font-weight: 600; color: #333;">Xem Trước Ảnh</label>
+                    <img id="imagePreview" style="max-width: 300px; max-height: 300px; border-radius: 8px; border: 1px solid #ddd; padding: 5px;">
+                </div>
+
+                if (Model.Type == 0)
+                {
+                    <div class="form-group">
+                        <label for="Rating" style="font-weight: 600; color: #333;">Đánh Giá (Sao)</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            @{
+                                for (int i = 1; i <= 5; i++)
+                                {
+                                    <label style="margin: 0; cursor: pointer;">
+                                        <input type="radio" name="Rating" value="@i" @(Model.Rating == i ? "checked" : "") style="margin-right: 5px;" />
+                                        <i class="fas fa-star" style="color: #ffc107; font-size: 20px;"></i>
+                                    </label>
+                                }
+                            }
+                        </div>
+                        @Html.ValidationMessageFor(m => m.Rating, "", new { @class = "text-danger" })
+                    </div>
+                }
+
+                <div class="alert alert-info" style="margin-top: 20px;">
+                    <i class="fas fa-info-circle"></i>
+                    <small>Bài sửa đổi lần cuối: @(Model.UpdatedAt.HasValue ? Model.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm") : "Chưa sửa")</small>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: space-between; margin-top: 30px;">
+                    <a href="@Url.Action("Detail", "Post", new { area = "Community", id = Model.Id })" class="btn btn-secondary" style="padding: 12px 30px; border-radius: 25px;">
+                        <i class="fas fa-arrow-left"></i> Hủy
+                    </a>
+                    <button type="submit" class="btn-primary-community" style="padding: 12px 30px;">
+                        <i class="fas fa-check"></i> Cập Nhật
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    function handleImageUpload(event) {
+        var file = event.target.files[0];
+        
+        if (!file) return;
+
+        if (!file.type.match('image.*')) {
+            alert('❌ Vui lòng chọn file ảnh!');
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert('❌ Kích thước ảnh phải nhỏ hơn 5MB!');
+            return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('imageUrlInput').value = e.target.result;
+            document.getElementById('imagePreview').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var imageUrl = document.getElementById('imageUrlInput').value;
+        if (imageUrl) {
+            document.getElementById('imagePreview').src = imageUrl;
+        }
+    });
+
+    document.getElementById('imageUrlInput').addEventListener('change', function() {
+        var url = this.value.trim();
+        if (url) {
+            document.getElementById('imagePreview').src = url;
+            document.getElementById('imagePreview').onerror = function() {
+                this.src = '';
+            };
+        }
+    });
+</script>

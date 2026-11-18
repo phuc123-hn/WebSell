@@ -1,0 +1,98 @@
+﻿@model web1.Models.Order
+
+@{
+    ViewBag.Title = "Hủy đơn hàng - Admin";
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2>Hủy đơn hàng #@Model.Id</h2>
+    </div>
+    <div class="col-md-6 text-right">
+        <a href="@Url.Action("Details", "Order", new { area = "Admin", id = Model.Id })" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+<div class="alert alert-danger" role="alert">
+    <strong><i class="fas fa-exclamation-triangle"></i> Cảnh báo!</strong> Bạn sắp hủy đơn hàng này. Số lượng sản phẩm sẽ được hoàn lại vào kho. Hành động này không thể hoàn tác.
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-times"></i> Thông tin đơn hàng cần hủy</h5>
+            </div>
+            <div class="card-body" style="color:yellow">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong>Mã đơn hàng:</strong> #@Model.Id</p>
+                        <p><strong>Khách hàng:</strong> @Model.User.FullName</p>
+                        <p><strong>Ngày đặt:</strong> @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Trạng thái:</strong> <span class="badge bg-warning">@Model.Status</span></p>
+                        <p><strong>Tổng tiền:</strong> <strong style="color: #667eea;">@Model.TotalAmount.ToString("N0") đ</strong></p>
+                        <p><strong>Phương thức thanh toán:</strong> @Model.PaymentMethod</p>
+                    </div>
+                </div>
+
+                <hr />
+
+                <h6>Sản phẩm trong đơn hàng:</h6>
+                @if (Model.OrderDetails != null && Model.OrderDetails.Count > 0)
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>Số lượng</th>
+                                    <th>Giá</th>
+                                    <th>Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var detail in Model.OrderDetails)
+                                {
+                                    <tr>
+                                        <td>@detail.Product.Name</td>
+                                        <td>@detail.Quantity</td>
+                                        <td>@detail.UnitPrice.ToString("N0") đ</td>
+                                        <td><strong>@detail.TotalPrice.ToString("N0") đ</strong></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                <div class="alert alert-info mt-3">
+                    <strong><i class="fas fa-info-circle"></i> Lưu ý:</strong>
+                    <ul class="mb-0">
+                        <li>Tất cả sản phẩm sẽ được hoàn lại vào kho hàng</li>
+                        <li>Khách hàng sẽ được thông báo về việc hủy đơn</li>
+                        <li>Nếu khách đã thanh toán, cần hoàn lại tiền theo quy trình</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            @using (Html.BeginForm("Cancel", "Order", new { area = "Admin" }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.Id)
+
+                <button type="submit" class="btn btn-danger btn-lg">
+                    <i class="fas fa-trash"></i> Xác nhận hủy đơn hàng
+                </button>
+                <a href="@Url.Action("Details", "Order", new { area = "Admin", id = Model.Id })" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times"></i> Không hủy
+                </a>
+            }
+        </div>
+    </div>
+</div>

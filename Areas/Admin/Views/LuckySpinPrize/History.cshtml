@@ -1,0 +1,92 @@
+﻿@model List<web1.Models.LuckySpinHistory>
+
+@{
+    ViewBag.Title = "Lịch sử quay - Admin";
+    var groupedByUser = Model
+        .GroupBy(h => new { h.UserId, h.User.FullName, h.User.Email })
+        .OrderByDescending(g => g.Max(h => h.SpinDate))
+        .ToList();
+}
+
+<div class="row mb-3">
+    <div class="col-md-8">
+        <h2 style="color: #FFD700;">Lịch sử Quay May Mắn</h2>
+    </div>
+    <div class="col-md-4 text-right">
+        <a href="@Url.Action("Index", "LuckySpinPrize", new { area = "Admin" })" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại quản lý
+        </a>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th style="color: #FFD700; width: 5%;">ID</th>
+                <th style="color: #FFD700; width: 15%;">Khách hàng</th>
+                <th style="color: #FFD700; width: 10%;">Email</th>
+                <th style="color: #FFD700; width: 8%;">Lần quay</th>
+                <th style="color: #FFD700; width: 12%;">Quay gần nhất</th>
+                <th style="color: #FFD700; width: 20%;">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (groupedByUser != null && groupedByUser.Count > 0)
+            {
+                int index = 1;
+                foreach (var group in groupedByUser)
+                {
+                    var lastSpinDate = group.Max(h => h.SpinDate);
+                    var totalSpins = group.Count();
+
+                    <tr style="color: #FFD700;">
+                        <td>@index</td>
+                        <td>
+                            <strong>@group.Key.FullName</strong>
+                        </td>
+                        <td>
+                            <small>@group.Key.Email</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">@totalSpins</span>
+                        </td>
+                        <td>
+                            @lastSpinDate.ToString("dd/MM/yyyy HH:mm")
+                        </td>
+                        <td>
+                            <a href="@Url.Action("UserSpinDetail", "LuckySpinPrize", new { area = "Admin", userId = group.Key.UserId })" 
+                               class="btn btn-sm btn-primary">
+                                <i class="fas fa-eye"></i> Xem chi tiết
+                            </a>
+                        </td>
+                    </tr>
+                    index++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center" style="color: #FFD700;">Chưa có lịch sử quay</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .table {
+        background: #1e293b;
+    }
+
+    .table td, .table th {
+        border-color: #334155;
+    }
+</style>

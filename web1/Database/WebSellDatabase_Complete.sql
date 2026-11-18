@@ -1,0 +1,1978 @@
+/*
+================================================================================
+WEBSELL - E-COMMERCE SYSTEM
+SQL Database Script (Complete)
+Target: SQL Server
+Version: 1.0
+Created: 2024
+================================================================================
+
+STRUCTURE:
+1. CREATE TABLES (Schema & Constraints)
+2. INSERT SAMPLE DATA
+3. CREATE VIEWS
+4. CREATE STORED PROCEDURES
+5. CREATE FUNCTIONS
+6. CREATE TRIGGERS & TRANSACTIONS
+7. CREATE USER & PERMISSIONS
+================================================================================
+*/
+
+-- ============================================================================
+-- PART 1: CREATE DATABASE & TABLES
+-- ============================================================================
+
+-- Create Database (If Not Exists)
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'WebSellDB')
+BEGIN
+    CREATE DATABASE WebSellDB
+END
+GO
+
+USE WebSellDB
+GO
+
+-- ============================================================================
+-- 1.1: Category Table
+-- ============================================================================
+IF OBJECT_ID('dbo.Categories', 'U') IS NOT NULL
+    DROP TABLE dbo.Categories
+GO
+
+CREATE TABLE dbo.Categories
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    [Name] NVARCHAR(100) NOT NULL UNIQUE,
+    [Type] NVARCHAR(50),
+    [Description] NVARCHAR(500),
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME,
+    IsActive BIT DEFAULT 1
+)
+GO
+
+-- ============================================================================
+-- 1.2: Users Table
+-- ============================================================================
+IF OBJECT_ID('dbo.Users', 'U') IS NOT NULL
+    DROP TABLE dbo.Users
+GO
+
+CREATE TABLE dbo.Users
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Username NVARCHAR(50) NOT NULL UNIQUE,
+    Email NVARCHAR(255) NOT NULL UNIQUE,
+    Phone NVARCHAR(20) NOT NULL,
+    FullName NVARCHAR(100) NOT NULL,
+    PasswordHash NVARCHAR(255) NOT NULL,
+    [Role] NVARCHAR(20) DEFAULT 'Customer', -- Customer, Admin, Moderator
+    IsVerified BIT DEFAULT 0,
+    OTP NVARCHAR(10),
+    OTPExpire DATETIME,
+    SpinCount INT DEFAULT 0,
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME,
+    IsActive BIT DEFAULT 1,
+    CONSTRAINT CK_PhoneFormat CHECK (Phone LIKE '0[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_Users_Email ON dbo.Users(Email)
+CREATE NONCLUSTERED INDEX IX_Users_Username ON dbo.Users(Username)
+CREATE NONCLUSTERED INDEX IX_Users_Role ON dbo.Users([Role])
+GO
+
+-- ============================================================================
+-- 1.3: Products Table
+-- ============================================================================
+IF OBJECT_ID('dbo.Products', 'U') IS NOT NULL
+    DROP TABLE dbo.Products
+GO
+
+CREATE TABLE dbo.Products
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    [Name] NVARCHAR(200) NOT NULL,
+    CategoryId INT NOT NULL,
+    Price DECIMAL(18,2) NOT NULL,
+    [Description] NVARCHAR(2000),
+    ImageUrl NVARCHAR(500),
+    Stock INT DEFAULT 0,
+    IsHot BIT DEFAULT 0,
+    Rating DECIMAL(3,2) DEFAULT 0,
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME,
+    IsActive BIT DEFAULT 1,
+    CONSTRAINT FK_Products_Categories FOREIGN KEY (CategoryId) REFERENCES dbo.Categories(Id) ON DELETE CASCADE,
+    CONSTRAINT CK_ProductPrice CHECK (Price > 0),
+    CONSTRAINT CK_ProductStock CHECK (Stock >= 0)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_Products_CategoryId ON dbo.Products(CategoryId)
+CREATE NONCLUSTERED INDEX IX_Products_IsHot ON dbo.Products(IsHot)
+CREATE NONCLUSTERED INDEX IX_Products_Name ON dbo.Products([Name])
+GO
+
+-- ============================================================================
+-- 1.4: Orders Table
+-- ============================================================================
+IF OBJECT_ID('dbo.Orders', 'U') IS NOT NULL
+    DROP TABLE dbo.Orders
+GO
+
+CREATE TABLE dbo.Orders
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    UserId INT NOT NULL,
+    OrderDate DATETIME DEFAULT GETUTCDATE(),
+    ShippingName NVARCHAR(100),
+    ShippingPhone NVARCHAR(20),
+    ShippingAddress NVARCHAR(500),
+    TotalAmount DECIMAL(18,2) NOT NULL,
+    TotalVoucherDiscount DECIMAL(18,2) DEFAULT 0,
+    [Status] NVARCHAR(50) DEFAULT 'Pending', -- Pending, Processing, Shipped, Delivered, Cancelled
+    PaymentMethod NVARCHAR(50) DEFAULT 'COD', -- COD, VNPay, BankTransfer
+    IsPaid BIT DEFAULT 0,
+    AppliedVoucherCodes NVARCHAR(500),
+    Notes NVARCHAR(1000),
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME,
+    CONSTRAINT FK_Orders_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id),
+    CONSTRAINT CK_OrderAmount CHECK (TotalAmount >= 0)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_Orders_UserId ON dbo.Orders(UserId)
+CREATE NONCLUSTERED INDEX IX_Orders_Status ON dbo.Orders([Status])
+CREATE NONCLUSTERED INDEX IX_Orders_OrderDate ON dbo.Orders(OrderDate DESC)
+GO
+
+-- ============================================================================
+-- 1.5: OrderDetails Table
+-- ============================================================================
+IF OBJECT_ID('dbo.OrderDetails', 'U') IS NOT NULL
+    DROP TABLE dbo.OrderDetails
+GO
+
+CREATE TABLE dbo.OrderDetails
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    OrderId INT NOT NULL,
+    ProductId INT NOT NULL,
+    Quantity INT NOT NULL,
+    UnitPrice DECIMAL(18,2) NOT NULL,
+    TotalPrice DECIMAL(18,2) NOT NULL,
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    CONSTRAINT FK_OrderDetails_Orders FOREIGN KEY (OrderId) REFERENCES dbo.Orders(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_OrderDetails_Products FOREIGN KEY (ProductId) REFERENCES dbo.Products(Id),
+    CONSTRAINT CK_OrderDetailQuantity CHECK (Quantity > 0),
+    CONSTRAINT CK_OrderDetailPrice CHECK (TotalPrice > 0)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_OrderDetails_OrderId ON dbo.OrderDetails(OrderId)
+CREATE NONCLUSTERED INDEX IX_OrderDetails_ProductId ON dbo.OrderDetails(ProductId)
+GO
+
+-- ============================================================================
+-- 1.6: Events Table
+-- ============================================================================
+IF OBJECT_ID('dbo.Events', 'U') IS NOT NULL
+    DROP TABLE dbo.Events
+GO
+
+CREATE TABLE dbo.Events
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    [Name] NVARCHAR(255) NOT NULL,
+    [Description] NVARCHAR(1000),
+    StartDate DATETIME NOT NULL,
+    EndDate DATETIME NOT NULL,
+    ImageUrl NVARCHAR(1000),
+    IsActive BIT DEFAULT 1,
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME,
+    CONSTRAINT CK_EventDates CHECK (StartDate < EndDate)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_Events_StartDate ON dbo.Events(StartDate)
+CREATE NONCLUSTERED INDEX IX_Events_EndDate ON dbo.Events(EndDate)
+GO
+
+-- ============================================================================
+-- 1.7: Vouchers Table
+-- ============================================================================
+IF OBJECT_ID('dbo.Vouchers', 'U') IS NOT NULL
+    DROP TABLE dbo.Vouchers
+GO
+
+CREATE TABLE dbo.Vouchers
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Code NVARCHAR(50) NOT NULL UNIQUE,
+    [Name] NVARCHAR(255) NOT NULL,
+    [Description] NVARCHAR(500),
+    DiscountPercent DECIMAL(5,2) DEFAULT 0,
+    DiscountAmount DECIMAL(18,2) DEFAULT 0,
+    StartDate DATETIME NOT NULL,
+    EndDate DATETIME NOT NULL,
+    Quantity INT DEFAULT 0, -- 0 = unlimited
+    UsedQuantity INT DEFAULT 0,
+    MinOrderAmount DECIMAL(18,2) DEFAULT 0,
+    IsPrivate BIT DEFAULT 0,
+    OwnerUserId INT,
+    EventId INT,
+    IsLuckySpinVoucher BIT DEFAULT 0,
+    RequireEventParticipation BIT DEFAULT 0,
+    IsActive BIT DEFAULT 1,
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME,
+    CONSTRAINT FK_Vouchers_Events FOREIGN KEY (EventId) REFERENCES dbo.Events(Id),
+    CONSTRAINT FK_Vouchers_Users FOREIGN KEY (OwnerUserId) REFERENCES dbo.Users(Id),
+    CONSTRAINT CK_VoucherDates CHECK (StartDate < EndDate),
+    CONSTRAINT CK_VoucherDiscount CHECK ((DiscountPercent BETWEEN 0 AND 100) OR DiscountAmount > 0)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_Vouchers_Code ON dbo.Vouchers(Code)
+CREATE NONCLUSTERED INDEX IX_Vouchers_IsActive ON dbo.Vouchers(IsActive)
+CREATE NONCLUSTERED INDEX IX_Vouchers_EndDate ON dbo.Vouchers(EndDate)
+GO
+
+-- ============================================================================
+-- 1.8: VoucherUsages Table
+-- ============================================================================
+IF OBJECT_ID('dbo.VoucherUsages', 'U') IS NOT NULL
+    DROP TABLE dbo.VoucherUsages
+GO
+
+CREATE TABLE dbo.VoucherUsages
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    VoucherId INT NOT NULL,
+    UserId INT NOT NULL,
+    OrderId INT NOT NULL,
+    UsedAt DATETIME DEFAULT GETUTCDATE(),
+    Notes NVARCHAR(500),
+    CONSTRAINT FK_VoucherUsages_Vouchers FOREIGN KEY (VoucherId) REFERENCES dbo.Vouchers(Id),
+    CONSTRAINT FK_VoucherUsages_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id),
+    CONSTRAINT FK_VoucherUsages_Orders FOREIGN KEY (OrderId) REFERENCES dbo.Orders(Id),
+    CONSTRAINT UQ_VoucherUsage_User_Voucher UNIQUE (VoucherId, UserId, OrderId)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_VoucherUsages_VoucherId ON dbo.VoucherUsages(VoucherId)
+CREATE NONCLUSTERED INDEX IX_VoucherUsages_UserId ON dbo.VoucherUsages(UserId)
+GO
+
+-- ============================================================================
+-- 1.9: OrderVouchers Table (Multiple Vouchers per Order)
+-- ============================================================================
+IF OBJECT_ID('dbo.OrderVouchers', 'U') IS NOT NULL
+    DROP TABLE dbo.OrderVouchers
+GO
+
+CREATE TABLE dbo.OrderVouchers
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    OrderId INT NOT NULL,
+    VoucherId INT NOT NULL,
+    DiscountApplied DECIMAL(18,2) NOT NULL,
+    AppliedAt DATETIME DEFAULT GETUTCDATE(),
+    CONSTRAINT FK_OrderVouchers_Orders FOREIGN KEY (OrderId) REFERENCES dbo.Orders(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_OrderVouchers_Vouchers FOREIGN KEY (VoucherId) REFERENCES dbo.Vouchers(Id)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_OrderVouchers_OrderId ON dbo.OrderVouchers(OrderId)
+GO
+
+-- ============================================================================
+-- 1.10: EventParticipants Table
+-- ============================================================================
+IF OBJECT_ID('dbo.EventParticipants', 'U') IS NOT NULL
+    DROP TABLE dbo.EventParticipants
+GO
+
+CREATE TABLE dbo.EventParticipants
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    EventId INT NOT NULL,
+    UserId INT NOT NULL,
+    Score INT DEFAULT 0,
+    DiscountPercent DECIMAL(5,2) DEFAULT 0,
+    ParticipatedAt DATETIME DEFAULT GETUTCDATE(),
+    CompletedAt DATETIME,
+    CONSTRAINT FK_EventParticipants_Events FOREIGN KEY (EventId) REFERENCES dbo.Events(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_EventParticipants_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id),
+    CONSTRAINT UQ_EventParticipant_Unique UNIQUE (EventId, UserId)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_EventParticipants_EventId ON dbo.EventParticipants(EventId)
+CREATE NONCLUSTERED INDEX IX_EventParticipants_UserId ON dbo.EventParticipants(UserId)
+GO
+
+-- ============================================================================
+-- 1.11: EventQuestions Table
+-- ============================================================================
+IF OBJECT_ID('dbo.EventQuestions', 'U') IS NOT NULL
+    DROP TABLE dbo.EventQuestions
+GO
+
+CREATE TABLE dbo.EventQuestions
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    EventId INT NOT NULL,
+    Question NVARCHAR(500) NOT NULL,
+    OptionA NVARCHAR(200) NOT NULL,
+    OptionB NVARCHAR(200) NOT NULL,
+    OptionC NVARCHAR(200) NOT NULL,
+    OptionD NVARCHAR(200) NOT NULL,
+    CorrectAnswer NVARCHAR(1) NOT NULL, -- A, B, C, D
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    CONSTRAINT FK_EventQuestions_Events FOREIGN KEY (EventId) REFERENCES dbo.Events(Id) ON DELETE CASCADE,
+    CONSTRAINT CK_CorrectAnswer CHECK (CorrectAnswer IN ('A', 'B', 'C', 'D'))
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_EventQuestions_EventId ON dbo.EventQuestions(EventId)
+GO
+
+-- ============================================================================
+-- 1.12: LuckySpinPrizes Table
+-- ============================================================================
+IF OBJECT_ID('dbo.LuckySpinPrizes', 'U') IS NOT NULL
+    DROP TABLE dbo.LuckySpinPrizes
+GO
+
+CREATE TABLE dbo.LuckySpinPrizes
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    [Name] NVARCHAR(255) NOT NULL,
+    [Description] NVARCHAR(500),
+    WinRate DECIMAL(5,2) NOT NULL, -- Win percentage (0-100)
+    PrizeType NVARCHAR(50) NOT NULL, -- Message, Voucher, Product
+    VoucherId INT,
+    ProductId INT,
+    DisplayOrder INT DEFAULT 0,
+    IsActive BIT DEFAULT 1,
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME,
+    CONSTRAINT FK_LuckySpinPrizes_Vouchers FOREIGN KEY (VoucherId) REFERENCES dbo.Vouchers(Id),
+    CONSTRAINT FK_LuckySpinPrizes_Products FOREIGN KEY (ProductId) REFERENCES dbo.Products(Id),
+    CONSTRAINT CK_PrizeType CHECK (PrizeType IN ('Message', 'Voucher', 'Product')),
+    CONSTRAINT CK_WinRate CHECK (WinRate BETWEEN 0 AND 100)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_LuckySpinPrizes_IsActive ON dbo.LuckySpinPrizes(IsActive)
+GO
+
+-- ============================================================================
+-- 1.13: LuckySpinHistories Table
+-- ============================================================================
+IF OBJECT_ID('dbo.LuckySpinHistories', 'U') IS NOT NULL
+    DROP TABLE dbo.LuckySpinHistories
+GO
+
+CREATE TABLE dbo.LuckySpinHistories
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    UserId INT NOT NULL,
+    OrderId INT,
+    PrizeId INT NOT NULL,
+    WonVoucherId INT,
+    WonProductId INT,
+    SpinDate DATETIME DEFAULT GETUTCDATE(),
+    ClaimedDate DATETIME,
+    [Status] NVARCHAR(50) DEFAULT 'Won', -- Won, Claimed, Expired
+    CONSTRAINT FK_LuckySpinHistories_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id),
+    CONSTRAINT FK_LuckySpinHistories_Orders FOREIGN KEY (OrderId) REFERENCES dbo.Orders(Id),
+    CONSTRAINT FK_LuckySpinHistories_Prizes FOREIGN KEY (PrizeId) REFERENCES dbo.LuckySpinPrizes(Id),
+    CONSTRAINT FK_LuckySpinHistories_Vouchers FOREIGN KEY (WonVoucherId) REFERENCES dbo.Vouchers(Id),
+    CONSTRAINT FK_LuckySpinHistories_Products FOREIGN KEY (WonProductId) REFERENCES dbo.Products(Id)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_LuckySpinHistories_UserId ON dbo.LuckySpinHistories(UserId)
+CREATE NONCLUSTERED INDEX IX_LuckySpinHistories_SpinDate ON dbo.LuckySpinHistories(SpinDate DESC)
+GO
+
+-- ============================================================================
+-- 1.14: Posts Table (Community)
+-- ============================================================================
+IF OBJECT_ID('dbo.Posts', 'U') IS NOT NULL
+    DROP TABLE dbo.Posts
+GO
+
+CREATE TABLE dbo.Posts
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    UserId INT NOT NULL,
+    Title NVARCHAR(255) NOT NULL,
+    [Content] NVARCHAR(5000) NOT NULL,
+    ImageUrl NVARCHAR(500),
+    [Type] INT DEFAULT 0, -- 0: Review, 1: Rent
+    Rating INT, -- 1-5 for reviews
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME,
+    IsDeleted BIT DEFAULT 0,
+    CONSTRAINT FK_Posts_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id),
+    CONSTRAINT CK_PostRating CHECK (Rating IS NULL OR Rating BETWEEN 1 AND 5)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_Posts_UserId ON dbo.Posts(UserId)
+CREATE NONCLUSTERED INDEX IX_Posts_CreatedAt ON dbo.Posts(CreatedAt DESC)
+CREATE NONCLUSTERED INDEX IX_Posts_IsDeleted ON dbo.Posts(IsDeleted)
+GO
+
+-- ============================================================================
+-- 1.15: Comments Table
+-- ============================================================================
+IF OBJECT_ID('dbo.Comments', 'U') IS NOT NULL
+    DROP TABLE dbo.Comments
+GO
+
+CREATE TABLE dbo.Comments
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    PostId INT NOT NULL,
+    UserId INT NOT NULL,
+    [Content] NVARCHAR(2000) NOT NULL,
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME,
+    IsDeleted BIT DEFAULT 0,
+    CONSTRAINT FK_Comments_Posts FOREIGN KEY (PostId) REFERENCES dbo.Posts(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_Comments_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_Comments_PostId ON dbo.Comments(PostId)
+CREATE NONCLUSTERED INDEX IX_Comments_UserId ON dbo.Comments(UserId)
+GO
+
+-- ============================================================================
+-- 1.16: Likes Table
+-- ============================================================================
+IF OBJECT_ID('dbo.Likes', 'U') IS NOT NULL
+    DROP TABLE dbo.Likes
+GO
+
+CREATE TABLE dbo.Likes
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    PostId INT NOT NULL,
+    UserId INT NOT NULL,
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    CONSTRAINT FK_Likes_Posts FOREIGN KEY (PostId) REFERENCES dbo.Posts(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_Likes_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id),
+    CONSTRAINT UQ_Like_Unique UNIQUE (PostId, UserId)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_Likes_PostId ON dbo.Likes(PostId)
+GO
+
+-- ============================================================================
+-- 1.17: Reactions Table
+-- ============================================================================
+IF OBJECT_ID('dbo.Reactions', 'U') IS NOT NULL
+    DROP TABLE dbo.Reactions
+GO
+
+CREATE TABLE dbo.Reactions
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    PostId INT NOT NULL,
+    UserId INT NOT NULL,
+    ReactionType NVARCHAR(50) NOT NULL, -- love, haha, wow, sad, angry
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    CONSTRAINT FK_Reactions_Posts FOREIGN KEY (PostId) REFERENCES dbo.Posts(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_Reactions_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id),
+    CONSTRAINT UQ_Reaction_Unique UNIQUE (PostId, UserId)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_Reactions_PostId ON dbo.Reactions(PostId)
+GO
+
+-- ============================================================================
+-- 1.18: Messages Table
+-- ============================================================================
+IF OBJECT_ID('dbo.Messages', 'U') IS NOT NULL
+    DROP TABLE dbo.Messages
+GO
+
+CREATE TABLE dbo.Messages
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    UserId INT NOT NULL,
+    [Content] NVARCHAR(5000) NOT NULL,
+    IsRead BIT DEFAULT 0,
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    CONSTRAINT FK_Messages_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_Messages_UserId ON dbo.Messages(UserId)
+CREATE NONCLUSTERED INDEX IX_Messages_IsRead ON dbo.Messages(IsRead)
+GO
+
+-- ============================================================================
+-- 1.19: UserBans Table
+-- ============================================================================
+IF OBJECT_ID('dbo.UserBans', 'U') IS NOT NULL
+    DROP TABLE dbo.UserBans
+GO
+
+CREATE TABLE dbo.UserBans
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    UserId INT NOT NULL,
+    Reason NVARCHAR(500),
+    BanDate DATETIME DEFAULT GETUTCDATE(),
+    UnbanDate DATETIME,
+    BannedBy INT,
+    CONSTRAINT FK_UserBans_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id),
+    CONSTRAINT FK_UserBans_BannedBy FOREIGN KEY (BannedBy) REFERENCES dbo.Users(Id)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_UserBans_UserId ON dbo.UserBans(UserId)
+GO
+
+-- ============================================================================
+-- 1.20: PostWarnings Table
+-- ============================================================================
+IF OBJECT_ID('dbo.PostWarnings', 'U') IS NOT NULL
+    DROP TABLE dbo.PostWarnings
+GO
+
+CREATE TABLE dbo.PostWarnings
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    PostId INT NOT NULL,
+    AdminId INT NOT NULL,
+    Reason NVARCHAR(500) NOT NULL,
+    WarningDate DATETIME DEFAULT GETUTCDATE(),
+    IsResolved BIT DEFAULT 0,
+    CONSTRAINT FK_PostWarnings_Posts FOREIGN KEY (PostId) REFERENCES dbo.Posts(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_PostWarnings_Admins FOREIGN KEY (AdminId) REFERENCES dbo.Users(Id)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_PostWarnings_PostId ON dbo.PostWarnings(PostId)
+GO
+
+-- ============================================================================
+-- 1.21: PaymentTransactions Table
+-- ============================================================================
+IF OBJECT_ID('dbo.PaymentTransactions', 'U') IS NOT NULL
+    DROP TABLE dbo.PaymentTransactions
+GO
+
+CREATE TABLE dbo.PaymentTransactions
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    OrderId INT NOT NULL,
+    PaymentMethod NVARCHAR(50) DEFAULT 'COD',
+    TransactionId NVARCHAR(100),
+    Amount DECIMAL(18,2) NOT NULL,
+    [Status] NVARCHAR(50) DEFAULT 'Pending', -- Pending, Success, Failed, Cancelled
+    ResponseMessage NVARCHAR(500),
+    RawResponse NVARCHAR(MAX),
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    ConfirmedAt DATETIME,
+    CONSTRAINT FK_PaymentTransactions_Orders FOREIGN KEY (OrderId) REFERENCES dbo.Orders(Id)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_PaymentTransactions_OrderId ON dbo.PaymentTransactions(OrderId)
+CREATE NONCLUSTERED INDEX IX_PaymentTransactions_Status ON dbo.PaymentTransactions([Status])
+GO
+
+-- ============================================================================
+-- 1.22: AuditLogs Table
+-- ============================================================================
+IF OBJECT_ID('dbo.AuditLogs', 'U') IS NOT NULL
+    DROP TABLE dbo.AuditLogs
+GO
+
+CREATE TABLE dbo.AuditLogs
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    UserId INT,
+    [Action] NVARCHAR(100) NOT NULL,
+    Entity NVARCHAR(100) NOT NULL,
+    EntityId INT,
+    OldValue NVARCHAR(MAX),
+    NewValue NVARCHAR(MAX),
+    [Description] NVARCHAR(500),
+    IpAddress NVARCHAR(50),
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    CONSTRAINT FK_AuditLogs_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_AuditLogs_UserId ON dbo.AuditLogs(UserId)
+CREATE NONCLUSTERED INDEX IX_AuditLogs_CreatedAt ON dbo.AuditLogs(CreatedAt DESC)
+GO
+
+-- ============================================================================
+-- 1.23: News Table
+-- ============================================================================
+IF OBJECT_ID('dbo.News', 'U') IS NOT NULL
+    DROP TABLE dbo.News
+GO
+
+CREATE TABLE dbo.News
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Title NVARCHAR(500) NOT NULL,
+    [Content] NVARCHAR(MAX) NOT NULL,
+    Category NVARCHAR(100),
+    ImageUrl NVARCHAR(500),
+    PublishDate DATETIME DEFAULT GETUTCDATE(),
+    IsActive BIT DEFAULT 1,
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_News_PublishDate ON dbo.News(PublishDate DESC)
+CREATE NONCLUSTERED INDEX IX_News_IsActive ON dbo.News(IsActive)
+GO
+
+-- ============================================================================
+-- 1.24: NewsImages Table
+-- ============================================================================
+IF OBJECT_ID('dbo.NewsImages', 'U') IS NOT NULL
+    DROP TABLE dbo.NewsImages
+GO
+
+CREATE TABLE dbo.NewsImages
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    NewsId INT NOT NULL,
+    ImageUrl NVARCHAR(500) NOT NULL,
+    DisplayOrder INT DEFAULT 0,
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    CONSTRAINT FK_NewsImages_News FOREIGN KEY (NewsId) REFERENCES dbo.News(Id) ON DELETE CASCADE
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_NewsImages_NewsId ON dbo.NewsImages(NewsId)
+GO
+
+-- ============================================================================
+-- 1.25: OtpTokens Table
+-- ============================================================================
+IF OBJECT_ID('dbo.OtpTokens', 'U') IS NOT NULL
+    DROP TABLE dbo.OtpTokens
+GO
+
+CREATE TABLE dbo.OtpTokens
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    UserId INT NOT NULL,
+    Token NVARCHAR(10) NOT NULL,
+    ExpiryDate DATETIME NOT NULL,
+    IsUsed BIT DEFAULT 0,
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    CONSTRAINT FK_OtpTokens_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id)
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_OtpTokens_UserId ON dbo.OtpTokens(UserId)
+GO
+
+-- ============================================================================
+-- 1.26: RateLimitLogs Table
+-- ============================================================================
+IF OBJECT_ID('dbo.RateLimitLogs', 'U') IS NOT NULL
+    DROP TABLE dbo.RateLimitLogs
+GO
+
+CREATE TABLE dbo.RateLimitLogs
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    UserId INT,
+    IpAddress NVARCHAR(50),
+    Endpoint NVARCHAR(255),
+    RequestCount INT DEFAULT 1,
+    FirstRequestTime DATETIME DEFAULT GETUTCDATE(),
+    LastRequestTime DATETIME DEFAULT GETUTCDATE()
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_RateLimitLogs_IpAddress ON dbo.RateLimitLogs(IpAddress)
+GO
+
+-- ============================================================================
+-- 1.27: BlockedEntities Table
+-- ============================================================================
+IF OBJECT_ID('dbo.BlockedEntities', 'U') IS NOT NULL
+    DROP TABLE dbo.BlockedEntities
+GO
+
+CREATE TABLE dbo.BlockedEntities
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    EntityType NVARCHAR(50), -- User, IpAddress, Email
+    EntityValue NVARCHAR(255),
+    Reason NVARCHAR(500),
+    BlockedDate DATETIME DEFAULT GETUTCDATE(),
+    UnblockedDate DATETIME,
+    IsActive BIT DEFAULT 1
+)
+GO
+
+CREATE NONCLUSTERED INDEX IX_BlockedEntities_EntityValue ON dbo.BlockedEntities(EntityValue)
+GO
+
+-- ============================================================================
+-- 1.28: ApplicationSettings Table
+-- ============================================================================
+IF OBJECT_ID('dbo.ApplicationSettings', 'U') IS NOT NULL
+    DROP TABLE dbo.ApplicationSettings
+GO
+
+CREATE TABLE dbo.ApplicationSettings
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    SettingKey NVARCHAR(100) UNIQUE NOT NULL,
+    SettingValue NVARCHAR(MAX),
+    [Description] NVARCHAR(500),
+    CreatedAt DATETIME DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME
+)
+GO
+
+-- ============================================================================
+-- PART 2: INSERT SAMPLE DATA
+-- ============================================================================
+
+-- Clear existing data (for reset purposes)
+DELETE FROM dbo.AuditLogs
+DELETE FROM dbo.NewsImages
+DELETE FROM dbo.News
+DELETE FROM dbo.RateLimitLogs
+DELETE FROM dbo.BlockedEntities
+DELETE FROM dbo.PostWarnings
+DELETE FROM dbo.UserBans
+DELETE FROM dbo.Reactions
+DELETE FROM dbo.Likes
+DELETE FROM dbo.Comments
+DELETE FROM dbo.Posts
+DELETE FROM dbo.Messages
+DELETE FROM dbo.PaymentTransactions
+DELETE FROM dbo.LuckySpinHistories
+DELETE FROM dbo.LuckySpinPrizes
+DELETE FROM dbo.EventQuestions
+DELETE FROM dbo.EventParticipants
+DELETE FROM dbo.OrderVouchers
+DELETE FROM dbo.VoucherUsages
+DELETE FROM dbo.Vouchers
+DELETE FROM dbo.OrderDetails
+DELETE FROM dbo.Orders
+DELETE FROM dbo.Events
+DELETE FROM dbo.Products
+DELETE FROM dbo.Users
+DELETE FROM dbo.Categories
+DELETE FROM dbo.ApplicationSettings
+
+-- Reset Identity Seeds
+DBCC CHECKIDENT ('Categories', RESEED, 0)
+DBCC CHECKIDENT ('Users', RESEED, 0)
+DBCC CHECKIDENT ('Products', RESEED, 0)
+DBCC CHECKIDENT ('Orders', RESEED, 0)
+DBCC CHECKIDENT ('OrderDetails', RESEED, 0)
+DBCC CHECKIDENT ('Events', RESEED, 0)
+DBCC CHECKIDENT ('Vouchers', RESEED, 0)
+DBCC CHECKIDENT ('VoucherUsages', RESEED, 0)
+DBCC CHECKIDENT ('OrderVouchers', RESEED, 0)
+DBCC CHECKIDENT ('EventParticipants', RESEED, 0)
+DBCC CHECKIDENT ('EventQuestions', RESEED, 0)
+DBCC CHECKIDENT ('LuckySpinPrizes', RESEED, 0)
+DBCC CHECKIDENT ('LuckySpinHistories', RESEED, 0)
+DBCC CHECKIDENT ('Posts', RESEED, 0)
+DBCC CHECKIDENT ('Comments', RESEED, 0)
+DBCC CHECKIDENT ('Likes', RESEED, 0)
+DBCC CHECKIDENT ('Reactions', RESEED, 0)
+DBCC CHECKIDENT ('Messages', RESEED, 0)
+DBCC CHECKIDENT ('UserBans', RESEED, 0)
+DBCC CHECKIDENT ('PostWarnings', RESEED, 0)
+DBCC CHECKIDENT ('PaymentTransactions', RESEED, 0)
+DBCC CHECKIDENT ('AuditLogs', RESEED, 0)
+DBCC CHECKIDENT ('News', RESEED, 0)
+DBCC CHECKIDENT ('NewsImages', RESEED, 0)
+DBCC CHECKIDENT ('OtpTokens', RESEED, 0)
+
+GO
+
+-- ============================================================================
+-- 2.1: Insert Categories
+-- ============================================================================
+INSERT INTO dbo.Categories (Name, Type, Description, IsActive)
+VALUES
+    ('Laptops', 'Electronics', 'Máy tính xách tay cao c?p', 1),
+    ('Smartphones', 'Electronics', '?i?n tho?i thông minh', 1),
+    ('Tablets', 'Electronics', 'Máy tính b?ng', 1),
+    ('Accessories', 'Components', 'Ph? ki?n công ngh?', 1),
+    ('Gaming Gear', 'Components', 'Thi?t b? ch?i game', 1)
+GO
+
+-- ============================================================================
+-- 2.2: Insert Users (Admin + Customers)
+-- ============================================================================
+INSERT INTO dbo.Users (Username, Email, Phone, FullName, PasswordHash, Role, IsVerified, IsActive, SpinCount)
+VALUES
+    -- Admin
+    ('admin', 'admin@websell.com', '0912345678', 'Admin Nguyen', 
+     'K5/wZr5/mKlCRvSJdlL7V7KvL7/7+6/Bd/lXlJV7OGY=', 'Admin', 1, 1, 0),
+    
+    -- Moderator
+    ('moderator', 'moderator@websell.com', '0987654321', 'Moderator Tran', 
+     'K5/wZr5/mKlCRvSJdlL7V7KvL7/7+6/Bd/lXlJV7OGY=', 'Moderator', 1, 1, 0),
+    
+    -- Customers
+    ('customer1', 'customer1@email.com', '0901111111', 'Nguyen Van A', 
+     'K5/wZr5/mKlCRvSJdlL7V7KvL7/7+6/Bd/lXlJV7OGY=', 'Customer', 1, 1, 5),
+    ('customer2', 'customer2@email.com', '0902222222', 'Tran Thi B', 
+     'K5/wZr5/mKlCRvSJdlL7V7KvL7/7+6/Bd/lXlJV7OGY=', 'Customer', 1, 1, 3),
+    ('customer3', 'customer3@email.com', '0903333333', 'Le Van C', 
+     'K5/wZr5/mKlCRvSJdlL7V7KvL7/7+6/Bd/lXlJV7OGY=', 'Customer', 0, 1, 0),
+    ('customer4', 'customer4@email.com', '0904444444', 'Hoang Thi D', 
+     'K5/wZr5/mKlCRvSJdlL7V7KvL7/7+6/Bd/lXlJV7OGY=', 'Customer', 1, 1, 2)
+GO
+
+-- ============================================================================
+-- 2.3: Insert Products
+-- ============================================================================
+INSERT INTO dbo.Products (Name, CategoryId, Price, Description, ImageUrl, Stock, IsHot, Rating, IsActive)
+VALUES
+    -- Laptops
+    ('Dell XPS 13', 1, 25999000.00, 'Laptop cao c?p 13 inch', '/images/dell-xps-13.jpg', 15, 1, 4.8, 1),
+    ('MacBook Pro 16', 1, 48999000.00, 'Laptop Pro 16 inch M3 Max', '/images/macbook-pro-16.jpg', 8, 1, 4.9, 1),
+    ('ASUS ROG Gaming', 1, 35999000.00, 'Gaming laptop RTX 4070', '/images/asus-rog.jpg', 12, 1, 4.7, 1),
+    
+    -- Smartphones
+    ('iPhone 15 Pro', 2, 29999000.00, 'iPhone 15 Pro 256GB', '/images/iphone-15-pro.jpg', 20, 1, 4.8, 1),
+    ('Samsung S24 Ultra', 2, 27999000.00, 'Samsung Galaxy S24 Ultra', '/images/samsung-s24.jpg', 18, 1, 4.7, 1),
+    ('Google Pixel 8', 2, 19999000.00, 'Google Pixel 8 Pro', '/images/pixel-8.jpg', 25, 0, 4.6, 1),
+    
+    -- Tablets
+    ('iPad Pro 12.9', 3, 21999000.00, 'iPad Pro M2 12.9 inch', '/images/ipad-pro.jpg', 10, 1, 4.9, 1),
+    ('Samsung Tab S9', 3, 16999000.00, 'Samsung Galaxy Tab S9 Ultra', '/images/tab-s9.jpg', 14, 0, 4.5, 1),
+    
+    -- Accessories
+    ('Magic Keyboard', 4, 2999000.00, 'Apple Magic Keyboard', '/images/magic-keyboard.jpg', 50, 0, 4.4, 1),
+    ('USB-C Hub', 4, 999000.00, '7-in-1 USB-C Hub', '/images/usb-c-hub.jpg', 100, 0, 4.3, 1),
+    
+    -- Gaming
+    ('Razer DeathAdder', 5, 1999000.00, 'Razer DeathAdder V3', '/images/razer-deathadder.jpg', 40, 1, 4.7, 1),
+    ('Corsair K70', 5, 3999000.00, 'Corsair K70 Mechanical Keyboard', '/images/corsair-k70.jpg', 30, 0, 4.8, 1)
+GO
+
+-- ============================================================================
+-- 2.4: Insert Events
+-- ============================================================================
+INSERT INTO dbo.Events (Name, Description, StartDate, EndDate, ImageUrl, IsActive)
+VALUES
+    ('Summer Sale 2024', 'Mùa hè khuy?n m?i l?n', '2024-06-01', '2024-08-31', '/images/summer-sale.jpg', 1),
+    ('Tech Fest 2024', 'L? h?i công ngh? l?n th? 2', '2024-07-15', '2024-07-30', '/images/tech-fest.jpg', 1),
+    ('Black Friday 2024', 'Ngày mua s?m l?n nh?t n?m', '2024-11-25', '2024-11-30', '/images/black-friday.jpg', 0),
+    ('New Year 2025', 'Chào ?ón n?m m?i v?i ?u ?ãi', '2025-01-01', '2025-01-31', '/images/new-year.jpg', 0)
+GO
+
+-- ============================================================================
+-- 2.5: Insert Vouchers
+-- ============================================================================
+INSERT INTO dbo.Vouchers (Code, Name, Description, DiscountPercent, DiscountAmount, StartDate, EndDate, 
+                          Quantity, UsedQuantity, MinOrderAmount, IsPrivate, EventId, IsActive, RequireEventParticipation)
+VALUES
+    -- Public Vouchers
+    ('SALE30', 'Gi?m 30%', 'Gi?m giá 30% cho ??n hàng', 30, 0, '2024-06-01', '2024-08-31', 100, 5, 5000000, 0, 1, 1, 0),
+    ('WELCOME10', 'Welcome 10%', 'Gi?m 10% cho khách m?i', 10, 0, '2024-01-01', '2025-12-31', 500, 45, 0, 0, NULL, 1, 0),
+    ('SUMMERCODE', 'Mã Hè', 'Gi?m 100k cho mùa hè', 0, 100000, '2024-06-01', '2024-08-31', 200, 30, 2000000, 0, 1, 1, 0),
+    ('TECH20', 'Tech Fest', 'Gi?m 20% t?i Tech Fest', 20, 0, '2024-07-15', '2024-07-30', 150, 25, 1000000, 0, 2, 1, 1),
+    ('BIRTHDAY15', 'Sinh nh?t 15%', 'Gi?m 15% n?u là sinh nh?t', 15, 0, '2024-01-01', '2025-12-31', 300, 10, 500000, 0, NULL, 1, 0)
+GO
+
+-- ============================================================================
+-- 2.6: Insert Orders
+-- ============================================================================
+INSERT INTO dbo.Orders (UserId, OrderDate, ShippingName, ShippingPhone, ShippingAddress, TotalAmount, 
+                        TotalVoucherDiscount, Status, PaymentMethod, IsPaid, AppliedVoucherCodes)
+VALUES
+    (3, '2024-07-15 10:30:00', 'Nguyen Van A', '0901111111', '123 Nguyen Hue, HCMC', 75000000.00, 3000000, 'Delivered', 'VNPay', 1, 'SALE30'),
+    (3, '2024-07-20 14:45:00', 'Nguyen Van A', '0901111111', '123 Nguyen Hue, HCMC', 45000000.00, 0, 'Processing', 'COD', 0, ''),
+    (4, '2024-07-22 09:15:00', 'Tran Thi B', '0902222222', '456 Le Loi, HCMC', 32000000.00, 1600000, 'Delivered', 'VNPay', 1, 'WELCOME10'),
+    (5, '2024-07-25 16:20:00', 'Le Van C', '0903333333', '789 Tran Hung Dao, HN', 8000000.00, 800000, 'Pending', 'COD', 0, 'BIRTHDAY15'),
+    (6, '2024-07-28 11:00:00', 'Hoang Thi D', '0904444444', '321 Pasteur, HCMC', 60000000.00, 12000000, 'Shipped', 'VNPay', 1, 'SALE30')
+GO
+
+-- ============================================================================
+-- 2.7: Insert OrderDetails
+-- ============================================================================
+INSERT INTO dbo.OrderDetails (OrderId, ProductId, Quantity, UnitPrice, TotalPrice)
+VALUES
+    (1, 1, 2, 25999000, 51998000),
+    (1, 10, 3, 999000, 2997000),
+    (2, 4, 1, 29999000, 29999000),
+    (2, 11, 2, 1999000, 3998000),
+    (3, 2, 1, 48999000, 48999000),
+    (3, 9, 1, 2999000, 2999000),
+    (4, 5, 1, 27999000, 27999000),
+    (5, 7, 2, 21999000, 43998000),
+    (5, 12, 1, 3999000, 3999000)
+GO
+
+-- ============================================================================
+-- 2.8: Insert EventParticipants
+-- ============================================================================
+INSERT INTO dbo.EventParticipants (EventId, UserId, Score, DiscountPercent, ParticipatedAt, CompletedAt)
+VALUES
+    (1, 3, 8, 25, '2024-06-15', '2024-06-15 14:00'),
+    (1, 4, 6, 20, '2024-07-01', '2024-07-01 15:30'),
+    (2, 3, 9, 25, '2024-07-20', '2024-07-20 16:45'),
+    (2, 5, 5, 15, '2024-07-22', '2024-07-22 10:20')
+GO
+
+-- ============================================================================
+-- 2.9: Insert EventQuestions
+-- ============================================================================
+INSERT INTO dbo.EventQuestions (EventId, Question, OptionA, OptionB, OptionC, OptionD, CorrectAnswer)
+VALUES
+    -- Summer Sale Event
+    (1, 'Th??ng hi?u nào n?i ti?ng nh?t?', 'Apple', 'Samsung', 'Dell', 'Sony', 'A'),
+    (1, 'Công ngh? nào m?i nh?t?', 'AI', 'IoT', 'Blockchain', 'Cloud', 'A'),
+    (1, 'Giá tr? c?a startup nào cao nh?t?', 'Tesla', 'SpaceX', 'Apple', 'Google', 'B'),
+    
+    -- Tech Fest Event
+    (2, 'Th? h? CPU m?i nh?t là?', 'Gen 12', 'Gen 13', 'Gen 14', 'Gen 15', 'D'),
+    (2, 'T?c ?? 5G là bao nhiêu?', '1 Gbps', '10 Gbps', '100 Gbps', '1 Tbps', 'B')
+GO
+
+-- ============================================================================
+-- 2.10: Insert VoucherUsages
+-- ============================================================================
+INSERT INTO dbo.VoucherUsages (VoucherId, UserId, OrderId, UsedAt, Notes)
+VALUES
+    (1, 3, 1, '2024-07-15', 'Mua laptop Dell XPS'),
+    (2, 4, 3, '2024-07-22', 'Khách hàng m?i'),
+    (5, 5, 4, '2024-07-25', 'Sinh nh?t discount'),
+    (1, 6, 5, '2024-07-28', 'Mùa hè sale')
+GO
+
+-- ============================================================================
+-- 2.11: Insert LuckySpinPrizes
+-- ============================================================================
+INSERT INTO dbo.LuckySpinPrizes (Name, Description, WinRate, PrizeType, VoucherId, ProductId, DisplayOrder, IsActive)
+VALUES
+    -- Voucher Prizes
+    ('Gi?m 50%', 'Gi?m giá 50% cho l?n ti?p theo', 5, 'Voucher', 1, NULL, 1, 1),
+    ('Gi?m 30%', 'Gi?m giá 30% cho ??n hàng', 10, 'Voucher', 2, NULL, 2, 1),
+    ('Gi?m 20%', 'Gi?m giá 20% t?i shop', 15, 'Voucher', 5, NULL, 3, 1),
+    
+    -- Product Prizes
+    ('Mouse Razer', 'Chu?t Razer DeathAdder V3', 8, 'Product', NULL, 11, 4, 1),
+    ('Keyboard Corsair', 'Bàn phím c? Corsair', 5, 'Product', NULL, 12, 5, 1),
+    
+    -- Message Prizes
+    ('Chúc m?ng!', 'B?n ?ã trúng - Hãy tham gia l?n sau', 42, 'Message', NULL, NULL, 6, 1)
+GO
+
+-- ============================================================================
+-- 2.12: Insert LuckySpinHistories
+-- ============================================================================
+INSERT INTO dbo.LuckySpinHistories (UserId, OrderId, PrizeId, WonVoucherId, WonProductId, SpinDate, ClaimedDate, Status)
+VALUES
+    (3, 1, 1, 1, NULL, '2024-07-16', '2024-07-16', 'Claimed'),
+    (3, 1, 2, 2, NULL, '2024-07-17', '2024-07-17', 'Claimed'),
+    (4, 3, 3, 5, NULL, '2024-07-23', NULL, 'Won'),
+    (6, 5, 4, NULL, 11, '2024-07-29', '2024-07-29', 'Claimed'),
+    (6, 5, 6, NULL, NULL, '2024-07-30', NULL, 'Won')
+GO
+
+-- ============================================================================
+-- 2.13: Insert Posts (Community)
+-- ============================================================================
+INSERT INTO dbo.Posts (UserId, Title, Content, ImageUrl, Type, Rating, CreatedAt, IsDeleted)
+VALUES
+    (3, 'Review: Dell XPS 13 tuy?t v?i!', 'Mình v?a mua Dell XPS 13 và th?c s? r?t hài lòng. Màn hình ??p, hi?u n?ng m?nh...', '/images/post1.jpg', 0, 5, '2024-07-16', 0),
+    (4, 'Tìm ng??i thuê iPhone 15', 'B?n nào có iPhone 15 mu?n cho thuê? Tôi c?n dùng vài ngày.', NULL, 1, NULL, '2024-07-18', 0),
+    (3, 'So sánh MacBook vs Dell', 'Ai c?ng b?o MacBook t?t h?n nh?ng mình th?y Dell c?ng OK l?m...', NULL, 0, 4, '2024-07-20', 0),
+    (5, 'Thi?t b? gaming t?t nh?t 2024', 'N?m nay gaming gear nào hay nh?t? Mình tìm keyboard t?t.', NULL, 0, NULL, '2024-07-22', 0),
+    (6, 'iPad Pro - ?áng mua không?', 'Có ai dùng iPad Pro? Giá 20+ tri?u có ?áng không?', NULL, 0, NULL, '2024-07-24', 0)
+GO
+
+-- ============================================================================
+-- 2.14: Insert Comments
+-- ============================================================================
+INSERT INTO dbo.Comments (PostId, UserId, Content, CreatedAt, IsDeleted)
+VALUES
+    (1, 4, 'Mình c?ng ??nh mua Dell XPS! Giá bao nhiêu bây gi??', '2024-07-16 11:00', 0),
+    (1, 5, 'Màn hình OLED nó r?t ??p th?t, tôi dùng r?i', '2024-07-16 12:30', 0),
+    (2, 3, 'Mình có iPhone 15 Pro nh?ng không cho thuê, s? h?ng', '2024-07-18 13:00', 0),
+    (3, 6, 'MacBook M3 ?ang gi?m giá, nên mua cái này', '2024-07-20 14:15', 0),
+    (4, 4, 'Corsair K70 c? b?n r?t t?t, mình dùng ???c 2 n?m', '2024-07-22 15:45', 0),
+    (5, 3, 'iPad Pro ?áng mua n?u b?n là l?p trình viên', '2024-07-24 16:00', 0)
+GO
+
+-- ============================================================================
+-- 2.15: Insert Likes
+-- ============================================================================
+INSERT INTO dbo.Likes (PostId, UserId, CreatedAt)
+VALUES
+    (1, 4, '2024-07-16'),
+    (1, 5, '2024-07-16'),
+    (1, 6, '2024-07-17'),
+    (3, 4, '2024-07-20'),
+    (3, 5, '2024-07-21'),
+    (4, 3, '2024-07-22'),
+    (4, 6, '2024-07-23'),
+    (5, 3, '2024-07-24'),
+    (5, 4, '2024-07-25')
+GO
+
+-- ============================================================================
+-- 2.16: Insert Reactions
+-- ============================================================================
+INSERT INTO dbo.Reactions (PostId, UserId, ReactionType, CreatedAt)
+VALUES
+    (1, 3, 'love', '2024-07-16'),
+    (2, 4, 'wow', '2024-07-18'),
+    (3, 5, 'haha', '2024-07-20'),
+    (4, 6, 'love', '2024-07-22'),
+    (5, 3, 'wow', '2024-07-24')
+GO
+
+-- ============================================================================
+-- 2.17: Insert Messages
+-- ============================================================================
+INSERT INTO dbo.Messages (UserId, Content, IsRead, CreatedAt)
+VALUES
+    (3, '??n hàng c?a tôi bao gi? giao?', 0, '2024-07-25 10:00'),
+    (4, 'Có th? hoàn l?i hàng không?', 0, '2024-07-26 11:30'),
+    (5, 'Tôi mu?n h?i v? chính sách b?o hành', 0, '2024-07-27 14:00'),
+    (6, 'C?m ?n vì ?ã giúp ??!', 1, '2024-07-28 15:45')
+GO
+
+-- ============================================================================
+-- 2.18: Insert News
+-- ============================================================================
+INSERT INTO dbo.News (Title, Content, Category, ImageUrl, PublishDate, IsActive)
+VALUES
+    ('Apple ra m?t M4 Max', 'Apple v?a công b? chip M4 Max v?i hi?u n?ng g?p 2 l?n M3 Max...', 'Technology', '/images/news1.jpg', '2024-07-25', 1),
+    ('Samsung Galaxy S25 l? di?n', 'Smartphone Samsung S25 s?p ra m?t v?i camera 200MP...', 'Technology', '/images/news2.jpg', '2024-07-26', 1),
+    ('GPU RTX 50 s? ra m?t s?m h?n', 'Nvidia công b? l? trình s? ra m?t RTX 50 vào quý 1 n?m 2025...', 'Gaming', '/images/news3.jpg', '2024-07-27', 1),
+    ('Cu?c cách m?ng AI', 'ChatGPT 5 s?p ra m?t v?i kh? n?ng suy lu?n v??t tr?i...', 'AI', '/images/news4.jpg', '2024-07-28', 1)
+GO
+
+-- ============================================================================
+-- 2.19: Insert PaymentTransactions
+-- ============================================================================
+INSERT INTO dbo.PaymentTransactions (OrderId, PaymentMethod, TransactionId, Amount, Status, ResponseMessage, ConfirmedAt)
+VALUES
+    (1, 'VNPay', 'VNP20240715001', 75000000.00, 'Success', 'Giao d?ch thành công', '2024-07-15 10:45'),
+    (3, 'VNPay', 'VNP20240722001', 32000000.00, 'Success', 'Giao d?ch thành công', '2024-07-22 09:30'),
+    (5, 'VNPay', 'VNP20240728001', 60000000.00, 'Success', 'Giao d?ch thành công', '2024-07-28 11:15')
+GO
+
+-- ============================================================================
+-- 2.20: Insert AuditLogs
+-- ============================================================================
+INSERT INTO dbo.AuditLogs (UserId, Action, Entity, EntityId, Description, IpAddress, CreatedAt)
+VALUES
+    (1, 'Create', 'Product', 1, 'Admin t?o s?n ph?m Dell XPS', '192.168.1.100', '2024-07-01 09:00'),
+    (1, 'Update', 'Product', 1, 'Admin c?p nh?t giá Dell XPS', '192.168.1.100', '2024-07-10 10:30'),
+    (3, 'Create', 'Order', 1, 'Khách hàng t?o ??n hàng', '203.162.10.15', '2024-07-15 10:30'),
+    (4, 'Ban', 'User', 5, 'Moderator ban user vì spam', '192.168.1.101', '2024-07-25 14:00')
+GO
+
+-- ============================================================================
+-- 2.21: Insert ApplicationSettings
+-- ============================================================================
+INSERT INTO dbo.ApplicationSettings (SettingKey, SettingValue, Description)
+VALUES
+    ('ShippingFee', '30000', 'Phí giao hàng m?c ??nh (VN?)'),
+    ('MinOrderAmount', '0', '??n hàng t?i thi?u'),
+    ('OTPExpiry', '300', 'H?t h?n OTP (giây)'),
+    ('RateLimitAttempts', '5', 'S? l?n ??ng nh?p t?i ?a'),
+    ('RateLimitWindow', '900', 'Th?i gian window rate limit (giây)'),
+    ('SessionTimeout', '1200', 'Th?i gian timeout session (giây)'),
+    ('MaintenanceMode', 'false', 'B?t/t?t ch? ?? b?o trì'),
+    ('SMTPServer', 'smtp.gmail.com', 'Server g?i email'),
+    ('SMTPPort', '587', 'Port SMTP'),
+    ('AdminEmail', 'admin@websell.com', 'Email admin'),
+    ('SiteTitle', 'WebSell - E-Commerce System', 'Tên trang web'),
+    ('SiteUrl', 'https://websell.com', 'URL trang web')
+GO
+
+-- ============================================================================
+-- PART 3: CREATE VIEWS
+-- ============================================================================
+
+-- ============================================================================
+-- 3.1: View - Dashboard Statistics
+-- ============================================================================
+IF OBJECT_ID('dbo.vw_DashboardStats', 'V') IS NOT NULL
+    DROP VIEW dbo.vw_DashboardStats
+GO
+
+CREATE VIEW dbo.vw_DashboardStats AS
+SELECT
+    (SELECT COUNT(*) FROM dbo.Products WHERE IsActive = 1) AS TotalProducts,
+    (SELECT COUNT(*) FROM dbo.Users WHERE IsActive = 1) AS TotalUsers,
+    (SELECT COUNT(*) FROM dbo.Orders) AS TotalOrders,
+    (SELECT COUNT(*) FROM dbo.Orders WHERE Status = 'Delivered') AS DeliveredOrders,
+    (SELECT COUNT(*) FROM dbo.Posts WHERE IsDeleted = 0) AS TotalPosts,
+    (SELECT SUM(TotalAmount) FROM dbo.Orders WHERE Status = 'Delivered') AS TotalRevenue
+GO
+
+-- ============================================================================
+-- 3.2: View - Active Vouchers
+-- ============================================================================
+IF OBJECT_ID('dbo.vw_ActiveVouchers', 'V') IS NOT NULL
+    DROP VIEW dbo.vw_ActiveVouchers
+GO
+
+CREATE VIEW dbo.vw_ActiveVouchers AS
+SELECT
+    Id, Code, Name, Description, DiscountPercent, DiscountAmount,
+    StartDate, EndDate, Quantity, UsedQuantity,
+    (Quantity - UsedQuantity) AS RemainingQuantity,
+    MinOrderAmount, DATEDIFF(DAY, GETUTCDATE(), EndDate) AS DaysLeft
+FROM dbo.Vouchers
+WHERE IsActive = 1
+    AND StartDate <= GETUTCDATE()
+    AND EndDate > GETUTCDATE()
+    AND (Quantity = 0 OR UsedQuantity < Quantity)
+GO
+
+-- ============================================================================
+-- 3.3: View - User Order Summary
+-- ============================================================================
+IF OBJECT_ID('dbo.vw_UserOrderSummary', 'V') IS NOT NULL
+    DROP VIEW dbo.vw_UserOrderSummary
+GO
+
+CREATE VIEW dbo.vw_UserOrderSummary AS
+SELECT
+    u.Id, u.Username, u.Email, u.FullName,
+    COUNT(o.Id) AS TotalOrders,
+    SUM(o.TotalAmount) AS TotalSpent,
+    MAX(o.OrderDate) AS LastOrderDate,
+    COUNT(CASE WHEN o.Status = 'Delivered' THEN 1 END) AS DeliveredOrders
+FROM dbo.Users u
+LEFT JOIN dbo.Orders o ON u.Id = o.UserId
+GROUP BY u.Id, u.Username, u.Email, u.FullName
+GO
+
+-- ============================================================================
+-- 3.4: View - Product Sales Report
+-- ============================================================================
+IF OBJECT_ID('dbo.vw_ProductSalesReport', 'V') IS NOT NULL
+    DROP VIEW dbo.vw_ProductSalesReport
+GO
+
+CREATE VIEW dbo.vw_ProductSalesReport AS
+SELECT
+    p.Id, p.Name, c.Name AS Category, p.Price,
+    COUNT(od.Id) AS TotalSold,
+    SUM(od.Quantity) AS TotalQuantity,
+    SUM(od.TotalPrice) AS TotalRevenue,
+    p.Stock, p.Rating
+FROM dbo.Products p
+LEFT JOIN dbo.Categories c ON p.CategoryId = c.Id
+LEFT JOIN dbo.OrderDetails od ON p.Id = od.ProductId
+GROUP BY p.Id, p.Name, c.Name, p.Price, p.Stock, p.Rating
+GO
+
+-- ============================================================================
+-- 3.5: View - Community Post Statistics
+-- ============================================================================
+IF OBJECT_ID('dbo.vw_PostStatistics', 'V') IS NOT NULL
+    DROP VIEW dbo.vw_PostStatistics
+GO
+
+CREATE VIEW dbo.vw_PostStatistics AS
+SELECT
+    p.Id, p.Title, u.FullName AS Author, p.Type,
+    COUNT(DISTINCT c.Id) AS CommentCount,
+    COUNT(DISTINCT l.Id) AS LikeCount,
+    COUNT(DISTINCT r.Id) AS ReactionCount,
+    p.Rating, p.CreatedAt
+FROM dbo.Posts p
+LEFT JOIN dbo.Users u ON p.UserId = u.Id
+LEFT JOIN dbo.Comments c ON p.Id = c.PostId AND c.IsDeleted = 0
+LEFT JOIN dbo.Likes l ON p.Id = l.PostId
+LEFT JOIN dbo.Reactions r ON p.Id = r.PostId
+WHERE p.IsDeleted = 0
+GROUP BY p.Id, p.Title, u.FullName, p.Type, p.Rating, p.CreatedAt
+GO
+
+-- ============================================================================
+-- 3.6: View - Event Participant Performance
+-- ============================================================================
+IF OBJECT_ID('dbo.vw_EventPerformance', 'V') IS NOT NULL
+    DROP VIEW dbo.vw_EventPerformance
+GO
+
+CREATE VIEW dbo.vw_EventPerformance AS
+SELECT
+    e.Id, e.Name AS EventName, u.FullName AS Participant,
+    ep.Score, ep.DiscountPercent, ep.ParticipatedAt, ep.CompletedAt
+FROM dbo.Events e
+LEFT JOIN dbo.EventParticipants ep ON e.Id = ep.EventId
+LEFT JOIN dbo.Users u ON ep.UserId = u.Id
+GO
+
+-- ============================================================================
+-- PART 4: CREATE STORED PROCEDURES
+-- ============================================================================
+
+-- ============================================================================
+-- 4.1: SP - Get Dashboard Data
+-- ============================================================================
+IF OBJECT_ID('dbo.sp_GetDashboardData', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.sp_GetDashboardData
+GO
+
+CREATE PROCEDURE dbo.sp_GetDashboardData
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    SELECT
+        (SELECT COUNT(*) FROM dbo.Products WHERE IsActive = 1) AS TotalProducts,
+        (SELECT COUNT(*) FROM dbo.Users WHERE IsActive = 1 AND Role = 'Customer') AS TotalCustomers,
+        (SELECT COUNT(*) FROM dbo.Orders) AS TotalOrders,
+        (SELECT COUNT(*) FROM dbo.Orders WHERE Status = 'Delivered') AS DeliveredOrders,
+        (SELECT COUNT(*) FROM dbo.Orders WHERE Status = 'Pending') AS PendingOrders,
+        (SELECT SUM(TotalAmount) FROM dbo.Orders WHERE Status = 'Delivered' AND MONTH(OrderDate) = MONTH(GETUTCDATE())) AS MonthlyRevenue,
+        (SELECT SUM(TotalAmount) FROM dbo.Orders WHERE Status = 'Delivered') AS TotalRevenue,
+        (SELECT AVG(Rating) FROM dbo.Products) AS AverageProductRating
+END
+GO
+
+-- ============================================================================
+-- 4.2: SP - Get User's Applicable Vouchers
+-- ============================================================================
+IF OBJECT_ID('dbo.sp_GetUserVouchers', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.sp_GetUserVouchers
+GO
+
+CREATE PROCEDURE dbo.sp_GetUserVouchers
+    @UserId INT
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    SELECT DISTINCT
+        v.Id, v.Code, v.Name, v.Description,
+        v.DiscountPercent, v.DiscountAmount,
+        v.StartDate, v.EndDate,
+        DATEDIFF(DAY, GETUTCDATE(), v.EndDate) AS DaysLeft,
+        v.MinOrderAmount, v.IsPrivate,
+        CASE WHEN vu.Id IS NOT NULL THEN 1 ELSE 0 END AS IsUsed
+    FROM dbo.Vouchers v
+    LEFT JOIN dbo.VoucherUsages vu ON v.Id = vu.VoucherId AND vu.UserId = @UserId
+    WHERE v.IsActive = 1
+        AND v.StartDate <= GETUTCDATE()
+        AND v.EndDate > GETUTCDATE()
+        AND (v.IsPrivate = 0 OR v.OwnerUserId = @UserId)
+        AND (v.Quantity = 0 OR v.UsedQuantity < v.Quantity)
+    ORDER BY v.EndDate ASC, v.DiscountPercent DESC
+END
+GO
+
+-- ============================================================================
+-- 4.3: SP - Validate Voucher
+-- ============================================================================
+IF OBJECT_ID('dbo.sp_ValidateVoucher', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.sp_ValidateVoucher
+GO
+
+CREATE PROCEDURE dbo.sp_ValidateVoucher
+    @Code NVARCHAR(50),
+    @UserId INT,
+    @OrderAmount DECIMAL(18,2),
+    @IsValid BIT OUTPUT,
+    @DiscountAmount DECIMAL(18,2) OUTPUT,
+    @Message NVARCHAR(500) OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    DECLARE @VoucherId INT
+    DECLARE @DiscountPercent DECIMAL(5,2)
+    DECLARE @DiscountValue DECIMAL(18,2)
+    DECLARE @MinOrder DECIMAL(18,2)
+    DECLARE @AlreadyUsed BIT
+    
+    -- Find voucher
+    SELECT @VoucherId = Id, @DiscountPercent = DiscountPercent, 
+           @DiscountValue = DiscountAmount, @MinOrder = MinOrderAmount
+    FROM dbo.Vouchers
+    WHERE Code = @Code AND IsActive = 1
+    
+    -- Check if voucher exists
+    IF @VoucherId IS NULL
+    BEGIN
+        SET @IsValid = 0
+        SET @DiscountAmount = 0
+        SET @Message = 'Mã voucher không t?n t?i'
+        RETURN
+    END
+    
+    -- Check if valid date
+    IF GETUTCDATE() < (SELECT StartDate FROM dbo.Vouchers WHERE Id = @VoucherId)
+        OR GETUTCDATE() > (SELECT EndDate FROM dbo.Vouchers WHERE Id = @VoucherId)
+    BEGIN
+        SET @IsValid = 0
+        SET @DiscountAmount = 0
+        SET @Message = 'Voucher ?ã h?t h?n'
+        RETURN
+    END
+    
+    -- Check minimum order amount
+    IF @OrderAmount < @MinOrder
+    BEGIN
+        SET @IsValid = 0
+        SET @DiscountAmount = 0
+        SET @Message = '??n hàng ch?a ??t giá tr? t?i thi?u'
+        RETURN
+    END
+    
+    -- Check if user already used
+    SELECT @AlreadyUsed = CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+    FROM dbo.VoucherUsages
+    WHERE VoucherId = @VoucherId AND UserId = @UserId
+    
+    IF @AlreadyUsed = 1
+    BEGIN
+        SET @IsValid = 0
+        SET @DiscountAmount = 0
+        SET @Message = 'B?n ?ã s? d?ng voucher này r?i'
+        RETURN
+    END
+    
+    -- Calculate discount
+    IF @DiscountPercent > 0
+        SET @DiscountAmount = (@OrderAmount * @DiscountPercent) / 100
+    ELSE
+        SET @DiscountAmount = @DiscountValue
+    
+    SET @IsValid = 1
+    SET @Message = 'Voucher h?p l?'
+END
+GO
+
+-- ============================================================================
+-- 4.4: SP - Create Order (Transaction)
+-- ============================================================================
+IF OBJECT_ID('dbo.sp_CreateOrder', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.sp_CreateOrder
+GO
+
+CREATE PROCEDURE dbo.sp_CreateOrder
+    @UserId INT,
+    @ShippingName NVARCHAR(100),
+    @ShippingPhone NVARCHAR(20),
+    @ShippingAddress NVARCHAR(500),
+    @PaymentMethod NVARCHAR(50),
+    @TotalAmount DECIMAL(18,2),
+    @VoucherDiscount DECIMAL(18,2),
+    @VoucherCode NVARCHAR(50),
+    @OrderId INT OUTPUT,
+    @ErrorMessage NVARCHAR(MAX) OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    BEGIN TRY
+        BEGIN TRANSACTION
+        
+        -- Insert Order
+        INSERT INTO dbo.Orders (UserId, ShippingName, ShippingPhone, ShippingAddress, 
+                               PaymentMethod, TotalAmount, TotalVoucherDiscount, AppliedVoucherCodes)
+        VALUES (@UserId, @ShippingName, @ShippingPhone, @ShippingAddress, 
+                @PaymentMethod, @TotalAmount, @VoucherDiscount, @VoucherCode)
+        
+        SET @OrderId = SCOPE_IDENTITY()
+        
+        -- Update Voucher Usage
+        IF @VoucherCode IS NOT NULL AND @VoucherCode != ''
+        BEGIN
+            DECLARE @VoucherId INT
+            SELECT @VoucherId = Id FROM dbo.Vouchers WHERE Code = @VoucherCode
+            
+            IF @VoucherId IS NOT NULL
+            BEGIN
+                INSERT INTO dbo.VoucherUsages (VoucherId, UserId, OrderId)
+                VALUES (@VoucherId, @UserId, @OrderId)
+                
+                UPDATE dbo.Vouchers
+                SET UsedQuantity = UsedQuantity + 1
+                WHERE Id = @VoucherId
+            END
+        END
+        
+        -- Log audit
+        INSERT INTO dbo.AuditLogs (UserId, Action, Entity, EntityId, Description)
+        VALUES (@UserId, 'Create', 'Order', @OrderId, 'T?o ??n hàng m?i')
+        
+        COMMIT TRANSACTION
+        
+        SET @ErrorMessage = NULL
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION
+        SET @ErrorMessage = ERROR_MESSAGE()
+        SET @OrderId = -1
+    END CATCH
+END
+GO
+
+-- ============================================================================
+-- 4.5: SP - Random Lucky Spin Prize
+-- ============================================================================
+IF OBJECT_ID('dbo.sp_GetRandomPrize', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.sp_GetRandomPrize
+GO
+
+CREATE PROCEDURE dbo.sp_GetRandomPrize
+    @PrizeId INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    DECLARE @Random DECIMAL(5,2)
+    DECLARE @CumulativeRate DECIMAL(5,2) = 0
+    
+    -- Generate random number 0-100
+    SET @Random = ABS(CHECKSUM(NEWID())) % 10000 / 100.0
+    
+    -- Find prize based on cumulative win rate
+    SELECT @PrizeId = Id
+    FROM (
+        SELECT Id, WinRate,
+               SUM(WinRate) OVER (ORDER BY DisplayOrder) AS CumulativeWinRate
+        FROM dbo.LuckySpinPrizes
+        WHERE IsActive = 1
+        ORDER BY DisplayOrder
+    ) AS PrizeRates
+    WHERE CumulativeWinRate >= @Random
+    ORDER BY CumulativeWinRate ASC
+    
+    -- If no prize found (shouldn't happen), get last prize
+    IF @PrizeId IS NULL
+        SELECT @PrizeId = Id FROM dbo.LuckySpinPrizes 
+        WHERE IsActive = 1 
+        ORDER BY DisplayOrder DESC
+END
+GO
+
+-- ============================================================================
+-- 4.6: SP - Get Monthly Revenue Report
+-- ============================================================================
+IF OBJECT_ID('dbo.sp_GetMonthlyRevenueReport', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.sp_GetMonthlyRevenueReport
+GO
+
+CREATE PROCEDURE dbo.sp_GetMonthlyRevenueReport
+    @Year INT,
+    @Month INT
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    SELECT
+        DATEFROMPARTS(@Year, @Month, DAY(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)))) AS ReportDate,
+        COUNT(DISTINCT o.Id) AS TotalOrders,
+        COUNT(DISTINCT o.UserId) AS UniqueCustomers,
+        SUM(o.TotalAmount) AS TotalRevenue,
+        SUM(o.TotalVoucherDiscount) AS TotalDiscounts,
+        AVG(o.TotalAmount) AS AverageOrderValue,
+        SUM(SUM(o.TotalAmount)) OVER () AS GrandTotal
+    FROM dbo.Orders o
+    WHERE YEAR(o.OrderDate) = @Year
+        AND MONTH(o.OrderDate) = @Month
+        AND o.Status = 'Delivered'
+    GROUP BY DAY(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)))
+END
+GO
+
+-- ============================================================================
+-- 4.7: SP - Update Order Status
+-- ============================================================================
+IF OBJECT_ID('dbo.sp_UpdateOrderStatus', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.sp_UpdateOrderStatus
+GO
+
+CREATE PROCEDURE dbo.sp_UpdateOrderStatus
+    @OrderId INT,
+    @NewStatus NVARCHAR(50),
+    @AdminId INT,
+    @ErrorMessage NVARCHAR(MAX) OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    BEGIN TRY
+        UPDATE dbo.Orders
+        SET Status = @NewStatus, UpdatedAt = GETUTCDATE()
+        WHERE Id = @OrderId
+        
+        -- Log audit
+        INSERT INTO dbo.AuditLogs (UserId, Action, Entity, EntityId, Description)
+        VALUES (@AdminId, 'Update', 'Order', @OrderId, 'C?p nh?t tr?ng thái: ' + @NewStatus)
+        
+        SET @ErrorMessage = NULL
+    END TRY
+    BEGIN CATCH
+        SET @ErrorMessage = ERROR_MESSAGE()
+    END CATCH
+END
+GO
+
+-- ============================================================================
+-- 4.8: SP - Get User Activity Report
+-- ============================================================================
+IF OBJECT_ID('dbo.sp_GetUserActivityReport', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.sp_GetUserActivityReport
+GO
+
+CREATE PROCEDURE dbo.sp_GetUserActivityReport
+    @UserId INT
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    SELECT
+        u.Id, u.Username, u.Email, u.FullName, u.Phone, u.Role,
+        u.CreatedAt AS JoinDate,
+        COUNT(DISTINCT o.Id) AS TotalOrders,
+        SUM(CASE WHEN o.Status = 'Delivered' THEN o.TotalAmount ELSE 0 END) AS TotalSpent,
+        COUNT(DISTINCT p.Id) AS TotalPostsCreated,
+        COUNT(DISTINCT c.Id) AS TotalCommentsWritten,
+        u.SpinCount AS LuckySpinCount,
+        CASE WHEN ub.Id IS NOT NULL THEN 1 ELSE 0 END AS IsBanned
+    FROM dbo.Users u
+    LEFT JOIN dbo.Orders o ON u.Id = o.UserId
+    LEFT JOIN dbo.Posts p ON u.Id = p.UserId AND p.IsDeleted = 0
+    LEFT JOIN dbo.Comments c ON u.Id = c.UserId AND c.IsDeleted = 0
+    LEFT JOIN dbo.UserBans ub ON u.Id = ub.UserId AND ub.UnbanDate IS NULL
+    WHERE u.Id = @UserId
+    GROUP BY u.Id, u.Username, u.Email, u.FullName, u.Phone, u.Role,
+             u.CreatedAt, u.SpinCount, ub.Id
+END
+GO
+
+-- ============================================================================
+-- PART 5: CREATE FUNCTIONS
+-- ============================================================================
+
+-- ============================================================================
+-- 5.1: Function - Calculate Discount Amount
+-- ============================================================================
+IF OBJECT_ID('dbo.fn_CalculateDiscount', 'FN') IS NOT NULL
+    DROP FUNCTION dbo.fn_CalculateDiscount
+GO
+
+CREATE FUNCTION dbo.fn_CalculateDiscount
+(
+    @OrderAmount DECIMAL(18,2),
+    @DiscountPercent DECIMAL(5,2),
+    @DiscountAmount DECIMAL(18,2)
+)
+RETURNS DECIMAL(18,2)
+AS
+BEGIN
+    DECLARE @Result DECIMAL(18,2) = 0
+    
+    IF @DiscountPercent > 0
+        SET @Result = (@OrderAmount * @DiscountPercent) / 100
+    ELSE IF @DiscountAmount > 0
+        SET @Result = @DiscountAmount
+    
+    RETURN @Result
+END
+GO
+
+-- ============================================================================
+-- 5.2: Function - Get Order Total
+-- ============================================================================
+IF OBJECT_ID('dbo.fn_GetOrderTotal', 'FN') IS NOT NULL
+    DROP FUNCTION dbo.fn_GetOrderTotal
+GO
+
+CREATE FUNCTION dbo.fn_GetOrderTotal
+(
+    @OrderId INT
+)
+RETURNS DECIMAL(18,2)
+AS
+BEGIN
+    DECLARE @Total DECIMAL(18,2)
+    
+    SELECT @Total = ISNULL(TotalAmount, 0)
+    FROM dbo.Orders
+    WHERE Id = @OrderId
+    
+    RETURN @Total
+END
+GO
+
+-- ============================================================================
+-- 5.3: Function - Is User Banned
+-- ============================================================================
+IF OBJECT_ID('dbo.fn_IsUserBanned', 'FN') IS NOT NULL
+    DROP FUNCTION dbo.fn_IsUserBanned
+GO
+
+CREATE FUNCTION dbo.fn_IsUserBanned
+(
+    @UserId INT
+)
+RETURNS BIT
+AS
+BEGIN
+    DECLARE @IsBanned BIT = 0
+    
+    SELECT @IsBanned = CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+    FROM dbo.UserBans
+    WHERE UserId = @UserId AND UnbanDate IS NULL
+    
+    RETURN @IsBanned
+END
+GO
+
+-- ============================================================================
+-- 5.4: Function - Count Product Sales
+-- ============================================================================
+IF OBJECT_ID('dbo.fn_CountProductSales', 'FN') IS NOT NULL
+    DROP FUNCTION dbo.fn_CountProductSales
+GO
+
+CREATE FUNCTION dbo.fn_CountProductSales
+(
+    @ProductId INT
+)
+RETURNS INT
+AS
+BEGIN
+    DECLARE @Count INT = 0
+    
+    SELECT @Count = ISNULL(SUM(Quantity), 0)
+    FROM dbo.OrderDetails
+    WHERE ProductId = @ProductId
+    
+    RETURN @Count
+END
+GO
+
+-- ============================================================================
+-- 5.5: Function - Get Days Until Voucher Expiry
+-- ============================================================================
+IF OBJECT_ID('dbo.fn_GetDaysUntilExpiry', 'FN') IS NOT NULL
+    DROP FUNCTION dbo.fn_GetDaysUntilExpiry
+GO
+
+CREATE FUNCTION dbo.fn_GetDaysUntilExpiry
+(
+    @EndDate DATETIME
+)
+RETURNS INT
+AS
+BEGIN
+    RETURN DATEDIFF(DAY, GETUTCDATE(), @EndDate)
+END
+GO
+
+-- ============================================================================
+-- PART 6: CREATE TRIGGERS & TRANSACTIONS
+-- ============================================================================
+
+-- ============================================================================
+-- 6.1: Trigger - Update Product Stock When Order Created
+-- ============================================================================
+IF OBJECT_ID('dbo.trg_UpdateProductStock', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.trg_UpdateProductStock
+GO
+
+CREATE TRIGGER dbo.trg_UpdateProductStock
+ON dbo.OrderDetails
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    UPDATE p
+    SET Stock = Stock - i.Quantity
+    FROM dbo.Products p
+    INNER JOIN inserted i ON p.Id = i.ProductId
+    WHERE p.Stock >= i.Quantity
+    
+    -- Log if stock goes negative
+    INSERT INTO dbo.AuditLogs (Action, Entity, EntityId, Description)
+    SELECT 'Update', 'Product', p.Id, 'Stock gi?m sau ??n hàng'
+    FROM dbo.Products p
+    INNER JOIN inserted i ON p.Id = i.ProductId
+    WHERE p.Stock < 0
+END
+GO
+
+-- ============================================================================
+-- 6.2: Trigger - Log User Changes
+-- ============================================================================
+IF OBJECT_ID('dbo.trg_LogUserChanges', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.trg_LogUserChanges
+GO
+
+CREATE TRIGGER dbo.trg_LogUserChanges
+ON dbo.Users
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    INSERT INTO dbo.AuditLogs (Action, Entity, EntityId, OldValue, NewValue, Description)
+    SELECT
+        'Update', 'User', i.Id,
+        'Email: ' + d.Email + ', Phone: ' + d.Phone,
+        'Email: ' + i.Email + ', Phone: ' + i.Phone,
+        'C?p nh?t thông tin ng??i dùng'
+    FROM inserted i
+    INNER JOIN deleted d ON i.Id = d.Id
+    WHERE i.Email != d.Email OR i.Phone != d.Phone
+END
+GO
+
+-- ============================================================================
+-- 6.3: Trigger - Validate Voucher Quantity
+-- ============================================================================
+IF OBJECT_ID('dbo.trg_ValidateVoucherQuantity', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.trg_ValidateVoucherQuantity
+GO
+
+CREATE TRIGGER dbo.trg_ValidateVoucherQuantity
+ON dbo.VoucherUsages
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    DECLARE @VoucherId INT, @Quantity INT, @UsedQty INT
+    
+    SELECT @VoucherId = VoucherId FROM inserted
+    SELECT @Quantity = Quantity, @UsedQty = UsedQuantity FROM dbo.Vouchers WHERE Id = @VoucherId
+    
+    -- Prevent over-usage
+    IF @UsedQty >= @Quantity AND @Quantity > 0
+    BEGIN
+        RAISERROR ('Voucher ?ã h?t s? l??ng', 16, 1)
+        ROLLBACK TRANSACTION
+    END
+END
+GO
+
+-- ============================================================================
+-- 6.4: Trigger - Auto-clean Old Messages
+-- ============================================================================
+IF OBJECT_ID('dbo.trg_CleanOldMessages', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.trg_CleanOldMessages
+GO
+
+CREATE TRIGGER dbo.trg_CleanOldMessages
+ON dbo.Messages
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    -- Delete messages older than 30 days
+    DELETE FROM dbo.Messages
+    WHERE CreatedAt < DATEADD(DAY, -30, GETUTCDATE())
+        AND IsRead = 1
+END
+GO
+
+-- ============================================================================
+-- 6.5: Trigger - Update Voucher EndDate Alert
+-- ============================================================================
+IF OBJECT_ID('dbo.trg_VoucherExpiryAlert', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.trg_VoucherExpiryAlert
+GO
+
+CREATE TRIGGER dbo.trg_VoucherExpiryAlert
+ON dbo.Vouchers
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    -- Log when voucher is about to expire
+    INSERT INTO dbo.AuditLogs (Action, Entity, EntityId, Description)
+    SELECT 'Alert', 'Voucher', Id, 'Voucher s?p h?t h?n: ' + Code
+    FROM inserted
+    WHERE DATEDIFF(DAY, GETUTCDATE(), EndDate) <= 3
+        AND DATEDIFF(DAY, GETUTCDATE(), EndDate) > 0
+END
+GO
+
+-- ============================================================================
+-- PART 7: CREATE USER & PERMISSIONS
+-- ============================================================================
+
+-- ============================================================================
+-- 7.1: Create Database User Logins and Users
+-- ============================================================================
+
+-- Create login for application (if using Windows authentication, skip this)
+-- For SQL Server authentication:
+-- USE master
+-- GO
+-- IF NOT EXISTS (SELECT * FROM sys.server_principals WHERE name = 'websell_user')
+-- BEGIN
+--     CREATE LOGIN websell_user WITH PASSWORD = 'YourSecurePassword123!@#'
+-- END
+-- GO
+
+-- Create database user
+-- USE WebSellDB
+-- GO
+-- IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = 'websell_user')
+-- BEGIN
+--     CREATE USER websell_user FOR LOGIN websell_user
+-- END
+-- GO
+
+-- Create role for read-only access
+IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = 'db_reader')
+BEGIN
+    CREATE ROLE db_reader
+END
+GO
+
+-- Create role for app user
+IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = 'db_app_user')
+BEGIN
+    CREATE ROLE db_app_user
+END
+GO
+
+-- ============================================================================
+-- 7.2: Grant Permissions to Application User
+-- ============================================================================
+
+-- Grant default permissions
+GRANT EXECUTE ON dbo.sp_GetDashboardData TO db_app_user
+GRANT EXECUTE ON dbo.sp_GetUserVouchers TO db_app_user
+GRANT EXECUTE ON dbo.sp_ValidateVoucher TO db_app_user
+GRANT EXECUTE ON dbo.sp_CreateOrder TO db_app_user
+GRANT EXECUTE ON dbo.sp_GetRandomPrize TO db_app_user
+GRANT EXECUTE ON dbo.sp_UpdateOrderStatus TO db_app_user
+GRANT EXECUTE ON dbo.sp_GetUserActivityReport TO db_app_user
+GRANT EXECUTE ON dbo.sp_GetMonthlyRevenueReport TO db_app_user
+
+-- Grant table permissions
+GRANT SELECT, INSERT, UPDATE ON dbo.Users TO db_app_user
+GRANT SELECT, INSERT, UPDATE ON dbo.Products TO db_app_user
+GRANT SELECT, INSERT ON dbo.Orders TO db_app_user
+GRANT SELECT, INSERT ON dbo.OrderDetails TO db_app_user
+GRANT SELECT ON dbo.Vouchers TO db_app_user
+GRANT SELECT, INSERT ON dbo.VoucherUsages TO db_app_user
+GRANT SELECT, INSERT ON dbo.Posts TO db_app_user
+GRANT SELECT, INSERT ON dbo.Comments TO db_app_user
+GRANT SELECT, INSERT ON dbo.AuditLogs TO db_app_user
+GRANT SELECT ON dbo.Categories TO db_app_user
+GRANT SELECT ON dbo.Events TO db_app_user
+
+-- Grant view permissions
+GRANT SELECT ON dbo.vw_DashboardStats TO db_app_user
+GRANT SELECT ON dbo.vw_ActiveVouchers TO db_app_user
+GRANT SELECT ON dbo.vw_UserOrderSummary TO db_app_user
+GRANT SELECT ON dbo.vw_ProductSalesReport TO db_app_user
+GRANT SELECT ON dbo.vw_PostStatistics TO db_app_user
+
+-- Grant read-only role
+GRANT SELECT ON SCHEMA :: dbo TO db_reader
+
+-- ============================================================================
+-- 7.3: Create Admin User Role
+-- ============================================================================
+
+IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = 'db_admin_user')
+BEGIN
+    CREATE ROLE db_admin_user
+END
+GO
+
+-- Grant admin full permissions
+GRANT EXECUTE ON SCHEMA :: dbo TO db_admin_user
+GRANT SELECT, INSERT, UPDATE, DELETE ON SCHEMA :: dbo TO db_admin_user
+GRANT CONTROL ON DATABASE :: WebSellDB TO db_admin_user
+
+-- ============================================================================
+-- FINAL: Display Summary Information
+-- ============================================================================
+
+PRINT '==============================================='
+PRINT 'WebSell Database Setup Completed Successfully!'
+PRINT '==============================================='
+PRINT ''
+PRINT 'DATABASE OBJECTS CREATED:'
+PRINT '- Tables: 28'
+PRINT '- Views: 6'
+PRINT '- Stored Procedures: 8'
+PRINT '- Functions: 5'
+PRINT '- Triggers: 5'
+PRINT ''
+PRINT 'SAMPLE DATA INSERTED:'
+PRINT '- Categories: 5'
+PRINT '- Users: 6 (1 Admin, 1 Moderator, 4 Customers)'
+PRINT '- Products: 12'
+PRINT '- Orders: 5'
+PRINT '- Vouchers: 5'
+PRINT '- Events: 4'
+PRINT '- Posts: 5'
+PRINT '- And more...'
+PRINT ''
+PRINT 'DATABASE USERS:'
+PRINT '- db_reader: Read-only access'
+PRINT '- db_app_user: Application user with specific permissions'
+PRINT '- db_admin_user: Administrator with full permissions'
+PRINT ''
+PRINT '==============================================='
+GO
+
+-- Display table record counts
+SELECT 'Categories' AS TableName, COUNT(*) AS RecordCount FROM dbo.Categories
+UNION ALL
+SELECT 'Users', COUNT(*) FROM dbo.Users
+UNION ALL
+SELECT 'Products', COUNT(*) FROM dbo.Products
+UNION ALL
+SELECT 'Orders', COUNT(*) FROM dbo.Orders
+UNION ALL
+SELECT 'OrderDetails', COUNT(*) FROM dbo.OrderDetails
+UNION ALL
+SELECT 'Vouchers', COUNT(*) FROM dbo.Vouchers
+UNION ALL
+SELECT 'Events', COUNT(*) FROM dbo.Events
+UNION ALL
+SELECT 'Posts', COUNT(*) FROM dbo.Posts
+UNION ALL
+SELECT 'Comments', COUNT(*) FROM dbo.Comments
+UNION ALL
+SELECT 'AuditLogs', COUNT(*) FROM dbo.AuditLogs
+ORDER BY TableName
+GO

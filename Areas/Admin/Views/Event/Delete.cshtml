@@ -1,0 +1,81 @@
+﻿@model web1.Models.Event
+
+@{
+    ViewBag.Title = "Xóa sự kiện - Admin";
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2 style="color: #FFD700;">Xóa sự kiện</h2>
+    </div>
+    <div class="col-md-6 text-right">
+        <a href="@Url.Action("Index", "Event", new { area = "Admin" })" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Xác nhận xóa</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <strong>Cảnh báo!</strong> Bạn sắp xóa sự kiện. Hành động này không thể hoàn tác!
+                </div>
+
+                <h5 style="color: #FFD700;">@Model.Name</h5>
+
+                <div class="row mb-3">
+                    <div class="col-md-6" style="color:greenyellow">
+                        <p><strong>Ngày bắt đầu:</strong> @Model.StartDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    </div>
+                    <div class="col-md-6" style="color:greenyellow">
+                        <p><strong>Ngày kết thúc:</strong> @Model.EndDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    </div>
+                </div>
+
+                <p><strong style="color:greenyellow">Mô tả:</strong></p>
+                <p>@Model.Description</p>
+
+                <hr />
+
+                <h6 style="color: #FFD700;">Thông tin liên quan sẽ bị xóa:</h6>
+                <ul>
+                    <li style="color:greenyellow">Tất cả câu hỏi thuộc sự kiện này</li>
+                    <li style="color:greenyellow">Tất cả người tham gia sự kiện này</li>
+                    <li style="color:greenyellow">Voucher liên kết sự kiện này</li>
+                </ul>
+
+                <hr />
+
+                @using (Html.BeginForm("Delete", "Event", new { area = "Admin" }, FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.Id)
+
+                    <button type="submit" class="btn btn-danger btn-lg">
+                        <i class="fas fa-trash"></i> Xóa sự kiện
+                    </button>
+                    <a href="@Url.Action("Index", "Event", new { area = "Admin" })" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times"></i> Hủy
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Chi tiết</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Trạng thái:</strong> @(Model.IsActive ? "Đang hoạt động" : "Tắt")</p>
+                <p><strong>Tạo lúc:</strong> @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+            </div>
+        </div>
+    </div>
+</div>

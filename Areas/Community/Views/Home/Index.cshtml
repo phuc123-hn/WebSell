@@ -1,0 +1,145 @@
+﻿@model List<web1.Models.Post>
+
+@{
+    ViewBag.Title = "Cộng Đồng - TechWorld";
+    ViewBag.CurrentTab = "all";
+    Layout = "~/Areas/Community/Views/Shared/_CommunityLayout.cshtml";
+}
+
+@if (Model != null && Model.Count > 0)
+{
+    <div class="posts-list">
+        @foreach (var post in Model.OrderByDescending(p => p.CreatedAt))
+        {
+            var typeText = post.Type == 0 ? "Đánh Giá" : "Cho Thuê";
+            var typeBadge = post.Type == 0 ? "post-type-review" : "post-type-rent";
+            var likeCount = post.Likes != null ? post.Likes.Count : 0;
+            var commentCount = post.Comments != null ? post.Comments.Where(c => !c.IsDeleted).Count() : 0;
+
+            <div class="post-card" data-post-id="@post.Id" style="margin-bottom: 20px;">
+                <div class="post-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                    <div>
+                        <span class="post-type-badge @typeBadge">
+                            @if (post.Type == 0)
+                            {
+                                <text><i class="fas fa-star"></i> @typeText</text>
+                            }
+                            else
+                            {
+                                <text><i class="fas fa-tools"></i> @typeText</text>
+                            }
+                        </span>
+                    </div>
+                </div>
+
+                <a href="@Url.Action("Detail", "Post", new { area = "Community", id = post.Id })" class="post-title" style="text-decoration: none; color: inherit;">
+                    @post.Title
+                </a>
+
+                <div style="color: #666; font-size: 14px; margin: 10px 0;">
+                    <span class="post-author">@post.User.FullName</span>
+                    <span class="post-date" style="margin-left: 10px;">
+                        <i class="fas fa-calendar"></i> @post.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                    </span>
+                </div>
+
+                @if (post.Type == 0 && post.Rating.HasValue)
+                {
+                    <div style="margin: 10px 0;">
+                        <span class="stars">
+                            @for (int i = 0; i < post.Rating.Value; i++)
+                            {
+                                <i class="fas fa-star" style="color: #f39c12;"></i>
+                            }
+                            @for (int i = post.Rating.Value; i < 5; i++)
+                            {
+                                <i class="far fa-star" style="color: #ddd;"></i>
+                            }
+                        </span>
+                        <span style="margin-left: 8px; font-weight: 600; color: #f39c12;">@post.Rating/5</span>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(post.ImageUrl))
+                {
+                    <div style="margin: 15px 0;">
+                        <img src="@post.ImageUrl" style="max-width: 100%; max-height: 200px; border-radius: 8px; object-fit: cover;">
+                    </div>
+                }
+
+                <div class="post-content" style="color: #555; line-height: 1.6; margin: 12px 0;">
+                    @{
+                        var content = post.Content;
+                        if (content.Length > 150)
+                        {
+                            content = content.Substring(0, 150) + "...";
+                        }
+                    }
+                    @content
+                </div>
+
+                <div class="post-footer" style="display: flex; gap: 15px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; font-size: 13px; color: #999;">
+                    <span>
+                        <i class="fas fa-heart" style="color: #e74c3c;"></i>
+                        <span class="like-count">@likeCount</span> Thích
+                    </span>
+                    <span>
+                        <i class="fas fa-comment"></i>
+                        @commentCount Bình luận
+                    </span>
+                </div>
+
+                <a href="@Url.Action("Detail", "Post", new { area = "Community", id = post.Id })" class="btn btn-sm btn-primary" style="margin-top: 12px; width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                    <i class="fas fa-arrow-right"></i> Xem Chi Tiết
+                </a>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div style="text-align: center; padding: 50px 20px;">
+        <i class="fas fa-inbox" style="font-size: 48px; color: #ccc; margin-bottom: 15px; display: block;"></i>
+        <h3 style="color: #999;">Chưa có bài viết</h3>
+        <p style="color: #bbb;">Hãy là người đầu tiên chia sẻ trong cộng đồng</p>
+    </div>
+}
+
+@section scripts {
+    <script>
+        function toggleLike(postId) {
+            if (!@(User.Identity.IsAuthenticated ? "true" : "false")) {
+                alert('Vui lòng đăng nhập để like');
+                window.location.href = '@Url.Action("Login", "Account", new { area = "" })';
+                return;
+            }
+
+            $.post('@Url.Action("Toggle", "Like", new { area = "Community" })', { postId: postId }, function (result) {
+                if (result.success) {
+                    var btn = $('[data-post-id="' + postId + '"]');
+                    btn.find('.like-count').text(result.likeCount);
+                    if (result.liked) {
+                        btn.addClass('liked');
+                    } else {
+                        btn.removeClass('liked');
+                    }
+                } else {
+                    alert(result.message);
+                }
+            });
+        }
+
+        function deletePost(postId) {
+            if (confirm('Bạn chắc chắn muốn xóa bài này?')) {
+                $.post('@Url.Action("Delete", "Post", new { area = "Community" })', { id: postId }, function (result) {
+                    if (result.success) {
+                        alert(result.message);
+                        location.reload();
+                    } else {
+                        alert(result.message);
+                    }
+                });
+            }
+        }
+    </script>
+}

@@ -1,0 +1,34 @@
+﻿@{
+    ViewBag.Title = "Tài Khoản Bị Cấm - Community TechWorld";
+    ViewBag.CurrentTab = "banned";
+    Layout = "~/Areas/Community/Views/Shared/_CommunityLayout.cshtml";
+}
+
+<div class="container" style="text-align: center; padding: 60px 20px;">
+    <div style="background: white; border-radius: 12px; padding: 40px; box-shadow: 0 2px 12px rgba(0,0,0,0.1);">
+        <i class="fas fa-ban" style="font-size: 60px; color: #e74c3c; margin-bottom: 20px; display: block;"></i>
+
+        <h2 style="color: #e74c3c; margin-bottom: 15px;">Tài Khoản Bị Cấm</h2>
+
+        <p style="color: #666; font-size: 16px; line-height: 1.6;">
+            @if (!string.IsNullOrEmpty(ViewBag.BanMessage))
+            {
+                <text>@ViewBag.BanMessage</text>
+            }
+            else
+            {
+                <text>Tài khoản của bạn tạm thời bị cấm truy cập khu vực Community.</text>
+            }
+        </p>
+
+        <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #e0e0e0;">
+            <p style="color: #999; margin-bottom: 20px;">
+                Bạn vẫn có thể mua sắm bình thường. Vui lòng liên hệ Admin nếu có thắc mắc.
+            </p>
+
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="btn btn-primary" style="padding: 12px 30px; border-radius: 25px;">
+                <i class="fas fa-arrow-left"></i> Quay Về Trang Chủ
+            </a>
+        </div>
+    </div>
+</div>

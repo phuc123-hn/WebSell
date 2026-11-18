@@ -1,0 +1,172 @@
+﻿@model List<web1.Models.Message>
+
+@{
+    ViewBag.Title = "Inbox - Tin Nhắn";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2 style="color: #333;">
+                <i class="fas fa-inbox"></i> Inbox Tin Nhắn
+            </h2>
+        </div>
+        <div class="col-md-6 text-right">
+            <span class="badge badge-danger" style="font-size: 14px; padding: 10px 15px;">
+                <i class="fas fa-envelope"></i> @ViewBag.UnreadCount chưa đọc
+            </span>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-hover" style="background: white;">
+                <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <tr>
+                        <th style="width: 5%;">ID</th>
+                        <th style="width: 20%;">Từ</th>
+                        <th style="width: 10%;">Email</th>
+                        <th style="width: 45%;">Nội Dung</th>
+                        <th style="width: 10%;">Ngày Gửi</th>
+                        <th style="width: 10%;">Trạng Thái</th>
+                        <th style="width: 15%;">Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var msg in Model)
+                    {
+                        var preview = msg.Content.Length > 80 ? msg.Content.Substring(0, 80) + "..." : msg.Content;
+                        var statusColor = msg.IsRead ? "success" : "warning";
+                        var statusText = msg.IsRead ? "Đã đọc" : "Chưa đọc";
+
+                        <tr style="@(msg.IsRead ? "" : "background: #f0f8ff; font-weight: 600;")">
+                            <td>@msg.Id</td>
+                            <td>
+                                <strong>@msg.User.FullName</strong>
+                            </td>
+                            <td>
+                                <a href="mailto:@msg.User.Email">@msg.User.Email</a>
+                            </td>
+                            <td style="max-width: 400px;">
+                                @Html.Encode(preview)
+                            </td>
+                            <td>
+                                <small>@msg.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                            </td>
+                            <td>
+                                <span class="badge badge-@statusColor">@statusText</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-info" onclick="viewMessage(@msg.Id)" data-toggle="modal" data-target="#messageModal" title="Chi tiết">
+                                    <i class="fas fa-eye"></i> Xem
+                                </button>
+
+                                @if (!msg.IsRead)
+                                {
+                                    <button class="btn btn-sm btn-success" onclick="markAsRead(@msg.Id)" title="Đánh dấu đã đọc">
+                                        <i class="fas fa-check"></i> Đọc
+                                    </button>
+                                }
+
+                                <button class="btn btn-sm btn-danger" onclick="deleteMessage(@msg.Id)" title="Xóa">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        if ((int)ViewBag.TotalPages > 1)
+        {
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Messages", "Admin", new { area = "Admin", page = i })">@i</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    }
+    else
+    {
+        <div class="alert alert-info text-center" style="padding: 50px;">
+            <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 20px; display: block; opacity: 0.5;"></i>
+            <h3>Không có tin nhắn</h3>
+            <p style="color: #666;">Inbox của bạn trống rỗng</p>
+        </div>
+    }
+</div>
+
+<div class="modal fade" id="messageModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="modal-title">Chi Tiết Tin Nhắn</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="messageContent" style="max-height: 500px; overflow-y: auto;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        var messageCache = {};
+
+        function viewMessage(messageId) {
+            // Giả lập load chi tiết tin nhắn
+            var content = '<div style="padding: 20px;">' +
+                '<p><strong>Tin nhắn ID:</strong> ' + messageId + '</p>' +
+                '<p><strong>Nội dung:</strong></p>' +
+                '<div style="background: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea;">' +
+                'Chi tiết tin nhắn (Mở trang chi tiết để xem)' +
+                '</div>' +
+                '</div>';
+
+            $('#messageContent').html(content);
+        }
+
+        function markAsRead(messageId) {
+            $.post('@Url.Action("MarkAsRead", "Admin", new { area = "Admin" })',
+                { id: messageId },
+                function (result) {
+                    if (result.success) {
+                        alert('Đã đánh dấu đã đọc');
+                        location.reload();
+                    } else {
+                        alert(result.message);
+                    }
+                }
+            );
+        }
+
+        function deleteMessage(messageId) {
+            if (confirm('Xóa tin nhắn này? Hành động không thể hoàn tác.')) {
+                $.post('@Url.Action("DeleteMessage", "Admin", new { area = "Admin" })',
+                    { id: messageId },
+                    function (result) {
+                        if (result.success) {
+                            alert('Tin nhắn đã được xóa');
+                            location.reload();
+                        } else {
+                            alert(result.message);
+                        }
+                    }
+                );
+            }
+        }
+    </script>
+}

@@ -1,0 +1,76 @@
+﻿@model List<web1.Models.Product>
+
+@{
+    ViewBag.Title = "Quản lý sản phẩm - Admin";
+}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <h2>Quản lý sản phẩm</h2>
+    </div>
+    <div class="col-md-6 text-right">
+        <a href="@Url.Action("Create", "Product", new { area = "Admin" })" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Thêm sản phẩm
+        </a>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Ảnh</th>
+                <th>ID</th>
+                <th>Tên</th>
+                <th>Danh mục</th>
+                <th>Giá</th>
+                <th>Tồn kho</th>
+                <th>Hot</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                foreach (var product in Model)
+                {
+                    <tr>
+                        <td style="text-align: center; width: 80px;">
+                            @if (!string.IsNullOrEmpty(product.ImageUrl))
+                            {
+                                <img src="@product.ImageUrl" alt="@product.Name" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;" />
+                            }
+                            else
+                            {
+                                <div style="width: 60px; height: 60px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #999;">
+                                    📷
+                                </div>
+                            }
+                        </td>
+                        <td>@product.Id</td>
+                        <td>@product.Name</td>
+                        <td>@(product.Category != null ? product.Category.Name : "N/A")</td>
+                        <td>@product.Price.ToString("N0") đ</td>
+                        <td>@product.Stock</td>
+                        <td>@(product.IsHot ? "<span class=\"badge badge-success\">Có</span>" : "<span class=\"badge badge-secondary\">Không</span>")
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Edit", "Product", new { area = "Admin", id = product.Id })" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> Sửa
+                            </a>
+                            <a href="@Url.Action("Delete", "Product", new { area = "Admin", id = product.Id })" class="btn btn-sm btn-danger" onclick="return confirm('Xác nhận xóa?')">
+                                <i class="fas fa-trash"></i> Xóa
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8" class="text-center text-muted">Không có sản phẩm nào</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

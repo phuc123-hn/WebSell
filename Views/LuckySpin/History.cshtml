@@ -1,0 +1,90 @@
+﻿@model List<web1.Models.LuckySpinHistory>
+
+@{
+    ViewBag.Title = "Lịch sử quay may mắn";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4" style="color: #667eea;">Lịch Sử Quay May Mắn</h2>
+
+            @if (Model != null && Model.Count > 0)
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Ngày quay</th>
+                                <th>Đơn hàng</th>
+                                <th>Giải thưởng</th>
+                                <th>Kết quả</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var history in Model)
+                            {
+                                var statusDisplay = "";
+                                if (history.Status == "Pending")
+                                {
+                                    statusDisplay = "<span class='badge bg-warning text-dark'>Chờ nhận</span>";
+                                }
+                                else if (history.Status == "Claimed")
+                                {
+                                    statusDisplay = "<span class='badge bg-success'>Đã nhận</span>";
+                                }
+                                else
+                                {
+                                    statusDisplay = "<span class='badge bg-secondary'>Hết hạn</span>";
+                                }
+
+                                <tr>
+                                    <td>@history.SpinDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        @if (history.OrderId.HasValue)
+                                        {
+                                            <a href="@Url.Action("OrderDetails", "AccountProfile", new { id = history.OrderId })" class="btn btn-sm btn-info">
+                                                #@history.OrderId
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <strong>@history.Prize?.Name</strong>
+                                    </td>
+                                    <td>
+                                        @if (history.WonVoucherId.HasValue && history.WonVoucher != null)
+                                        {
+                                            <span class="badge bg-success">@history.WonVoucher.Code</span>
+                                            <br/>
+                                            <small>Giảm @history.WonVoucher.DiscountPercent% hoặc @history.WonVoucher.DiscountAmount.ToString("N0")đ</small>
+                                        }
+                                        else if (history.WonProductId.HasValue && history.WonProduct != null)
+                                        {
+                                            <span class="badge bg-info">@history.WonProduct.Name</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>@Html.Raw(statusDisplay)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <p>Bạn chưa quay lần nào. <a href="/">Quay lại trang chủ</a></p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,399 @@
+/* ========================================
+   BUTTON EFFECTS - SEMANTIC COLORS
+   ======================================== */
+
+/* Primary Button - Purple Action */
+.btn-lift {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: var(--shadow-purple);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-glow);
+    background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+    text-decoration: none;
+    color: white;
+}
+
+.btn-lift:active,
+.btn-lift:focus {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    outline: none;
+}
+
+/* Info Button - Cyan View */
+.btn-info-custom {
+    background: transparent;
+    color: var(--color-cyan);
+    border: 1.5px solid var(--color-cyan);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+}
+
+.btn-info-custom:hover {
+    background: rgba(6, 182, 212, 0.15);
+    border-color: var(--color-cyan-light);
+    color: var(--color-cyan-light);
+    text-decoration: none;
+}
+
+/* Success Button - Green Confirm */
+.btn-success-custom {
+    background: var(--color-success);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+}
+
+.btn-success-custom:hover {
+    background: var(--color-success-light);
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: white;
+}
+
+/* Danger Button - Red Delete */
+.btn-danger-custom {
+    background: var(--color-danger);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+}
+
+.btn-danger-custom:hover {
+    background: var(--color-danger-light);
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: white;
+}
+
+/* Secondary Button - Gray Back */
+.btn-secondary-custom {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+}
+
+.btn-secondary-custom:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--text-secondary);
+    text-decoration: none;
+}
+
+/* Glass Button - Transparent */
+.btn-glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white !important;
+    padding: 12px 25px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-glass:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.3);
+    transform: scale(1.05);
+    text-decoration: none;
+}
+
+.btn-glass:active,
+.btn-glass:focus {
+    transform: scale(1.02);
+    outline: none;
+}
+
+/* ========================================
+   CARD STYLES & ENHANCEMENTS
+   ======================================== */
+
+.card-enhanced {
+    background: var(--bg-card);
+    border-radius: var(--border-radius-sm);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 1px solid var(--border-color);
+}
+
+.card-enhanced:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-purple);
+    border-color: var(--border-color-hover);
+}
+
+/* Card Headers */
+.card-header-primary {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.1));
+    color: var(--color-primary);
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-header-success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));
+    color: var(--color-success);
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-header-danger {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+    color: var(--color-danger);
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-header-info {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(6, 182, 212, 0.1));
+    color: var(--color-cyan);
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* ========================================
+   BADGE STYLES
+   ======================================== */
+
+.badge-enhanced {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.badge-primary-enhanced {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    color: white;
+}
+
+.badge-success-enhanced {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--color-success);
+}
+
+.badge-danger-enhanced {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--color-danger);
+}
+
+.badge-warning-enhanced {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--color-warning);
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 5px var(--color-primary);
+    }
+    50% {
+        box-shadow: 0 0 20px var(--color-primary);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.slide-in-right {
+    animation: slideInRight 0.4s ease-out;
+}
+
+.glow {
+    animation: glow 2s ease-in-out infinite;
+}
+
+/* ========================================
+   HOVER & INTERACTION EFFECTS
+   ======================================== */
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+.btn-ripple {
+    position: relative;
+    overflow: visible;
+}
+
+.btn-ripple:active::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 100%;
+    transform: translate(-50%, -50%);
+    animation: ripple 0.6s ease-out;
+}
+
+/* ========================================
+   LINK STYLES - DARK THEME
+   ======================================== */
+
+a {
+    color: var(--color-cyan);
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+a:hover {
+    color: var(--color-cyan-light);
+    text-decoration: underline;
+}
+
+/* ========================================
+   FORM STYLES - DARK THEME
+   ======================================== */
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.form-control:hover,
+.form-select:hover {
+    border-color: var(--color-primary);
+}
+
+.form-control::placeholder {
+    color: var(--text-tertiary);
+}
+
+/* ========================================
+   PAGINATION & NAVIGATION
+   ======================================== */
+
+.pagination {
+    gap: 5px;
+}
+
+.page-link {
+    color: var(--color-cyan);
+    border-color: var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-card);
+    transition: all 0.3s;
+}
+
+.page-link:hover {
+    color: var(--color-cyan-light);
+    background-color: var(--bg-hover);
+    border-color: var(--color-cyan);
+}
+
+.page-link.active {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    border-color: var(--color-primary);
+    color: white;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.smooth-transition {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.shadow-glow {
+    box-shadow: var(--shadow-glow);
+}
+
+.shadow-purple {
+    box-shadow: var(--shadow-purple);
+}
+
+/* Text utilities */
+.text-gradient {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}

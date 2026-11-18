@@ -1,0 +1,159 @@
+﻿using System;
+using System.Linq;
+using System.Web.Mvc;
+using web1.Data;
+using web1.Infrastructure.Logging;
+using web1.Infrastructure.Filters;
+using web1.Services;
+using web1.Models;
+using System.Collections.Generic;
+
+namespace web1.Controllers
+{
+    [Authorize]
+    public class PaymentController : Controller
+    {
+        private ApplicationDbContext db = new ApplicationDbContext();
+        private OtpService _otpService;
+        private FileLogger _logger = new FileLogger();
+
+        public PaymentController()
+        {
+            _otpService = new OtpService(db);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult SendOtpPayment(int orderId)
+        {
+            int userId = (int)(Session["UserId"] ?? 0);
+            if (userId == 0) return Json(new { success = false, message = "Vui lòng đăng nhập." });
+
+            // Kiểm tra xem có đơn hàng chờ trong Session không
+            if (string.IsNullOrEmpty(Session["PendingOrder"] as string))
+                return Json(new { success = false, message = "Không tìm thấy thông tin đặt hàng." });
+
+            var user = db.Users.Find(userId);
+            string otpCode = _otpService.GenerateOTP();
+            _otpService.SaveOTP(user.Email, otpCode, "Payment", userId);
+
+            return Json(new
+            {
+                success = true,
+                message = "Mã OTP đã được gửi",
+                email = MaskEmail(user.Email)
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult ConfirmPaymentWithOtp(int orderId, string otp)
+        {
+            int userId = (int)(Session["UserId"] ?? 0);
+            var user = db.Users.Find(userId);
+
+            if (!_otpService.VerifyOTP(user.Email, otp, "Payment"))
+                return Json(new { success = false, message = "Mã OTP không chính xác hoặc đã hết hạn." });
+
+            // ✅ LẤY DỮ LIỆU TỪ SESSION
+            var pendingOrderJson = Session["PendingOrder"] as string;
+            if (string.IsNullOrEmpty(pendingOrderJson))
+                return Json(new { success = false, message = "Phiên đặt hàng đã hết hạn." });
+
+            dynamic pendingOrder = Newtonsoft.Json.JsonConvert.DeserializeObject(pendingOrderJson);
+
+            using (var transaction = db.Database.BeginTransaction())
+            {
+                try
+                {
+                    // 1. Tạo đơn hàng
+                    string paymentMethod = (string)pendingOrder.PaymentMethod;
+
+                    var order = new Order
+                    {
+                        UserId = userId,
+                        OrderDate = DateTime.Now,
+                        ShippingName = (string)pendingOrder.ShippingName,
+                        ShippingPhone = (string)pendingOrder.ShippingPhone,
+                        ShippingAddress = (string)pendingOrder.ShippingAddress,
+                        PaymentMethod = paymentMethod,          // ✅ Chỉ khai báo 1 lần
+                        IsPaid = paymentMethod != "COD",
+                        Status = "Pending",
+                        TotalAmount = (decimal)pendingOrder.TotalAmount,
+                        TotalVoucherDiscount = (decimal)pendingOrder.TotalVoucherDiscount,
+                    };
+
+                    db.Orders.Add(order);
+                    db.SaveChanges(); // Lưu để lấy ID đơn hàng
+
+                    // 2. Lưu Chi tiết & Trừ kho
+                    foreach (var item in pendingOrder.CartItems)
+                    {
+                        int pId = (int)item.ProductId;
+                        var product = db.Products.Find(pId);
+                        if (product == null || product.Stock < (int)item.Quantity)
+                            throw new Exception($"Sản phẩm {(string)item.ProductName} đã hết hàng.");
+
+                        db.OrderDetails.Add(new OrderDetail
+                        {
+                            OrderId = order.Id,
+                            ProductId = pId,
+                            Quantity = (int)item.Quantity,
+                            UnitPrice = (decimal)item.Price,
+                            TotalPrice = (decimal)item.TotalPrice
+                        });
+
+                        product.Stock -= (int)item.Quantity;
+                    }
+
+                    // 3. Xử lý Voucher
+                    string vCode = (string)pendingOrder.VoucherCode;
+                    if (!string.IsNullOrEmpty(vCode))
+                    {
+                        var voucher = db.Vouchers.FirstOrDefault(v => v.Code == vCode);
+                        if (voucher != null)
+                        {
+                            db.VoucherUsages.Add(new VoucherUsage { VoucherId = voucher.Id, UserId = userId, UsedAt = DateTime.Now, OrderId = order.Id });
+                        }
+                    }
+
+                    db.SaveChanges();
+                    transaction.Commit();
+
+                    // ✅ Cộng 1 spin cho user
+                    var userToUpdate = db.Users.Find(userId);
+                    if (userToUpdate != null)
+                    {
+                        userToUpdate.SpinCount += 1;
+                        db.SaveChanges();
+                        _logger.LogInfo($"SpinCount += 1 for user {userId}, total: {userToUpdate.SpinCount}");
+                    }
+
+                    // ✅ XÓA SESSION SAU KHI THÀNH CÔNG
+                    Session.Remove("PendingOrder");
+                    Session["CartItems"] = new List<CartItem>();
+                    Session["VoucherDiscount"] = null;
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Thanh toán thành công",
+                        redirectUrl = Url.Action("OrderDetails", "AccountProfile", new { id = order.Id })
+                    });
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    return Json(new { success = false, message = "Lỗi lưu đơn hàng: " + ex.Message });
+                }
+            }
+        }
+
+        private string MaskEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email) || !email.Contains("@")) return email;
+            var parts = email.Split('@');
+            return parts[0].Substring(0, Math.Min(parts[0].Length, 3)) + "xxx@" + parts[1];
+        }
+    }
+}

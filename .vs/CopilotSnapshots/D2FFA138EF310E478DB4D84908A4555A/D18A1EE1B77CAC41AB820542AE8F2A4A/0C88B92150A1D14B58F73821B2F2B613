@@ -1,0 +1,439 @@
+﻿/* ========================================
+   GLOBAL THEME & BACKGROUND STYLES
+   ======================================== */
+
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --bg-light: #f8f9fa;
+    --bg-dark: #03050a;
+    --text-light: #ffffff;
+    --text-dark: #2f3542;
+    --green-tech: #a2f6a2;
+    --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ========================================
+   BUTTON EFFECTS
+   ======================================== */
+
+/* 1. HI?U ?NG "NÂNG LÊN & ?? BÓNG" - Dùng cho nút Mua ngay */
+.btn-lift {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: var(--transition-smooth);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+    background: linear-gradient(135deg, #7a8eef 0%, #8055b0 100%);
+    text-decoration: none;
+    color: white;
+}
+
+.btn-lift:active,
+.btn-lift:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    outline: none;
+}
+
+/* 2. HI?U ?NG "L?P PH? TRÀN" - Dùng cho nút Xem tin t?c */
+.btn-overlay {
+    position: relative;
+    overflow: hidden;
+    background: transparent;
+    color: #2f3542;
+    border: 2px solid #2f3542;
+    padding: 10px 20px;
+    z-index: 1;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 8px;
+    transition: color 0.4s;
+    font-weight: 600;
+}
+
+.btn-overlay::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: #2f3542;
+    transition: all 0.4s;
+    z-index: -1;
+}
+
+.btn-overlay:hover::before {
+    left: 0;
+}
+
+.btn-overlay:hover,
+.btn-overlay:focus {
+    color: #fff;
+    text-decoration: none;
+    outline: none;
+}
+
+/* Variant: Light overlay button */
+.btn-overlay-light {
+    color: #667eea;
+    border-color: #667eea;
+}
+
+.btn-overlay-light::before {
+    background: #667eea;
+}
+
+.btn-overlay-light:hover {
+    color: white;
+}
+
+/* 3. HI?U ?NG "L?P LÁNH" - Shine Effect (Flash Sale) */
+@keyframes shine {
+    100% {
+        left: 125%;
+    }
+}
+
+.btn-flash {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+}
+
+.btn-flash::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 20%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: rotate(30deg);
+    transition: none;
+}
+
+.btn-flash:hover::after {
+    animation: shine 0.7s forwards;
+}
+
+.btn-flash:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(245, 87, 108, 0.3);
+    text-decoration: none;
+}
+
+.btn-flash:active {
+    transform: translateY(-1px);
+}
+
+/* 4. HI?U ?NG "FLOATING GRADIENT" - ?? bóng màu r?c r? */
+.btn-modern-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.4s ease;
+    box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-modern-gradient:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(118, 75, 162, 0.5);
+    filter: brightness(1.1);
+    text-decoration: none;
+}
+
+.btn-modern-gradient:active,
+.btn-modern-gradient:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(118, 75, 162, 0.3);
+    outline: none;
+}
+
+/* 5. HI?U ?NG "GLASSMORPHISM" - Nút kính m? (Sang tr?ng) */
+.btn-glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white !important;
+    padding: 12px 25px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-glass:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.3);
+    transform: scale(1.05);
+    text-decoration: none;
+}
+
+.btn-glass:active,
+.btn-glass:focus {
+    transform: scale(1.02);
+    outline: none;
+}
+
+/* 6. HI?U ?NG "NEUMORPHISM PRESSED" - Nút v?t lý 3D nh? */
+.btn-neu {
+    background: #e0e0e0;
+    color: #444 !important;
+    padding: 12px 25px;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    box-shadow: 9px 9px 16px rgb(163, 177, 198, 0.6),
+        -9px -9px 16px rgba(255, 255, 255, 0.5);
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-neu:hover {
+    color: #000;
+    box-shadow: 12px 12px 20px rgb(163, 177, 198, 0.7),
+        -12px -12px 20px rgba(255, 255, 255, 0.6);
+}
+
+.btn-neu:active,
+.btn-neu:focus {
+    box-shadow: inset 5px 5px 10px #b8b9be, inset -5px -5px 10px #ffffff;
+    transform: scale(0.98);
+    outline: none;
+}
+
+/* ========================================
+   CARD STYLES & ENHANCEMENTS
+   ======================================== */
+
+/* Unified card style with shadow */
+.card-enhanced {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: none;
+}
+
+.card-enhanced:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Card header colors - Standardized */
+.card-header-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.card-header-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    border: none;
+}
+
+.card-header-info {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    border: none;
+}
+
+.card-header-warning {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+    border: none;
+}
+
+.card-header-danger {
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    color: white;
+    border: none;
+}
+
+/* ========================================
+   BADGE STYLES
+   ======================================== */
+
+.badge-enhanced {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.badge-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.badge-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+}
+
+/* ========================================
+   HOVER & INTERACTION EFFECTS
+   ======================================== */
+
+/* Ripple effect (optional) */
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+.btn-ripple {
+    position: relative;
+    overflow: visible;
+}
+
+.btn-ripple:active::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 100%;
+    transform: translate(-50%, -50%);
+    animation: ripple 0.6s ease-out;
+}
+
+/* ========================================
+   LINK STYLES
+   ======================================== */
+
+a {
+    color: #667eea;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+/* ========================================
+   INPUT & FORM STYLES
+   ======================================== */
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s;
+}
+
+.form-control:hover,
+.form-select:hover {
+    border-color: #667eea;
+}
+
+/* ========================================
+   PAGINATION & NAVIGATION
+   ======================================== */
+
+.pagination {
+    gap: 5px;
+}
+
+.page-link {
+    color: #667eea;
+    border-color: #dee2e6;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.page-link:hover {
+    color: #764ba2;
+    background-color: #f0f0f0;
+    border-color: #667eea;
+}
+
+.page-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+/* Smooth transitions */
+.smooth-transition {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Glow effect */
+.glow {
+    text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+}

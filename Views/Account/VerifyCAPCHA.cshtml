@@ -1,0 +1,14 @@
+﻿@{
+    ViewBag.Title = "Thông báo";
+}
+
+<div class="container mt-5">
+    <div class="alert alert-info text-center">
+        <h4>Chức năng xác thực OTP đã được gỡ bỏ</h4>
+        <p>Hệ thống hiện sử dụng captcha khi đăng ký.</p>
+
+        <a href="@Url.Action("Register", "Account")" class="btn btn-primary mt-3">
+            Quay lại đăng ký
+        </a>
+    </div>
+</div>
